@@ -25,28 +25,6 @@ creation make
 
 feature
 
-   current_type: TYPE;
-         -- Context of this expression.
-
-   start_position: POSITION;
-
-feature {NONE}
-
-   list: FEATURE_NAME_LIST;
-
-   make(sp: like start_position; l: like list) is
-      require
-         not sp.is_unknown
-      do
-         start_position := sp;
-         list := l;
-      ensure
-         start_position = sp;
-         list = l
-      end;
-
-feature
-
    is_current: BOOLEAN is false;
 
    is_writable: BOOLEAN is false;
@@ -68,6 +46,16 @@ feature
    is_pre_computable: BOOLEAN is false;
 
    isa_dca_inline_argument: INTEGER is 0;
+
+   current_type: TYPE;
+         -- Context of this expression.
+
+   start_position: POSITION;
+
+   to_integer_or_error: INTEGER is
+      do
+	 to_integer_error;
+      end;
 
    static_result_base_class: BASE_CLASS is
       do
@@ -341,6 +329,19 @@ feature
       end;
 
 feature {NONE}
+
+   list: FEATURE_NAME_LIST;
+
+   make(sp: like start_position; l: like list) is
+      require
+         not sp.is_unknown
+      do
+         start_position := sp;
+         list := l;
+      ensure
+         start_position = sp;
+         list = l
+      end;
 
    vwst1: STRING is "This is not an attribute of Current (VWST.1)."
 

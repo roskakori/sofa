@@ -58,7 +58,7 @@
    In order to reach registers as well, the first attempt is to use
    setjmp, in the hope that setjmp will save registers in the stack !
 
-   Finally, I am not sure to that previous explaination are cler enough,
+   Finally, I am not sure to that previous explaination are clear enough,
    be here is the "generic.c" definition of `mark_stack_and_registers'.
 */
 

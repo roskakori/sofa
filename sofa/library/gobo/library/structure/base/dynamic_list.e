@@ -8,8 +8,8 @@ indexing
 	author:     "Eric Bezault <ericb@gobosoft.com>"
 	copyright:  "Copyright (c) 1999, Eric Bezault and others"
 	license:    "Eiffel Forum Freeware License v1 (see forum.txt)"
-	date:       "$Date: 1999/09/01 12:25:35 $"
-	revision:   "$Revision: 1.1 $"
+	date:       "$Date: 1999/10/07 15:28:19 $"
+	revision:   "$Revision: 1.2 $"
 
 deferred class DYNAMIC_LIST [G]
 
@@ -54,7 +54,7 @@ feature -- Element change
 			new_index: index = old index + 1
 		end
 
-	put_right (v: like item) is
+	put_right (v: G) is
 			-- Add `v' to the right of cursor position.
 			-- Do not move cursor.
 		require

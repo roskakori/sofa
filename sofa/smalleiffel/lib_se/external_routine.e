@@ -27,21 +27,7 @@ feature
 
    alias_string: STRING;
 
-feature
-
    is_deferred: BOOLEAN is false;
-
-feature {NONE}
-
-   make_external_routine(n: like native; desc: STRING) is
-      require
-         n /= void
-      do
-         native := n;
-         alias_string := desc;
-      end;
-
-feature
 
    frozen set_rescue_compound(c: COMPOUND) is
       do
@@ -59,7 +45,28 @@ feature
          Result := native.use_current(Current);
       end;
 
-   external_c_name: STRING is
+   external_name: STRING is
+      local
+	 native_c_plus_plus: NATIVE_C_PLUS_PLUS;
+	 new_result: STRING;
+      do
+	 Result := c_plus_plus_name;
+	 native_c_plus_plus ?= native;
+	 if native_c_plus_plus /= Void then
+	    -- For C++, there is always a wrapping function :
+	    !!new_result.make(Result.count + 8);
+	    new_result.append("cpp");
+	    base_class.id.append_in(new_result);
+	    new_result.append(Result);
+	    Result := new_result;
+	 end
+      end;
+
+feature {NATIVE_C_PLUS_PLUS}
+
+   c_plus_plus_name: STRING is
+	 -- The name of the corresponding member in C++ is the 
+	 -- `alias_string' if any or the `first_name' itself.
       do
          if alias_string = Void then
             Result := first_name.to_string;
@@ -74,18 +81,26 @@ feature {NONE}
       do
          fmt.keyword("external");
          native.pretty_print;
-         if not external_c_name.is_equal(first_name.to_string) or else
+         if not external_name.is_equal(first_name.to_string) or else
             names.count > 1 then
             fmt.indent;
             fmt.keyword("alias");
             fmt.put_character('%"');
-            fmt.put_string(external_c_name);
+            fmt.put_string(external_name);
             fmt.put_character('%"');
          end;
       end;
 
    pretty_print_rescue is
       do
+      end;
+
+   make_external_routine(n: like native; desc: STRING) is
+      require
+         n /= void
+      do
+         native := n;
+         alias_string := desc;
       end;
 
 end -- EXTERNAL_ROUTINE

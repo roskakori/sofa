@@ -7,8 +7,8 @@ indexing
 	author:     "Eric Bezault <ericb@gobosoft.com>"
 	copyright:  "Copyright (c) 1999, Eric Bezault and others"
 	license:    "Eiffel Forum Freeware License v1 (see forum.txt)"
-	date:       "$Date: 1999/10/02 12:44:49 $"
-	revision:   "$Revision: 1.9 $"
+	date:       "$Date: 2000/02/09 18:30:48 $"
+	revision:   "$Revision: 1.10 $"
 
 class CALC_SCANNER
 
@@ -220,6 +220,12 @@ feature {NONE} -- Constants
 
 	yyEnd_of_buffer: INTEGER is 6
 			-- End of buffer rule code
+
+	yyLine_used: BOOLEAN is false
+			-- Are line and column numbers used?
+
+	yyPosition_used: BOOLEAN is false
+			-- Is `position' used?
 
 	INITIAL: INTEGER is 0
 			-- Start condition codes

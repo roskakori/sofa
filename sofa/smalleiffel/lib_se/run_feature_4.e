@@ -124,7 +124,6 @@ feature {CALL_PROC_CALL}
                when C_dca then
                   a ?= routine_body.first;
                   c ?= a.right_side;
-                  c.finalize;
                   c.run_feature.collect_c_tmp;
                else
                end;
@@ -299,12 +298,14 @@ feature {NONE}
          rb: COMPOUND;
       do
          rb := routine_body;
-         if (rb = Void or else rb.empty_or_null_body)
-            and then local_vars = Void
-          then
-            static_value_mem := 0;
-            is_static_flag := true;
-            Result := true;
+         if rb = Void or else rb.empty_or_null_body then
+	    if local_vars = Void then
+	       if result_type.expanded_initializer = Void then
+		  static_value_mem := 0;
+		  is_static_flag := true;
+		  Result := true;
+	       end;
+	    end;
          end;
       end;
 
@@ -362,10 +363,12 @@ feature {NONE}
       local
          e: EXPRESSION;
       do
-         e := body_one_result;
-         if e /= Void and then local_vars = Void then
-            Result := e.is_current;
-         end;
+	 if current_type.is_reference then
+	    e := body_one_result;
+	    if e /= Void and then local_vars = Void then
+	       Result := e.is_current;
+	    end;
+	 end;
       end;
 
    direct_call: BOOLEAN is
@@ -599,6 +602,7 @@ feature {NONE}
          when C_dca then
             a ?= routine_body.first;
             c ?= a.right_side;
+	    c.finalize;
             cpp.push_inline_dca(Current,c);
             c.run_feature.mapping_c;
             cpp.pop;

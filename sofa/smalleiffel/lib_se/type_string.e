@@ -71,11 +71,6 @@ feature
          Result := base_class_name;
       end;
 
-    run_class: RUN_CLASS is
-      do
-         Result := small_eiffel.run_class(Current);
-      end;
-
    c_sizeof: INTEGER is
       do
          Result := c_sizeof_pointer;

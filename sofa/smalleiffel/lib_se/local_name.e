@@ -41,11 +41,7 @@ feature
             if target_type.is_reference then
                -- Reference into Reference :
                cpp.put_character('(');
-               cpp.put_character('(');
-               cpp.put_character('T');
-               cpp.put_integer(target_type.id);
-               cpp.put_character('*');
-               cpp.put_character(')');
+	       target_type.mapping_cast;
                compile_to_c;
                cpp.put_character(')');
             else

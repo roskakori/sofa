@@ -20,7 +20,7 @@ class PRECURSOR_NAME
 
 inherit FEATURE_NAME;
 
-creation {E_PRECURSOR} refer_to
+creation {PRECURSOR_CALL} refer_to
 
 feature
 

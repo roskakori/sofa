@@ -291,11 +291,6 @@ feature
          Result := Current;
       end;
 
-   run_class: RUN_CLASS is
-      do
-         Result := small_eiffel.run_class(Current);
-      end;
-
    c_header_pass1 is
       do
          standard_c_typedef;
@@ -381,7 +376,7 @@ feature
       local
          bc: BASE_CLASS;
       do
-         bc := base_class_name.base_class;
+         bc := base_class;
          if bc.is_expanded and then not check_memory.fast_has(bc) then
             check_memory.add_last(bc);
             run_class.set_at_run_time;

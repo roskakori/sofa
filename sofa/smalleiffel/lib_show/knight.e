@@ -14,32 +14,20 @@
 -- Boston, MA 02111-1307, USA.
 --
 class KNIGHT
---|
---| In this program a knight try to go over the n*n squares of a
---| chessboard without pass by the same square again.
---| The position of the knigth is given by a number.
---|
---|  Auteur: Christophe ALEXANDRE
---|  date :  Thu Mar 21 1996
---
--- Here is an example of solution on a 7 X 7 chesboard,
--- knigth starting at position <1,1> :
---                 ----------------------
---                 | 1|28|37|24| 3|26|17|
---                 ----------------------
---                 |36|39| 2|27|18|11| 4|
---                 ----------------------
---                 |29|42|23|38|25|16| 9|
---                 ----------------------
---                 |40|35|30|19|10| 5|12|
---                 ----------------------
---                 |43|22|41|32|15| 8|47|
---                 ----------------------
---                 |34|31|20|45|48|13| 6|
---                 ----------------------
---                 |21|44|33|14| 7|46|49|
---                 ----------------------
---
+   --
+   -- The classic KNIGHT problem on a N times N square chessboard.
+   -- The knight have to pass on all places of the chessboard once
+   -- a time. For instance, here is solution for a 7 X 7 chesboard,
+   -- knigth starting at position <1,1> :
+   --
+   --            1   28   37   24    3   26   17
+   --           36   39    2   27   18   11    4
+   --           29   42   23   38   25   16    9
+   --           40   35   30   19   10    5   12
+   --           43   22   41   32   15    8   47
+   --           34   31   20   45   48   13    6
+   --           21   44   33   14    7   46   49
+   --
 
 inherit ANY redefine print_on end;
 
@@ -71,27 +59,27 @@ feature
          end;
          knight(size,line,column)
       end;
-
+   
 feature {NONE}
-
+   
    chess_min: INTEGER is 3;
-
+   
    chess_max: INTEGER is 24;
-
+   
    chessboard: ARRAY2[INTEGER];
-
+   
    nb_tries: INTEGER;
-
+   
    tl: ARRAY[INTEGER] is
       once
          Result := <<-2,-1,1,2,2,1,-1,-2>>;
       end;
-
+   
    tc: ARRAY[INTEGER] is
       once
          Result := <<1,2,2,1,-1,-2,-2,-1>>;
       end;
-
+   
    knight(size, line, column: INTEGER) is
       require
          size >= 3;
@@ -110,7 +98,7 @@ feature {NONE}
          io.put_string("%NNumber of tries : ");
          io.put_integer(nb_tries);
          io.put_new_line;
-      end; -- knight
+      end;
 
    solution(line,column:INTEGER):BOOLEAN is
       local
@@ -129,7 +117,7 @@ feature {NONE}
                i := i + 1;
             end;
          end;
-      end; -- solution
+      end;
 
    try(line, column, value: INTEGER): BOOLEAN is
          -- Try to place the knight by used cross back-tracking method.
@@ -144,7 +132,7 @@ feature {NONE}
                end;
             end;
          end
-      end; -- try
+      end;
 
    ask(s:STRING; min, max: INTEGER):INTEGER is
          -- Ask for question `s' until the answer is in range `min' `max'.

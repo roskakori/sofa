@@ -15,21 +15,18 @@
 --
 class MANIFEST_ARRAY
    --
-   -- Like :  << foo , bar >>
+   -- Like:  << foo , bar >>
    --
-
+   
 inherit EXPRESSION;
-
+   
 creation make
-
+   
 feature
-
+   
    start_position: POSITION;
          -- Of first character '<'.
-
-   list: ARRAY[EXPRESSION];
-         -- Void or elements in the array.
-
+   
    result_type: TYPE_ARRAY;
          -- Computed according to the actual `list'.
 
@@ -55,6 +52,11 @@ feature
 
    isa_dca_inline_argument: INTEGER is 0;
 
+   to_integer_or_error: INTEGER is
+      do
+	 to_integer_error;
+      end;
+
    static_result_base_class: BASE_CLASS is
       do
          Result := small_eiffel.get_class(as_array);
@@ -75,12 +77,12 @@ feature
       do
          if list = Void then
             Result := true;
-         elseif result_type.generic_list.item(1).is_string then
+         elseif result_type.generic_list.first.is_string then
             from
                Result := true;
                i := list.upper;
             until
-               not Result or else i = 0
+               not Result or else i < list.lower
             loop
                e := list.item(i);
                Result := e.is_pre_computable;
@@ -98,7 +100,7 @@ feature
             from
                i := list.upper;
             until
-               i = 0
+               i < list.lower
             loop
                e := list.item(i);
                e.assertion_check(tag);
@@ -115,7 +117,7 @@ feature
             from
                i := list.upper;
             until
-               i = 0
+               i < list.lower
             loop
                list.item(i).afd_check;
                i := i - 1;
@@ -123,22 +125,33 @@ feature
          end;
       end;
 
-   frozen mapping_c_target(target_type: TYPE) is
+   mapping_c_target(target_type: TYPE) is
       do
-         cpp.put_string(fz_b7);
-         cpp.put_integer(target_type.id);
-         cpp.put_string(fz_b8);
+         cpp.put_character('(');
+         target_type.mapping_cast;
          compile_to_c;
          cpp.put_character(')');
       end;
 
-   frozen mapping_c_arg(formal_arg_type: TYPE) is
+   mapping_c_arg(formal_arg_type: TYPE) is
       do
          compile_to_c;
       end;
 
    collect_c_tmp is
+      local
+         i: INTEGER;
       do
+	 if list /= Void then
+	    from
+	       i := list.upper;
+	    until
+	       i < list.lower
+	    loop
+	       list.item(i).collect_c_tmp;
+	       i := i - 1;
+	    end;
+	 end;
       end;
 
    compile_to_c is
@@ -155,13 +168,14 @@ feature
             cpp.put_character('0');
          else
             adr := formal_type.is_user_expanded;
-            cpp.put_integer(list.upper);
+            cpp.put_integer(list.count);
             from
-               i := 1;
+               i := list.lower;
             until
                i > list.upper
             loop
-               cpp.put_string(fz_b9);
+               cpp.put_character(',');
+               cpp.put_character('%N');
                if adr then
                   cpp.put_character('&');
                end;
@@ -182,7 +196,7 @@ feature
             from
                i := list.upper;
             until
-               i = 0
+               i < list.lower
             loop
                list.item(i).c_declare_for_old;
                i := i - 1;
@@ -198,7 +212,7 @@ feature
             from
                i := list.upper;
             until
-               i = 0
+               i < list.lower
             loop
                list.item(i).compile_to_c_old;
                i := i - 1;
@@ -214,7 +228,7 @@ feature
             from
                i := list.upper;
             until
-               i = 0
+               i < list.lower
             loop
                list.item(i).compile_to_jvm_old;
                i := i - 1;
@@ -235,7 +249,7 @@ feature
          ca := code_attribute;
          rt := result_type.run_type;
          rc := rt.run_class;
-         elt_type := rt.generic_list.item(1).run_type;
+         elt_type := rt.generic_list.first.run_type;
          idx_rc := rc.jvm_constant_pool_index;
          rc.jvm_basic_new;
          -- Set lower :
@@ -270,7 +284,7 @@ feature
             ca.opcode_push_integer(list.count);
             elt_type.jvm_xnewarray;
             from
-               i := 1;
+               i := list.lower;
             until
                i > list.upper
             loop
@@ -306,7 +320,7 @@ feature
             from
                i := list.upper;
             until
-               i = 0 or else Result
+               i < list.lower or else Result
             loop
                Result := list.item(i).use_current;
                i := i - 1;
@@ -323,7 +337,7 @@ feature
             from
                i := list.upper;
             until
-               not Result or else i = 0
+               not Result or else i < list.lower
             loop
                Result := list.item(i).stupid_switch(r);
                i := i - 1;
@@ -345,14 +359,14 @@ feature
                from
                   i := list.upper;
                until
-                  i = 0
+                  i < list.lower
                loop
                   e := list.item(i).to_runnable(ct);
                   if e = Void then
                      eh.add_position(start_position);
                      error(list.item(i).start_position,
                            "Bad expression in manifest array.");
-                     i := 0;
+                     i := list.lower - 1;
                   else
                      list.put(e,i);
                      if elt = Void then
@@ -374,7 +388,7 @@ feature
                   from
                      i := list.upper;
                   until
-                     i = 0
+                     i < list.lower
                   loop
                      e := list.item(i);
                      e := conversion_handler.implicit_cast(e,elt);
@@ -407,7 +421,7 @@ feature
          fmt.level_incr;
          if list /= Void then
             from
-               i := 1;
+               i := list.lower;
             until
                i > list.upper
             loop
@@ -437,7 +451,7 @@ feature
          short_print.hook_or("op_ma",fz_c_shift_left);
          if list /= Void then
             from
-               i := 1;
+               i := list.lower;
             until
                i > list.upper
             loop
@@ -463,12 +477,15 @@ feature
 
 feature {NONE}
 
+   list: FIXED_ARRAY[EXPRESSION];
+         -- Void or elements in the manifest array.
+
    current_type: TYPE;
 
    make(sp: like start_position; l: like list) is
       require
          not sp.is_unknown;
-         l /= Void implies not l.is_empty and l.lower =1;
+         l /= Void implies not l.is_empty;
       do
          start_position := sp;
          list := l;
@@ -480,13 +497,13 @@ feature {NONE}
    sd(elt_type: TYPE): STRING is
          -- The JVM descriptor for `storage'.
       do
-         tmp_string.clear;
-         tmp_string.extend('[');
-         elt_type.jvm_descriptor_in(tmp_string);
-         Result := tmp_string;
+         sd_buffer.clear;
+         sd_buffer.extend('[');
+         elt_type.jvm_descriptor_in(sd_buffer);
+         Result := sd_buffer;
       end;
 
-   tmp_string: STRING is
+   sd_buffer: STRING is
       once
          !!Result.make(16);
       end;
@@ -495,7 +512,6 @@ invariant
 
    not start_position.is_unknown;
 
-   list /= Void implies not list.is_empty and list.lower = 1;
+   list /= Void implies not list.is_empty;
 
 end -- MANIFEST_ARRAY
-

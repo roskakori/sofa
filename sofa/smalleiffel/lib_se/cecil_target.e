@@ -48,6 +48,11 @@ feature
 
    c_simple: BOOLEAN is true;
 
+   to_integer_or_error: INTEGER is
+      do
+	 to_integer_error;
+      end;
+
    static_result_base_class: BASE_CLASS is
       do
          Result := result_type.base_class;
@@ -89,7 +94,8 @@ feature
 
    mapping_c_target(target_type: TYPE) is
       do
-         run_feature.current_type.mapping_cast;
+--         run_feature.current_type.mapping_cast;
+	 target_type.mapping_cast;
          cpp.put_character('C');
       end;
 

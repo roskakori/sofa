@@ -1,7 +1,7 @@
 indexing
 
 	description: "Parser token codes"
-	generator: "geyacc version 1.5"
+	generator: "geyacc version 1.6"
 
 class PR_YACC_TOKENS
 
@@ -22,12 +22,14 @@ feature -- Token codes
 	T_ACTION: INTEGER is 270
 	T_USER_CODE: INTEGER is 271
 	T_CHAR: INTEGER is 272
-	T_INTEGER: INTEGER is 273
-	T_BOOLEAN: INTEGER is 274
-	T_CHARACTER: INTEGER is 275
-	T_REAL: INTEGER is 276
-	T_DOUBLE: INTEGER is 277
-	T_POINTER: INTEGER is 278
-	T_NUMBER: INTEGER is 279
+	T_STR: INTEGER is 273
+	T_INTEGER: INTEGER is 274
+	T_BOOLEAN: INTEGER is 275
+	T_CHARACTER: INTEGER is 276
+	T_REAL: INTEGER is 277
+	T_DOUBLE: INTEGER is 278
+	T_POINTER: INTEGER is 279
+	T_LIKE: INTEGER is 280
+	T_NUMBER: INTEGER is 281
 
 end -- class PR_YACC_TOKENS

@@ -74,8 +74,8 @@ feature
       end;
 
    collect_c_tmp is
-         -- Traverse the instruction to collect needed C tmp variables
-         -- (for user expanded) just before `compile_to_c'.
+         -- Traverse the instruction to collect extra mandatory C tmp 
+	 -- variables (for user expanded) just before `compile_to_c'.
       require
          small_eiffel.is_ready
       deferred

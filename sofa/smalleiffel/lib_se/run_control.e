@@ -246,16 +246,6 @@ feature {RUN_FEATURE_8}
 
 feature -- Other settings :
 
-   set_cecil_path(path: STRING) is
-      do
-         cecil_path := path;
-      ensure
-         cecil_path = path
-      end;
-
-   cecil_path: STRING;
-         -- Not Void when option -cecil used.
-
    set_root_procedure(rp: STRING) is
       do
          root_procedure_memory := rp;

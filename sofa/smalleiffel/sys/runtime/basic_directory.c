@@ -29,8 +29,8 @@ typedef struct _SIMULATED_DIR {
 
 static SIMULATED_DIR* simulated_opendir(char* path) {
   int len = strlen((char*)path);
-  char* pattern = malloc(len + 5);
-  SIMULATED_DIR* result = malloc(sizeof(SIMULATED_DIR));
+  char* pattern = se_malloc(len + 5);
+  SIMULATED_DIR* result = se_malloc(sizeof(SIMULATED_DIR));
 
   pattern = strcpy(pattern,(char*)path);
   if (pattern[len - 1] != '\\') pattern[len++] = '\\';
@@ -72,22 +72,25 @@ static int simulated_closedir(SIMULATED_DIR* dirstream) {
   return 0;
 }
 
-int getcwd(char* buffer, size_t maxlen);
-#define simulated_getcwd(x, y) getcwd(x, y)
-int chdir(char* buffer);
-#define simulated_chdir(x) chdir(x)
 
-int mkdir(char* directory_path);
-int simulated_mkdir(char* directory_path, int perm) {
+/* GCC(MingW32) doesn't need these prototypes; whereas, LCC needs them. */
+char * getcwd(char* buffer, int maxlen);
+int chdir(const char* buffer);
+int mkdir(const char* directory_path);
+int rmdir(const char* directory_path);
+
+
+#define simulated_getcwd(x, y) getcwd(x, y)
+#define simulated_chdir(x) chdir(x)
+#define simulated_rmdir(x) rmdir(x)
+
+int simulated_mkdir(const char* directory_path, int perm) {
 
   mkdir(directory_path);
   return 0;
 }
 
-int rmdir(char* directory_path);
-#define simulated_rmdir(x) rmdir(x)
 #endif  /* WIN32 */
-
 
 #ifdef AMIGA
 #define SIMULATED_MODE
@@ -117,42 +120,13 @@ typedef struct _SIMULATED_DIR {
   BPTR lock;
 } SIMULATED_DIR;
 
-/* Results of OS functions returning a BPTR should be compared with ZERO
-   rather than NULL, as BPTR is internally an integer type (despite its
-   name).
-*/
-#ifndef ZERO
-#define ZERO 0L
-#endif
-
-static void strip_trailing_slash(char *path, size_t *length,
-             BOOL * stripped) {
-  /* Used in `simulated_mkdir' and `simulated_rmdir' to temporarily
-     blank out a possible traling slash (/) in the directory path.
-     `restore_trailing_slash' puts it back in place afterwards.
-  */
-  *length = strlen(path);
-  if ((*length > 0) && (path[*length - 1] == '/')) {
-    *stripped = TRUE;
-    path[*length - 1] = '\0';
-  } else {
-    *stripped = FALSE;
-  }
-}
-
-static void restore_trailing_slash(char *path, size_t *length,
-               BOOL * stripped) {
-  if (*stripped) {
-    path[*length - 1] = '/';
-  }
-}
 
 /* Release all resources allocated during `simulated_opendir'; also
    works correctly if structure was only partially initialized.
 */
 static void free_simulated_dir(SIMULATED_DIR * dir) {
   if (dir != NULL) {
-    if (dir->lock != ZERO) {
+    if (dir->lock != NULL) {
       UnLock(dir->lock);
     }
     if (dir->info != NULL) {
@@ -164,20 +138,20 @@ static void free_simulated_dir(SIMULATED_DIR * dir) {
 
 static SIMULATED_DIR * simulated_opendir(char *path) {
   BOOL ok = FALSE;
-  SIMULATED_DIR *result = malloc(sizeof(SIMULATED_DIR));
+  SIMULATED_DIR *result = se_malloc(sizeof(SIMULATED_DIR));
 
   if (result != NULL) {
-    result->lock = ZERO;
+    result->lock = NULL;
     result->info = (struct FileInfoBlock *) AllocDosObject(DOS_FIB, NULL);
     if (result->info != NULL) {
       result->lock = Lock(path, ACCESS_READ);
-      if (result->lock != ZERO) {
-   ok = (Examine(result->lock, result->info) != DOSFALSE);
-   if (ok) {
-     /* Ensure we are scanning a directory, not a file */
-     ok = (result->info->fib_DirEntryType >= 0)
-       && (result->info->fib_DirEntryType != ST_SOFTLINK);
-   }
+      if (result->lock != NULL) {
+	ok = (Examine(result->lock, result->info) != DOSFALSE);
+	if (ok) {
+	  /* Ensure we are scanning a directory, not a file */
+	  ok = (result->info->fib_DirEntryType >= 0)
+	    && (result->info->fib_DirEntryType != ST_SOFTLINK);
+	}
       }
     }
   }
@@ -207,85 +181,74 @@ static int simulated_closedir(SIMULATED_DIR * dirstream) {
   return 0;
 }
 
-static int simulated_getcwd(char *buffer, size_t maximum_length) {
-  int result = 0;
-  BPTR lock = Lock("", ACCESS_READ);
-  if (lock != ZERO) {
-    if (NameFromLock(lock, buffer, maximum_length) != DOSFALSE) {
-      result = 1;
+
+static EIF_POINTER simulated_getcwd(char *buffer, size_t maximum_length) {
+     EIF_POINTER result = NULL;
+     BPTR lock = Lock("", ACCESS_READ);
+     if (lock != NULL) {
+       if (NameFromLock(lock, buffer, maximum_length) != DOSFALSE) {
+         result = (EIF_POINTER) buffer;
+       }
+       UnLock(lock);
+     }
+     return result;
+   }
+
+static int simulated_chdir(char *name) {
+  int result = -1;
+  BPTR lock = Lock(name, ACCESS_READ);
+  if (lock != NULL) {
+    /* Change the current working directory (CWD) of the task
+     */
+    BPTR old_lock = CurrentDir(lock);
+
+    /* Attempt to update internal buffer of the process.
+       If we are not running in a process, but a plain task, this
+       call does not cause any harm.
+    */
+    /* FIXME: What's the result of SetCurrentDirName() in a plain
+       task? If it is FALSE, the below code won't work.
+    */
+    if (SetCurrentDirName(name)) {
+      /* If this was successful, unlock `old_lock' because we
+	 are not going to restore it later; this routine is one
+	 of the few cases where such behavior is appropriate.
+      */
+      UnLock(old_lock);
+      result = 0;
     }
-    UnLock(lock);
+    else {
+      /* If it fails, restore the previous CWD and make the
+	 whole routine fail.
+      */
+      CurrentDir(old_lock);
+    }
   }
   return result;
 }
 
-static int simulated_chdir(char *name) {
-   int result = -1;
-   size_t name_length;
-   BOOL slash_stripped;
-   BPTR lock;
-
-   strip_trailing_slash(name, &name_length, &slash_stripped);
-   lock = Lock(name, ACCESS_READ);
-   if (lock != ZERO) {
-      /* Change the current working directory (CWD) of the task
-       */
-      BPTR old_lock = CurrentDir(lock);
-
-      /* Now the trouble starts: if the task is a DOS process, its internal
-       * buffer storing the name of the CWD has to be updated. Below you
-       * will probably find the sickest piece of code ever necessary to
-       * change the directory under any OS.
-       */
-
-      /* Find out if the task is a DOS process */
-      struct Task *das_ich = FindTask(NULL);
-      BOOL is_process = das_ich->tc_Node.ln_Type != NT_TASK;
-
-      if (is_process) {
-         /* Resolve a possible assign in `name' by re-querying it
-          * from `lock'. (This is to clone the behavior of CLI,
-          * where "cd" also resolves assigns.)
-          */
-         char *resolved_path = NULL;
-         size_t resolved_length = 8; /* FIXME */
-         do {
-            resolved_path = (char *) malloc(resolved_length);
-            if (resolved_path != NULL) {
-               if (NameFromLock(lock, resolved_path, resolved_length) == DOSFALSE) {
-                  free(resolved_path);
-                  resolved_path = NULL;
-                  resolved_length = 2 * resolved_length;
-               }
-            } else {
-               SetIoErr(ERROR_NO_FREE_STORE);
-            }
-         } while ((resolved_path == NULL) && (IoErr() == ERROR_LINE_TOO_LONG));
-
-         /* Actually update the process' buffer */
-         if (resolved_path != NULL) {
-            if (SetCurrentDirName(resolved_path)) {
-               /* If this was successful, unlock `old_lock' because we
-                * are not going to restore it later; this routine is one
-                * of the few cases where such behavior is appropriate.
-                */
-               UnLock(old_lock);
-               result = 0;
-            }
-         }
-         free(resolved_path);
-         if (result != 0) {
-            /* If the process' CWD could not be changed, restore the
-             * task's CWD to `old_lock'.
-             */
-            UnLock(lock);
-            CurrentDir(old_lock);
-         }
-      }
-   }
-   restore_trailing_slash(name, &name_length, &slash_stripped);
-   return result;
+static void strip_trailing_slash(char *path, size_t *length,
+				 BOOL * stripped) {
+  /* Used in `simulated_mkdir' and `simulated_rmdir' to temporarily
+     blank out a possible traling slash (/) in the directory path.
+     `restore_trailing_slash' puts it back in place afterwards.
+  */
+  *length = strlen(path);
+  if ((*length > 0) && (path[*length - 1] == '/')) {
+    *stripped = TRUE;
+    path[*length - 1] = '\0';
+  } else {
+    *stripped = FALSE;
+  }
 }
+
+static void restore_trailing_slash(char *path, size_t *length,
+				   BOOL * stripped) {
+  if (*stripped) {
+    path[*length - 1] = '/';
+  }
+}
+
 static int simulated_mkdir(char *directory_path, int permission) {
   BPTR lock;
   int result = -1;
@@ -294,7 +257,7 @@ static int simulated_mkdir(char *directory_path, int permission) {
 
   strip_trailing_slash(directory_path, &path_length, &slash_stripped);
   lock = CreateDir(directory_path);
-  if (lock != ZERO) {
+  if (lock != NULL) {
     UnLock(lock);
     result = 0;
   }
@@ -373,7 +336,7 @@ EIF_BOOLEAN basic_directory_close(EIF_POINTER dirstream) {
 #else
   status = (simulated_closedir((SIMULATED_DIR*)dirstream) == 0);
 #endif
-  return (EIF_BOOLEAN) (status ? 1 : 0);
+  return ((EIF_BOOLEAN)(status ? 1 : 0));
 }
 
 EIF_POINTER basic_directory_current_working_directory(void) {
@@ -383,24 +346,35 @@ EIF_POINTER basic_directory_current_working_directory(void) {
      See Eiffel source file for additional information.
   */
   static char* buf = NULL;
+#ifdef WIN32
+  /* MS Windows requires size to be an int; whereas in non-windows systems,
+     it needs to be size_t
+  */
+  static int size = 0;
+#else
   static size_t size = 0;
+#endif
   int status;
   if (buf == NULL) {
     size = 256;
-    buf = (char*)malloc(size);
+    buf = (char*)se_malloc(size);
   }
+
+
 #ifndef SIMULATED_MODE
   status = (getcwd(buf,size) != NULL);
 #else
-  status = simulated_getcwd(buf,size);
+  status = (simulated_getcwd(buf,size) != NULL);
 #endif
+
+
   if (status) {
     return buf;
   }
   else {
     free(buf);
     size = size * 2;
-    buf = (char*)malloc(size);
+    buf = (char*)se_malloc(size);
     return basic_directory_current_working_directory();
   }
 }
@@ -417,7 +391,7 @@ EIF_BOOLEAN basic_directory_chdir(EIF_POINTER destination) {
 #else
   status = simulated_chdir((char*)destination);
 #endif
-  return (EIF_BOOLEAN) (status == 0 ? 1 : 0);
+  return ((EIF_BOOLEAN)(status == 0 ? 1 : 0));
 }
 
 EIF_BOOLEAN basic_directory_mkdir(EIF_POINTER directory_path){
@@ -432,7 +406,7 @@ EIF_BOOLEAN basic_directory_mkdir(EIF_POINTER directory_path){
 #else
   status = simulated_mkdir((char*)directory_path,0777);
 #endif
-  return (EIF_BOOLEAN) (status == 0 ? 1 : 0);
+  return ((EIF_BOOLEAN)(status == 0 ? 1 : 0));
 }
 
 EIF_BOOLEAN basic_directory_rmdir(EIF_POINTER directory_path){
@@ -447,6 +421,6 @@ EIF_BOOLEAN basic_directory_rmdir(EIF_POINTER directory_path){
 #else
   status = simulated_rmdir((char*)directory_path);
 #endif
-  return (EIF_BOOLEAN) (status == 0 ? 1 : 0);
+  return ((EIF_BOOLEAN)(status == 0 ? 1 : 0));
 }
 

@@ -61,17 +61,17 @@ feature {NONE}
    compute_ceils is
       local
          fsoc_count_ceil, rsoc_count_ceil, i: INTEGER;
-         rcd: DICTIONARY[RUN_CLASS,STRING];
+         run_class_map: FIXED_ARRAY[RUN_CLASS];
          rc: RUN_CLASS;
          kb_count: INTEGER;
       do
-         rcd := small_eiffel.run_class_dictionary;
+         run_class_map := small_eiffel.get_run_class_map;
          from
-            i := 1;
+            i := run_class_map.upper;
          until
-            i > rcd.count
+            i < 0
          loop
-            rc := rcd.item(i);
+            rc := run_class_map.item(i);
             if rc.at_run_time then
                if rc.current_type.is_native_array then
                   rsoc_count_ceil := rsoc_count_ceil + 1;
@@ -79,7 +79,7 @@ feature {NONE}
                   fsoc_count_ceil := fsoc_count_ceil + 1;
                end;
             end;
-            i := i + 1;
+            i := i - 1;
          end;
          fsoc_count_ceil := 4 * fsoc_count_ceil;
          kb_count := fsoc_count_ceil * (fsoc_size // 1024);
@@ -166,47 +166,47 @@ feature {SMALL_EIFFEL}
       local
          i: INTEGER;
          rc: RUN_CLASS;
-         rcd: DICTIONARY[RUN_CLASS,STRING];
+         run_class_map: FIXED_ARRAY[RUN_CLASS];
          root_type: TYPE;
       do
-         rcd := small_eiffel.run_class_dictionary;
+         run_class_map := small_eiffel.get_run_class_map;
          root_type := small_eiffel.root_procedure.current_type;
          manifest_string_pool.define_manifest_string_mark;
          body.clear;
          once_routine_pool.gc_mark_in(body);
          cpp.put_c_function("void once_function_mark(void)",body);
          system_tools.put_mark_stack_and_registers;
-         define_gc_start(root_type,rcd);
+         define_gc_start(root_type,run_class_map);
          cpp.swap_on_h;
          from
-            i := 1;
-         until
-            i > rcd.count
-         loop
-            rc := rcd.item(i);
-            rc.gc_define1;
-            i := i + 1;
-         end;
-         cpp.swap_on_c;
-         from
-            i := 1;
-         until
-            i > rcd.count
-         loop
-            rc := rcd.item(i);
-            rc.gc_define2;
-            i := i + 1;
-         end;
-         from
-            i := run_class_list.upper;
+            i := run_class_map.upper;
          until
             i < 0
          loop
-            switch_for(run_class_list.item(i));
+            rc := run_class_map.item(i);
+            rc.gc_define1;
+            i := i - 1;
+         end;
+         cpp.swap_on_c;
+         from
+            i := run_class_map.upper;
+         until
+            i < 0
+         loop
+            rc := run_class_map.item(i);
+            rc.gc_define2;
+            i := i - 1;
+         end;
+         from
+            i := switch_list.upper;
+         until
+            i < 0
+         loop
+            switch_for(switch_list.item(i));
             i := i - 1;
          end;
          if info_flag then
-            define_gc_info(rcd);
+            define_gc_info(run_class_map);
          end;
       ensure
          small_eiffel.magic_count = old small_eiffel.magic_count
@@ -233,12 +233,12 @@ feature {C_PRETTY_PRINTER}
       do
          if not is_off then
             cpp.put_string(
-               "gcmt=((mch**)malloc((gcmt_max+1)*sizeof(void*)));%N%
+               "gcmt=((mch**)se_malloc((gcmt_max+1)*sizeof(void*)));%N%
                %stack_bottom=((void**)(&argc));%N");
          end;
       end;
 
-feature {CREATION_CALL,C_PRETTY_PRINTER,TYPE_BIT_REF}
+feature {CREATION_CALL,C_PRETTY_PRINTER,TYPE_BIT_REF,TYPE_TUPLE}
 
    allocation(rc: RUN_CLASS) is
          -- Basic allocation of in new temporary `n' local.
@@ -270,7 +270,7 @@ feature {C_PRETTY_PRINTER,CONVERSION_HANDLER}
          cpp.put_string(body);
       end;
 
-feature {RUN_CLASS}
+feature {RUN_CLASS,MANIFEST_STRING_POOL}
 
    basic_allocation(destination, c_code_buffer: STRING; rc: RUN_CLASS) is
          -- Basic allocation of a newly created object of class `rc'.
@@ -294,7 +294,7 @@ feature {RUN_CLASS}
 	    c_code_buffer.append("((T");
 	    id.append_in(c_code_buffer);
             if ct.need_c_struct then
-               c_code_buffer.append("*)malloc(sizeof(*");
+               c_code_buffer.append("*)se_malloc(sizeof(*");
                c_code_buffer.append(destination);
                c_code_buffer.append("))/*");
                rc.c_sizeof.append_in(c_code_buffer);
@@ -304,13 +304,13 @@ feature {RUN_CLASS}
                id.append_in(c_code_buffer);
             else
                -- Object has no attributes :
-               c_code_buffer.append("*)malloc(1))");
+               c_code_buffer.append("*)se_malloc(1))");
             end;
          elseif destination = fz_eiffel_root_object then
 	    c_code_buffer.append("((T");
 	    id.append_in(c_code_buffer);
             c_code_buffer.append(
-               "*)malloc(sizeof(double)+sizeof(*eiffel_root_object)));%N%
+               "*)se_malloc(sizeof(double)+sizeof(*eiffel_root_object)));%N%
 	       %*eiffel_root_object=M");
             id.append_in(c_code_buffer);
          else
@@ -326,9 +326,9 @@ feature {MANIFEST_STRING_POOL}
    new_manifest_string_in(c_code: STRING; string_at_run_time: BOOLEAN) is
       do
          if is_off or else not string_at_run_time then
-            c_code.append("((T7*)malloc(sizeof(T7)));%N");
+            c_code.append("((T7*)se_malloc(sizeof(T7)));%N");
          else
-            c_code.append("((T7*)malloc(sizeof(gc7)));%N%
+            c_code.append("((T7*)se_malloc(sizeof(gc7)));%N%
                           %((gc7*)s)->header.flag=FSOH_MARKED;%N");
          end;
          if string_at_run_time and then type_string.run_class.is_tagged then
@@ -339,7 +339,7 @@ feature {MANIFEST_STRING_POOL}
    new_native9_in(c_code: STRING; string_at_run_time: BOOLEAN) is
       do
          if is_off or else not string_at_run_time then
-            c_code.append(as_malloc);
+            c_code.append("se_malloc");
          else
             c_code.append(fz_new);
             c_code.extend('9');
@@ -365,10 +365,16 @@ feature
                c_code.append(entity);
                c_code.extend(')');
             end;
-            if r.count > 1 then
+            if r.count > 1 and not ct.is_expanded then
+	       --          **********************
+	       -- Note: I don't understand why this fix (provided 
+	       -- by Alain Le_Guennec) can be useful because, as far 
+	       -- as I know, an exapanded class must not have more 
+	       -- than one runnable.
+	       -- *** Fri Aug 15 2000, DC
                cpp.incr_switch_count;
-               if not run_class_list.fast_has(rc) then
-                  run_class_list.add_last(rc);
+               if not switch_list.fast_has(rc) then
+                  switch_list.add_last(rc);
                end;
                c_code.extend('X');
                ct.gc_mark_in(c_code);
@@ -414,9 +420,10 @@ feature {C_PRETTY_PRINTER}
 
 feature {NONE}
 
-   run_class_list: FIXED_ARRAY[RUN_CLASS] is
+   switch_list: FIXED_ARRAY[RUN_CLASS] is
+	 -- For which there is a switching function.
       once
-         !!Result.with_capacity(32);
+         !!Result.with_capacity(128);
       end;
 
    switch_for(rc: RUN_CLASS) is
@@ -476,7 +483,7 @@ feature {NONE}
          end;
       end;
 
-  just_before_mark(rcd: DICTIONARY[RUN_CLASS,STRING]) is
+  just_before_mark(run_class_map: FIXED_ARRAY[RUN_CLASS]) is
       require
          not is_off
       local
@@ -484,17 +491,17 @@ feature {NONE}
          rc: RUN_CLASS;
       do
          from
-            i := 1;
+            i := run_class_map.upper;
          until
-            i > rcd.count
+            i < 0
          loop
-            rc := rcd.item(i);
+            rc := run_class_map.item(i);
             rc.just_before_gc_mark_in(body);
-            i := i + 1;
+            i := i - 1;
          end;
       end;
 
-   define_gc_info(rcd: DICTIONARY[RUN_CLASS,STRING]) is
+   define_gc_info(run_class_map: FIXED_ARRAY[RUN_CLASS]) is
       require
          info_flag
       local
@@ -509,13 +516,13 @@ feature {NONE}
          body.clear;
          body.append("fprintf(SE_GCINFO,%"--------------------\n%");%N");
          from
-            i := 1;
+            i := run_class_map.upper;
          until
-            i > rcd.count
+            i < 0
          loop
-            rc := rcd.item(i);
+            rc := run_class_map.item(i);
             rc.gc_info_in(body);
-            i := i + 1;
+            i := i - 1;
          end;
          body.append(
            "fprintf(SE_GCINFO,%"Stack size = %%d\n%",gc_stack_size());%N%
@@ -535,7 +542,7 @@ feature {NONE}
          cpp.put_c_function(header,body);
       end;
 
-   define_gc_start(root_type: TYPE; rcd: DICTIONARY[RUN_CLASS,STRING]) is
+   define_gc_start(root_type: TYPE; run_class_map: FIXED_ARRAY[RUN_CLASS]) is
       do
          body.clear;
          body.append("if(gc_is_off)return;%N%
@@ -550,7 +557,7 @@ feature {NONE}
             %((gc");
          root_type.id.append_in(body);
          body.append("*)eiffel_root_object)->header.flag=FSOH_UNMARKED;%N");
-         just_before_mark(rcd);
+         just_before_mark(run_class_map);
          body.append(fz_gc_mark);
          root_type.id.append_in(body);
          body.append("(eiffel_root_object);%N%
@@ -559,13 +566,13 @@ feature {NONE}
          if run_control.generator_used then
             body.append("{int i=SE_MAXID-1;%N%
                         %while(i>=0){%N%
-                        %if(g[i]!=NULL)gc_mark9((g[i])->_storage);%N%
+                        %if(g[i]!=NULL)gc_mark7(g[i]);%N%
                         %i--;}%N}%N");
          end;
          if run_control.generating_type_used then
             body.append("{int i=SE_MAXID-1;%N%
                         %while(i>=0){%N%
-                        %if(t[i]!=NULL)gc_mark9((t[i])->_storage);%N%
+                        %if(t[i]!=NULL)gc_mark7(t[i]);%N%
                         %i--;}%N}%N");
          end;
          body.append("mark_stack_and_registers();%N%

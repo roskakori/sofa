@@ -148,13 +148,16 @@ int gc_stack_size(void) {
 #define GCLARGESTACK 50000
 
 int garbage_delayed(void) {
+  /*
+    To delay the first GC call.
+  */
   if (gc_stack_size() > GCLARGESTACK) {
     if (fsoc_count_ceil <= fsoc_count) {
       if (rsoc_count_ceil <= rsoc_count) {
 	if ((fsoc_count<FSOC_LIMIT)&&(rsoc_count<RSOC_LIMIT)) {
 	  fsoc_count_ceil++;
 	  rsoc_count_ceil++;
-	return 1;
+	  return 1;
 	}
 	else return 0;
       }
@@ -233,13 +236,13 @@ static void add_to_gcmt(mch*c) {
 }
 
 fsoc*new_fsoc(void) {
-  if(fsocfl!=NULL){
+  if (fsocfl != NULL) {
     fsoc*r=fsocfl;
     fsocfl=fsocfl->next;
     return r;
   }
   else {
-    mch*r=((mch*)(malloc(FSOC_SIZE)));
+    mch*r=((mch*)(se_malloc(FSOC_SIZE)));
     mch**p;
     gc_update_ceils();
     fsoc_count++;
@@ -355,7 +358,7 @@ static rsoc MRSOC = {
 };
 
 static void rsoc_malloc(na_env*nae){
-  rsoc*r=((rsoc*)(malloc(RSOC_SIZE)));
+  rsoc*r=((rsoc*)(se_malloc(RSOC_SIZE)));
   rsoc_count++;
   *r=MRSOC;
   r->nae=nae;
@@ -498,7 +501,7 @@ char*new_na(na_env*nae,int size) {
   }
   if (rsoc_count<rsoc_count_ceil) {
     if((size+sizeof(rsoc)-sizeof(rsoh))>RSOC_SIZE){
-      rsoc*c=((rsoc*)(malloc(size+sizeof(rsoc)-sizeof(rsoh))));
+      rsoc*c=((rsoc*)(se_malloc(size+sizeof(rsoc)-sizeof(rsoh))));
       rsoh*r=(&(c->first_header));
       rsoc_count++;
       *c=MRSOC;
@@ -528,7 +531,7 @@ char*new_na(na_env*nae,int size) {
     }
   }
   if((size+sizeof(rsoc)-sizeof(rsoh))>RSOC_SIZE){
-    rsoc*c=((rsoc*)(malloc(size+sizeof(rsoc)-sizeof(rsoh))));
+    rsoc*c=((rsoc*)(se_malloc(size+sizeof(rsoc)-sizeof(rsoh))));
     rsoh*r=(&(c->first_header));
     rsoc_count++;
     *c=MRSOC;

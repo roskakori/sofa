@@ -13,6 +13,11 @@ class SMALL_INTEGER
 --
 -- To implement NUMBER (do not use this class, see NUMBER).
 --
+
+-- The Maximum_integer number is 2147483647 so a SMALL INTEGER must 
+-- be on 9 digits, so the biggest SMALL INTEGER is 999999999 and the 
+-- smallest SMALL INTEGER is -999999999
+
 inherit ABSTRACT_INTEGER;
    
 creation make
@@ -39,6 +44,11 @@ feature
 	 Result := value < 0;
       end;
 
+   is_integer_value: BOOLEAN is
+      do
+	 Result := true;
+      end;
+   
    to_integer: INTEGER is
       do
 	 Result := value;
@@ -48,6 +58,12 @@ feature
       do
 	 Result := value;
       end;   
+   
+   
+   append_in(str:STRING) is
+      do
+	 str.append(value.to_string);
+      end;
    
    prefix "-" : NUMBER is
       do
@@ -61,19 +77,35 @@ feature
    
    infix "@+" (other: INTEGER): NUMBER is
       local
-	 sum : INTEGER
+	 sum : INTEGER;
+	 an : NUMBER;
       do
 	 sum := value + other;
-	 if is_positive and (other >= 0) and (sum < 0) then
-	    !LARGE_POSITIVE_INTEGER!Result.make_smaller(sum - Base)
-	 elseif is_negative and (other < 0) and (sum > 0) then
-	    !LARGE_NEGATIVE_INTEGER!Result.make_smaller(-sum - Base)
-	 elseif (sum = -Base) then
-	    Result := greater_large_negative_integer;
+	 if other >= Base then
+	    !LARGE_POSITIVE_INTEGER!an.make_smaller(other);
+	    Result := an @+ value;
+	 elseif other <= -Base then
+	    !LARGE_NEGATIVE_INTEGER!an.make_smaller(other);
+	    Result := an @+ value;
 	 else
-	    !SMALL_INTEGER!Result.make(sum);
+	    if sum >= Base then
+	       !LARGE_POSITIVE_INTEGER!Result.make_smaller(sum);
+	    elseif sum <= -Base then
+	       !LARGE_NEGATIVE_INTEGER!Result.make_smaller(-sum);
+	    else
+	       !SMALL_INTEGER!Result.make(sum);
+	    end;
 	 end;
       end;
+	 
+--	    if value <= 0 and (other < 0) and (sum > 0) then
+--	    !LARGE_NEGATIVE_INTEGER!Result.make_smaller(-sum - Base)
+--	 elseif (sum = -Base) then
+--	    Result := greater_large_negative_integer;
+--	 else
+--	    !SMALL_INTEGER!Result.make(sum);
+--	 end;
+--      end;
    
    infix "*" (other: NUMBER): NUMBER is
       do
@@ -86,71 +118,83 @@ feature
    
    infix "@*" (other : INTEGER): NUMBER is
       local
-	 results_sign, is_mini, other_is_mini: BOOLEAN; 
-	 int : INTEGER;
+	 d1, d2: INTEGER;
       do
-	 if (other = 1) then
-	    Result := Current;
-	 else	    
-	    results_sign := (is_positive = (other >= 0));
-	    is_mini := value = Minimum_integer;
-	    other_is_mini := other = Minimum_integer;
-	    if is_mini or other_is_mini then
-	       if is_mini and other_is_mini then
-		  !LARGE_POSITIVE_INTEGER!Result.make_big;
+	 if other = 0 or else value = 0 then
+	    !SMALL_INTEGER!Result.make(0);
+	 elseif other = 1 then
+	    !SMALL_INTEGER!Result.make(value);
+	 elseif value = 1 then
+	    if other >= Base then
+	       !LARGE_POSITIVE_INTEGER!Result.make_smaller(other);
+	    elseif other <= -Base then
+	       !LARGE_NEGATIVE_INTEGER!Result.make_smaller(other);
+	    else
+	       !SMALL_INTEGER!Result.make(other);
+	    end;
+	 elseif other >= Base then
+	    if value > 0 then
+	       !LARGE_POSITIVE_INTEGER!Result.make_from_large_product(value, other);
+	    else
+	       !LARGE_NEGATIVE_INTEGER!Result.make_from_large_product(value, other);
+	    end;
+	 elseif other <= -Base then
+	    if value > 0 then
+	       !LARGE_NEGATIVE_INTEGER!Result.make_from_large_product(value, other);
+	    else
+	       !LARGE_POSITIVE_INTEGER!Result.make_from_large_product(value, other);
+	    end;
+	 else
+	    d1 := value.abs;
+	    d2 := other.abs;
+	    if ((d1.log + d2.log - Log_base) * 10000).truncated_to_integer >= 0  or else d1 * d2 < 0 then
+	       if value > 0 then
+		  if other > 0 then
+		     !LARGE_POSITIVE_INTEGER!Result.make_from_product(d1, d2);
+		  else
+		     !LARGE_NEGATIVE_INTEGER!Result.make_from_product(d1, d2);
+		  end;
 	       else
-		  if other_is_mini then
-		     int := value.abs;
+		  if other > 0 then
+		     !LARGE_NEGATIVE_INTEGER!Result.make_from_product(d1, d2);
 		  else
-		     int := other.abs;
-		  end;	 
-		  if results_sign then
-		     !LARGE_POSITIVE_INTEGER!Result.make_from_product(int);
-		  else
-		     !LARGE_NEGATIVE_INTEGER!Result.make_from_product(int);
+		     !LARGE_POSITIVE_INTEGER!Result.make_from_product(d1, d2);
 		  end;
 	       end;
 	    else
-	       mult_2_integer(value.abs, other.abs);
-	       if results_sign then
-		  if (temp_2_digints @ 1) /= 0 then 
-		     !LARGE_POSITIVE_INTEGER!Result.make_from_fixed_array(
-                                                         clone(temp_2_digints));
-		  else
-		     !SMALL_INTEGER!Result.make(temp_2_digints @ 0);
-		  end;
-	       else 
-		  if ((temp_2_digints @ 1) = 0) then 
-		     !SMALL_INTEGER!Result.make(-(temp_2_digints @ 0));
-		  else
-		     if ((temp_2_digints @ 1)= 1) 
-			and ((temp_2_digints @ 0)=0) then 
-			Result := greater_large_negative_integer;
-		     else
-			!LARGE_NEGATIVE_INTEGER!Result.make_from_fixed_array(
-                                                          clone(temp_2_digints));
-		     end;
-		  end;
-	       end;
+	       !SMALL_INTEGER!Result.make(value * other);
 	    end;
-	 end;	 
-      end; 
+	 end;
+      end;
    
    infix "@/" (other: INTEGER): NUMBER is
       local
-	 tmp: SMALL_FRACTION;
+	 tmp: INTEGER_FRACTION;
 	 n, d: ABSTRACT_INTEGER;
+	 val: INTEGER;
       do
 	 if (other = 1) then
 	    Result := Current;
 	 else	    
 	    if (value \\ other) = 0  then
-	       !SMALL_INTEGER!Result.make(value // other);
-	    elseif (other = Minimum_integer) then
+	       val := value // other;
+	       if val >= Base then
+		  !LARGE_POSITIVE_INTEGER!Result.make_smaller(val);
+	       elseif val <= (-1 * Base) then
+		  !LARGE_NEGATIVE_INTEGER!Result.make_smaller(val);
+	       else
+		  !SMALL_INTEGER!Result.make(value // other);
+	       end;
+	    elseif other <= (-1 * Base) then
 	       n ?= abs;
-	       d ?= greater_large_negative_integer.abs;
-	       !LARGE_FRACTION!Result.make( n, d, is_positive);	       
-	    else	       
+	       !LARGE_NEGATIVE_INTEGER!d.make_smaller(other);
+	       !NUMBER_FRACTION!Result.make( n, d, is_positive);
+	    elseif other >= Base then
+	       n ?= abs;
+	       !LARGE_NEGATIVE_INTEGER!d.make_smaller(other);
+	       !NUMBER_FRACTION!Result.make( n, d, is_positive);
+	    else       
+	       !!tmp.make(1,2);
 	       Result := tmp.from_two_integer(value,other);
 	    end;
 	 end;
@@ -165,8 +209,17 @@ feature
       end;
    
    infix "@//" (other: INTEGER): NUMBER is
+      local
+	 tmp: INTEGER;
       do
-	 !SMALL_INTEGER!Result.make(value // other);
+	 tmp := value // other;
+	 if tmp >= Base then
+	    !LARGE_POSITIVE_INTEGER!Result.make_smaller(tmp);
+	 elseif tmp <= (-1 * Base) then
+	    !LARGE_NEGATIVE_INTEGER!Result.make_smaller(tmp);
+	 else
+	    !SMALL_INTEGER!Result.make(value // other);
+	 end;
       end;
    
    infix "\\" (other: NUMBER): NUMBER is
@@ -178,10 +231,18 @@ feature
       end;
    
    infix "@\\" (other : INTEGER): NUMBER is
+      local
+	 tmp: INTEGER;
       do
-	 !SMALL_INTEGER!Result.make(value \\ other);
+	 tmp := value \\ other;
+	 if tmp >= Base then
+	    !LARGE_POSITIVE_INTEGER!Result.make_smaller(tmp);
+	 elseif tmp <= (-1 * Base) then
+	    !LARGE_NEGATIVE_INTEGER!Result.make_smaller(tmp);
+	 else
+	    !SMALL_INTEGER!Result.make(tmp);
+	 end;
       end;
-   
    
    infix "@=" (other: INTEGER): BOOLEAN is
       do
@@ -257,12 +318,12 @@ feature {NUMBER}
 	 Result:= other @+ value;
       end;
    
-   add_with_small_fraction (other: SMALL_FRACTION ): NUMBER is
+   add_with_small_fraction (other: INTEGER_FRACTION ): NUMBER is
       do
 	 Result:= other @+ value;
       end;
    
-   add_with_large_fraction (other: LARGE_FRACTION): NUMBER is
+   add_with_large_fraction (other: NUMBER_FRACTION): NUMBER is
       do
 	 Result := other @+ value;
       end;
@@ -277,12 +338,12 @@ feature {NUMBER}
 	 Result:=other.multiply_with_small_integer(Current);
       end;
    
-   multiply_with_small_fraction (other: SMALL_FRACTION): NUMBER is
+   multiply_with_small_fraction (other: INTEGER_FRACTION): NUMBER is
       do
 	 Result:=other.multiply_with_small_integer(Current);
       end;
    
-   multiply_with_large_fraction (other: LARGE_FRACTION): NUMBER is
+   multiply_with_large_fraction (other: NUMBER_FRACTION): NUMBER is
       do
 	 Result := other.multiply_with_small_integer(Current); 
       end;
@@ -322,7 +383,7 @@ feature {NUMBER}
 	 if (is_one) or else (Current @= -1) then
 	    Result := Current;
 	 else
-	    !SMALL_FRACTION!Result.make(sign, value.abs);
+	    !INTEGER_FRACTION!Result.make(sign, value.abs);
 	 end;
       end;
    
@@ -335,12 +396,12 @@ feature {NUMBER}
 	 Result := true; 
       end;
    
-   greater_with_small_fraction(other: SMALL_FRACTION): BOOLEAN is  
+   greater_with_small_fraction(other: INTEGER_FRACTION): BOOLEAN is  
       do   
 	 Result := (Current @* other.denominator) @> other.numerator; 
       end;  
    
-   greater_with_large_fraction(other: LARGE_FRACTION): BOOLEAN is  
+   greater_with_large_fraction(other: NUMBER_FRACTION): BOOLEAN is  
       do   
 	 if other.is_negative then
 	     Result := (other.denominator * Current) > (- other.numerator);
@@ -358,6 +419,6 @@ feature {NONE}
 
 invariant   
    
-   value /= Minimum_integer;
+   value < Base and value > -Base;
    
 end

@@ -63,7 +63,7 @@ feature
          -- The static BASE_CLASS of the `result_type' (according to the
          -- `start_position').
          -- Void when it is too difficult to compute, when some error 
-         -- occurs or when this is the class NONE.
+         -- occurs or when this is the class NONE or TUPLE.
       deferred
       end;
 
@@ -102,6 +102,12 @@ feature
       end;
 
 feature
+
+   to_integer_or_error: INTEGER is
+	 -- Gives the corresponding INTEGER value or emit the 
+	 -- `to_integer_error' for non constant expression.
+      deferred
+      end;
 
    isa_dca_inline_argument: INTEGER is
          -- Interpretation of the Result :
@@ -176,8 +182,8 @@ feature
 feature -- To produce C code :
 
    collect_c_tmp is
-         -- Traverse the expression to collect needed C tmp variables
-         -- just before `compile_to_c'.
+         -- Traverse the expression to collect extra mandatory C tmp 
+	 -- variables (for user expanded) just before `compile_to_c'.
       require
          small_eiffel.is_ready
       deferred
@@ -202,7 +208,7 @@ feature -- To produce C code :
          -- the destination `formal_type'.
       require
          small_eiffel.is_ready;
-         formal_type.at_run_time
+         formal_type.run_class.at_run_time
       deferred
       end;
 
@@ -374,33 +380,6 @@ feature -- For `compile_to_jvm' :
       deferred
       end;
 
-feature {NONE}
-
-   frozen jvm_standard_branch_if_false: INTEGER is
-         -- Gives the `program_counter' to be resolved.
-      require
-         result_type.is_boolean
-      do
-         compile_to_jvm;
-         Result := code_attribute.opcode_ifeq;
-      end;
-
-   frozen jvm_standard_branch_if_true: INTEGER is
-         -- Gives the `program_counter' to be resolved.
-      require
-         result_type.is_boolean
-      do
-         compile_to_jvm;
-         Result := code_attribute.opcode_ifne
-      end;
-
-feature
-
-   to_integer: INTEGER is
-      do
-         error(start_position,fz_iinaiv);
-      end;
-
 feature -- Pretty printing :
 
    pretty_print is
@@ -439,6 +418,34 @@ feature -- For `short' :
          short_print.hook_or("open_b","(");
          short;
          short_print.hook_or("close_b",")");
+      end;
+
+feature {NONE}
+
+   frozen jvm_standard_branch_if_false: INTEGER is
+         -- Gives the `program_counter' to be resolved.
+      require
+         result_type.is_boolean
+      do
+         compile_to_jvm;
+         Result := code_attribute.opcode_ifeq;
+      end;
+
+   frozen jvm_standard_branch_if_true: INTEGER is
+         -- Gives the `program_counter' to be resolved.
+      require
+         result_type.is_boolean
+      do
+         compile_to_jvm;
+         Result := code_attribute.opcode_ifne
+      end;
+
+   frozen to_integer_error is
+	 -- The `to_integer_or_error' message.
+      do
+	 eh.append(fz_iinaiv);
+	 eh.add_position(start_position);
+	 eh.print_as_error;
       end;
 
 end -- EXPRESSION

@@ -9,8 +9,8 @@ indexing
 	author:     "Eric Bezault <ericb@gobosoft.com>"
 	copyright:  "Copyright (c) 1999, Eric Bezault and others"
 	license:    "Eiffel Forum Freeware License v1 (see forum.txt)"
-	date:       "$Date: 1999/10/02 14:05:55 $"
-	revision:   "$Revision: 1.5 $"
+	date:       "$Date: 2000/02/02 10:38:15 $"
+	revision:   "$Revision: 1.6 $"
 
 class PR_VARIABLE
 
@@ -26,7 +26,9 @@ inherit
 	DS_NESTED_LIST [PR_RULE]
 		rename
 			local_items as derives,
-			remote_items as firsts
+			remote_items as firsts,
+			set_local_items as set_derives,
+			add_local_item as add_derive
 		end
 
 creation
@@ -213,6 +215,20 @@ feature {NONE} -- Constants
 	Initial_max_nb_rules: INTEGER is 5
 	Max_nb_rules_increment: INTEGER is 5
 			-- Maxium number of derive rules
+
+feature {DS_NESTED_LIST_FLATTENER} -- Implementation
+
+	set_derives (a_derives: like derives) is
+			-- Set `derives' to `a_derives'.
+		do
+			derives := a_derives
+		end
+
+	add_derive (a_derive: PR_RULE) is
+			-- Add `a_derive' to `derives'.
+		do
+			derives.force_last (a_derive)
+		end
 
 invariant
 

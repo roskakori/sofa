@@ -20,7 +20,7 @@ class ARGUMENT_NAME1
 
 inherit LOCAL_ARGUMENT1; ARGUMENT_NAME;
 
-creation {TMP_NAME} make
+creation make
 
 feature {NONE}
 

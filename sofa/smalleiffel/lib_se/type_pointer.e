@@ -98,11 +98,6 @@ feature
          str.extend('8');
       end;
 
-   cast_to_ref is
-      do
-         type_pointer_ref.mapping_cast;
-      end;
-
    jvm_descriptor_in(str: STRING) is
       do
          str.append(fz_21);

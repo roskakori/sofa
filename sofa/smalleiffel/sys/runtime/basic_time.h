@@ -14,7 +14,7 @@
 /*
   This file (SmallEiffel/sys/runtime/basic_time.h) is automatically
   included when some external "SmallEiffel" feature of class BASIC_TIME
-  is live.
+  is used (ie. in live code).
 */
 #include <time.h>
 
@@ -22,21 +22,21 @@
 #include <windows.h>
 #endif
 
-EIF_INTEGER basic_time_time(void);
-EIF_DOUBLE basic_time_difftime (EIF_INTEGER t1, EIF_INTEGER t2);
-EIF_INTEGER basic_time_getyear(EIF_INTEGER t, EIF_INTEGER m);
-EIF_INTEGER basic_time_getmonth(EIF_INTEGER t, EIF_INTEGER m);
-EIF_INTEGER basic_time_getday(EIF_INTEGER t, EIF_INTEGER m);
-EIF_INTEGER basic_time_gethour(EIF_INTEGER t, EIF_INTEGER m);
-EIF_INTEGER basic_time_getminute(EIF_INTEGER t, EIF_INTEGER m);
-EIF_INTEGER basic_time_getsecond(EIF_INTEGER t, EIF_INTEGER m);
-EIF_INTEGER basic_time_getyday(EIF_INTEGER t, EIF_INTEGER m);
-EIF_INTEGER basic_time_getwday(EIF_INTEGER t, EIF_INTEGER m);
-EIF_BOOLEAN basic_time_is_summer_time_used(EIF_INTEGER t);
-EIF_INTEGER basic_time_mktime(EIF_INTEGER year,
-			      EIF_INTEGER mon,
-			      EIF_INTEGER mday,
-			      EIF_INTEGER hour,
-			      EIF_INTEGER min,
-			      EIF_INTEGER sec);
+EIF_DOUBLE basic_time_time(void);
+EIF_DOUBLE basic_time_difftime(EIF_DOUBLE t1, EIF_DOUBLE t2);
+EIF_INTEGER basic_time_getyear(EIF_DOUBLE t, EIF_INTEGER m);
+EIF_INTEGER basic_time_getmonth(EIF_DOUBLE t, EIF_INTEGER m);
+EIF_INTEGER basic_time_getday(EIF_DOUBLE t, EIF_INTEGER m);
+EIF_INTEGER basic_time_gethour(EIF_DOUBLE t, EIF_INTEGER m);
+EIF_INTEGER basic_time_getminute(EIF_DOUBLE t, EIF_INTEGER m);
+EIF_INTEGER basic_time_getsecond(EIF_DOUBLE t, EIF_INTEGER m);
+EIF_INTEGER basic_time_getyday(EIF_DOUBLE t, EIF_INTEGER m);
+EIF_INTEGER basic_time_getwday(EIF_DOUBLE t, EIF_INTEGER m);
+EIF_BOOLEAN basic_time_is_summer_time_used(EIF_DOUBLE t);
+EIF_DOUBLE basic_time_mktime(EIF_INTEGER year,
+			     EIF_INTEGER mon,
+			     EIF_INTEGER mday,
+			     EIF_INTEGER hour,
+			     EIF_INTEGER min,
+			     EIF_INTEGER sec);
 EIF_INTEGER  basic_time_clock(void);

@@ -49,6 +49,11 @@ feature
 
    use_current: BOOLEAN is false;
 
+   frozen to_integer_or_error: INTEGER is
+      do
+	 to_integer_error;
+      end;
+
    frozen result_type: TYPE is
       do
          Result := run_feature.result_type;
@@ -123,9 +128,8 @@ feature
          if rt.is_reference then
             if target_type.is_reference then
                -- Reference into Reference :
-               cpp.put_string(fz_b7);
-               cpp.put_integer(target_type.id);
-               cpp.put_string(fz_b8);
+	       cpp.put_character('(');
+               target_type.mapping_cast;
                compile_to_c;
                cpp.put_character(')');
             else

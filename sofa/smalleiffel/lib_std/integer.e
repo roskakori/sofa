@@ -20,15 +20,11 @@ inherit
          infix "+", infix "-", infix "*", infix "/", infix "\\", 
          infix "//", infix "^", infix "<", infix "<=", infix ">",
          infix ">=", prefix "-", prefix "+", hash_code, 
-         one, zero, out_in_tagged_out_memory, fill_tagged_out_memory
+         out_in_tagged_out_memory, fill_tagged_out_memory
       end;
 
 feature 
    
-   one: INTEGER is 1;
-
-   zero: INTEGER is 0;
-
    infix "+" (other: INTEGER): INTEGER is
       external "SmallEiffel"
       end;
@@ -165,8 +161,9 @@ feature -- Conversions :
          -- For example, if `Current' is -1 the new STRING is "-1".
          -- Note: see also `append_in' to save memory.
       do
-         !!Result.make(0);
-         append_in(Result);
+	 tmp_string.clear;
+         append_in(tmp_string);
+         Result := tmp_string.twin;
       end; 
 
    to_boolean: BOOLEAN is
@@ -175,6 +172,15 @@ feature -- Conversions :
          Result := Current /= 0;
       ensure 
          Result = (Current /= 0)
+      end;
+
+   to_number: NUMBER is
+      local
+	 number_tools: NUMBER_TOOLS;
+      do
+	 Result := number_tools.from_integer(Current);
+      ensure
+	 Result @= Current
       end;
 
    to_bit: BIT Integer_bits is
@@ -232,37 +238,48 @@ feature -- Conversions :
          -- number is right aligned. 
          -- Note: see `append_in_format' to save memory.
       require
-         to_string.count <= s;
+         to_string.count <= s
+      local
+	 i: INTEGER;
       do
-         from  
-            tmp_string.clear;
-            append_in(tmp_string);
+	 tmp_string.clear;
+	 append_in(tmp_string);
+         from
+	    !!Result.make(tmp_string.count.max(s));
+	    i := s - tmp_string.count;
          until
-            tmp_string.count >= s
+	    i <= 0
          loop
-            tmp_string.add_first(' ');
-         end;
-         Result := tmp_string.twin;
+            Result.extend(' ');
+	    i := i - 1;
+	 end;
+         Result.append(tmp_string);
       ensure
-         Result.count = s;
+         Result.count = s
       end; 
 
    append_in_format(str: STRING; s: INTEGER) is
          -- Append the equivalent of `to_string_format' at the end of 
          -- `str'. Thus you can save memory because no other
          -- STRING is allocate for the job.
+      require
+	 to_string.count <= s
+      local
+	 i: INTEGER;
       do
+	 tmp_string.clear;
+	 append_in(tmp_string);
          from
-            tmp_string.clear;
-            append_in(tmp_string);
+	    i := s - tmp_string.count;
          until
-            tmp_string.count >= s
+            i <= 0
          loop
-            tmp_string.add_first(' ');
+            str.extend(' ');
+	    i := i - 1;
          end;
          str.append(tmp_string);
       ensure
-         str.count >= (old str.count) + s;
+         str.count >= (old str.count) + s
       end;
    
    decimal_digit, digit: CHARACTER is

@@ -108,10 +108,10 @@ feature {RUN_FEATURE_3,RUN_FEATURE_4}
       require
          run_control.boost;
          small_eiffel.is_ready;
-         run_feature.current_type.run_class.running.count = 1
+         run_feature.run_class.running.count = 1
       deferred
       ensure
-         run_feature.current_type.run_class.at_run_time
+         run_feature.run_class.at_run_time
       end;
 
 feature {NONE}

@@ -18,7 +18,7 @@ class TYPE_NONE
    -- For declaration of type NONE.
    --
 
-inherit TYPE redefine base_class end;
+inherit TYPE;
 
 creation make
 
@@ -26,7 +26,7 @@ feature
 
    base_class_name: CLASS_NAME;
 
-   id: INTEGER is -1;
+   id: INTEGER is 0;
 
    is_expanded: BOOLEAN is false;
 
@@ -54,11 +54,6 @@ feature
 
    jvm_method_flags: INTEGER is 17;
 
-   base_class: BASE_CLASS is
-      once
-         !!Result.make(as_none,as_none,id);
-      end;
-
    pretty_print is
       do
          fmt.put_string(as_none);
@@ -71,11 +66,6 @@ feature
    static_base_class_name: CLASS_NAME is   
       do
          Result := base_class_name;
-      end;
-
-   run_class: RUN_CLASS is
-      do
-         Result := small_eiffel.run_class(Current);
       end;
 
    generic_list: ARRAY[TYPE] is
@@ -292,6 +282,12 @@ feature {NONE}
    make(sp: like start_position) is
       do
          !!base_class_name.make(as_none,sp);
+	 base_class_memory := unique_base_class_memory;
+      end;
+
+   unique_base_class_memory: BASE_CLASS is
+      once
+         !!Result.make(as_none,as_none,id);
       end;
 
 end -- TYPE_NONE

@@ -67,14 +67,14 @@ feature {E_WHEN,WHEN_ITEM_2}
             v := lower.to_runnable(ct);
             if v /= Void and then v.result_type.is_integer then
                lower := v;
-               lower_value := lower.to_integer;
+               lower_value := lower.to_integer_or_error;
             else
                error(lower.start_position,fz_biv);
             end;
             v := upper.to_runnable(ct);
             if v /= Void and then v.result_type.is_integer then
                upper := v;
-               upper_value := upper.to_integer;
+               upper_value := upper.to_integer_or_error;
             else
                error(upper.start_position,fz_biv);
             end;
@@ -97,14 +97,14 @@ feature {E_WHEN,WHEN_ITEM_2}
             v := lower.to_runnable(ct);
             if v /= Void and then v.result_type.is_character then
                lower := v;
-               lower_value := lower.to_integer;
+               lower_value := lower.to_integer_or_error;
             else
                error(lower.start_position,fz_bcv);
             end;
             v := upper.to_runnable(ct);
             if v /= Void and then v.result_type.is_character then
                upper := v;
-               upper_value := upper.to_integer;
+               upper_value := upper.to_integer_or_error;
             else
                error(upper.start_position,fz_bcv);
             end;

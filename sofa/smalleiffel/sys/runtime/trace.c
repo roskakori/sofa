@@ -18,10 +18,36 @@
   This file comes after no_check.[hc] to implements the -trace flag.
 */
 
-#ifdef SE_TRACE
+
+#ifdef SE_WEDIT
+/*
+   Smooth interface with the Wedit debugger.
+*/
+#define MAXBREAKPOINTS 256
+static int __BreakpointsList[MAXBREAKPOINTS];
+void SE_CallDebugger(void) {
+}
+
+se_position se_trace(se_position p) {
+  int l = se_position2line(p);
+  int c = se_position2column(p);
+  int f = se_position2path_id(p);
+  int i,s;
+
+  s = (f <<16)|l;
+  for (i=0; i< MAXBREAKPOINTS;i++) {
+    if (__BreakpointsList[i] == s) {
+      SE_CallDebugger();
+    }
+    else if (__BreakpointsList[i] == 0)
+      break;
+  }
+  return p;
+}
+#elif SE_TRACE
 /*
   The SmallEiffel -trace is used, so the command line SmallEiffel
-  step-by-step se_trace fucntion is defined.
+  step-by-step se_trace function is defined.
 */
 static FILE* se_trace_file = NULL;
 static int se_write_trace_flag = 0;
@@ -100,89 +126,63 @@ static void sedb_show_source_line(int l,int c,int f) {
 }
 
 void se_trace(se_dump_stack*ds, se_position position) {
-  static char cmd_memo = 1;
-  static char cmd;
-  int l = se_position2line(position);
-  int c = se_position2column(position);
-  int f = se_position2path_id(position);
-  ds->p = position;
-  if (se_trace_ready_flag) {
-    if (se_write_trace_flag) {
-      fprintf(se_trace_file,"line %d column %d in %s\n",l,c,p[f]);
-      fflush(se_trace_file);
-    }
-  next_command:
-    if (se_step_by_step_flag) {
-      if (cmd_memo != 0) {
-	printf("(sedb) ");
+  if (se_trace_flag) {
+    static char cmd_memo = 1;
+    static char cmd;
+    int l = se_position2line(position);
+    int c = se_position2column(position);
+    int f = se_position2path_id(position);
+    ds->p = position;
+    if (se_trace_ready_flag) {
+      if (se_write_trace_flag) {
+	fprintf(se_trace_file,"line %d column %d in %s\n",l,c,p[f]);
+	fflush(se_trace_file);
       }
-      fflush(stdout);
-      cmd = get_answer();
-      cmd_memo = cmd;
-      if ((cmd == 'h') || (cmd == 'H') || (cmd == '?')) {
-	sedb_help_command();
-	goto next_command;
+    next_command:
+      if (se_step_by_step_flag) {
+	if (cmd_memo != 0) {
+	  printf("(sedb) ");
+	}
+	fflush(stdout);
+	cmd = get_answer();
+	cmd_memo = cmd;
+	if ((cmd == 'h') || (cmd == 'H') || (cmd == '?')) {
+	  sedb_help_command();
+	  goto next_command;
+	}
+	else if ((cmd == 's') || (cmd == 'S')) {
+	  se_print_run_time_stack();
+	  goto next_command;
+	}
+	else if ((cmd == 'q') || (cmd == 'Q')) {
+	  exit(EXIT_FAILURE);
+	}
+	else if (cmd == 0) {
+	  sedb_show_source_line(l,c,f);
+	}
+	else {
+	  printf("Unknown command.\nTtype H for help\n");
+	  goto next_command;
+	}
       }
-      else if ((cmd == 's') || (cmd == 'S')) {
-	se_print_run_time_stack();
-	goto next_command;
-      }
-      else if ((cmd == 'q') || (cmd == 'Q')) {
-	exit(EXIT_FAILURE);
-      }
-      else if (cmd == 0) {
-	sedb_show_source_line(l,c,f);
-      }
-      else {
-	printf("Unknown command.\nTtype H for help\n");
-	goto next_command;
-      }
-    }
-  }
-  else {
-    se_trace_ready_flag = 1;
-    printf("Write the execution trace in \"trace.se\" file (y/n) ? [n]");
-    fflush(stdout);
-    if (get_answer() == 'y') {
-      se_write_trace_flag = 1;
-      se_trace_file = fopen("trace.se","w");
-    }
-    printf("Step-by-step execution (y/n) ? [y]");
-    fflush(stdout);
-    if (get_answer() == 'n') {
-      se_step_by_step_flag = 0;
     }
     else {
+      se_trace_ready_flag = 1;
+      printf("Write the execution trace in \"trace.se\" file (y/n) ? [n]");
+      fflush(stdout);
+      if (get_answer() == 'y') {
+	se_write_trace_flag = 1;
+	se_trace_file = fopen("trace.se","w");
+      }
+      printf("Step-by-step execution (y/n) ? [y]");
+      fflush(stdout);
+      if (get_answer() == 'n') {
+	se_step_by_step_flag = 0;
+      }
+      else {
 	sedb_help_command();
+      }
     }
-  }
-}
-#endif
-
-
-#ifdef SE_WEDIT
-/*
-   Smooth interface with Wedit debugger.
-*/
-#define MAXBREAKPOINTS 256
-static int __BreakpointsList[MAXBREAKPOINTS];
-void SE_CallDebugger(void) {
-}
-
-void se_trace(se_dump_stack*ds,se_position p) {
-  int l = se_position2line(p);
-  int c = se_position2column(p);
-  int f = se_position2path_id(p);
-  int i,s;
-
-  ds->p = p;
-  s = (f <<16)|l;
-  for (i=0; i< MAXBREAKPOINTS;i++) {
-    if (__BreakpointsList[i] == s) {
-      SE_CallDebugger();
-    }
-    else if (__BreakpointsList[i] == 0)
-      break;
   }
 }
 #endif

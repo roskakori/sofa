@@ -24,102 +24,86 @@ inherit GLOBALS;
 feature
 
    base_class: BASE_CLASS;
-         -- The class where the feature is really written.
+         -- The class where the feature is really written if any.
+	 -- Because of the undefine option for example, `base_class' may be 
+	 -- Void.
 
    names: FEATURE_NAME_LIST;
          -- All the names of the feature.
-
+   
    arguments: FORMAL_ARG_LIST is
          -- Arguments if any.
       deferred
       end;
-
+   
    result_type: TYPE is
          -- Result type if any.
       deferred
       end;
-
+   
    header_comment: COMMENT;
          -- Header comment for a routine or following comment for
          -- an attribute.
-
+   
    obsolete_mark: MANIFEST_STRING is
          -- The `obsolete' mark if any.
       deferred
       end;
-
+   
    require_assertion: E_REQUIRE is
          -- Not Void if any.
       deferred
       end;
-
+   
    ensure_assertion: E_ENSURE is
          -- Not Void if any.
       deferred
       end;
-
+   
    clients: CLIENT_LIST;
          -- Authorized clients list of the corresponding feature
          -- clause in the base definition class.
-
+   
    is_deferred: BOOLEAN is
          -- Is it a deferred feature ?
       deferred
       end;
-
-   frozen mapping_c_name_in(str: STRING) is
-	 -- *** VIRER ??? ***
-      do
-         base_class.mapping_c_in(str);
-         str.append(first_name.to_key);
-      end;
-
-   frozen mapping_c_name is
-      local
-         s: STRING;
-      do
-         s := "    ";
-         s.clear;
-         mapping_c_name_in(s);
-         cpp.put_string(s);
-      end;
-
+   
    frozen base_class_name: CLASS_NAME is
          -- Name of the class where the feature is really written.
       do
          Result := base_class.name;
       end;
-
+   
    frozen first_name: FEATURE_NAME is
       do
          Result := names.first;
       ensure
          Result /= void
       end;
-
+   
    frozen start_position: POSITION is
       do
          Result := first_name.start_position;
       end;
-
-   to_run_feature(t: TYPE; fn: FEATURE_NAME): RUN_FEATURE is
-         -- If possible, gives the checked runnable feature for `t'.
-         -- Note: corresponding run_class dictionary is updated
-         --       with this new feature.
+   
+   to_run_feature(ct: TYPE; fn: FEATURE_NAME): RUN_FEATURE is
+         -- If possible, gives the checked runnable feature for `ct'
+         -- using `fn' as the final name.
       require
-         t.is_run_type;
-         fn /= Void;
+	 ct.run_type = ct
+         ct.run_class.at(fn) = Void
       deferred
       ensure
-         Result /= Void implies t.run_class.at(fn) = Result;
+         Result /= Void implies ct.run_class.at(fn) = Result;
          Result = Void implies nb_errors > 0
       end;
-
+   
    can_hide(other: E_FEATURE; rc: RUN_CLASS): BOOLEAN is
          -- True when headings of Current can be hide with
          -- heading of `other' in `rc'.
       require
-         Current /= other;
+         Current /= other
       do
          if result_type /= other.result_type then
             if result_type = Void or else other.result_type = Void then
@@ -163,7 +147,7 @@ feature
             merge_header_comments(other);
          end;
       end;
-
+   
    frozen check_obsolete(caller: POSITION) is
       require
          not caller.is_unknown
@@ -178,18 +162,18 @@ feature
             end
          end;
       end;
-
+   
    set_header_comment(hc: like header_comment) is
       do
          header_comment := hc;
       end;
-
+   
    pretty_print is
       require
-         fmt.indent_level = 1;
+         fmt.indent_level = 1
       deferred
       ensure
-         fmt.indent_level = 1;
+         fmt.indent_level = 1
       end;
 
    frozen pretty_print_profile is
@@ -277,20 +261,21 @@ feature {FEATURE_CLAUSE,E_FEATURE}
 
    set_clients(c: like clients) is
       require
-         c /= Void;
+         c /= Void
       do
          clients := c;
       ensure
-         clients = c;
+         clients = c
       end;
 
 feature {FEATURE_CLAUSE}
 
-   add_into(fd: DICTIONARY[E_FEATURE,STRING]) is
+   frozen add_into(fd: DICTIONARY[E_FEATURE,STRING]) is
          -- Also check for multiple definitions.
       local
          i: INTEGER;
          fn: FEATURE_NAME;
+	 key: STRING;
       do
          base_class := names.item(1).start_position.base_class;
          from
@@ -299,8 +284,9 @@ feature {FEATURE_CLAUSE}
             i > names.count
          loop
             fn := names.item(i);
-            if fd.has(fn.to_key) then
-               fn := fd.at(fn.to_key).first_name;
+	    key := fn.to_key;
+            if fd.has(key) then
+               fn := fd.at(key).first_name;
                eh.add_position(fn.start_position);
                eh.add_position(names.item(i).start_position);
                eh.append("Double definition of feature ");
@@ -308,7 +294,7 @@ feature {FEATURE_CLAUSE}
                eh.append(fz_dot);
                eh.print_as_error;
             else
-               fd.put(Current,fn.to_key);
+               fd.add(Current,key);
             end;
             i := i + 1;
          end;
@@ -340,7 +326,7 @@ feature {NONE}
 
    make_e_feature(n: like names) is
       require
-         n.count >= 1;
+         n.count >= 1
       do
          names := n;
       ensure

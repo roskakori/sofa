@@ -89,6 +89,15 @@ feature
          Result := 0.0;
       end;
 
+   sign: INTEGER is
+      do
+	 if item < 0.0 then
+	    Result := -1;
+	 elseif item > 0.0 then
+	    Result := 1;
+	 end;
+      end;
+
    out_in_tagged_out_memory, fill_tagged_out_memory is
       do
          item.fill_tagged_out_memory;

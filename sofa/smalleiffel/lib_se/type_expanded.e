@@ -239,11 +239,6 @@ feature
          Result := mapped.base_class_name;
       end;
 
-   run_class: RUN_CLASS is
-      do
-         Result := small_eiffel.run_class(run_type);
-      end;
-
    to_runnable(rt: TYPE): like Current is
       local
          m: like mapped;

@@ -10,8 +10,8 @@ indexing
 	author:     "Eric Bezault <ericb@gobosoft.com>"
 	copyright:  "Copyright (c) 1999, Eric Bezault and others"
 	license:    "Eiffel Forum Freeware License v1 (see forum.txt)"
-	date:       "$Date: 1999/09/01 12:30:21 $"
-	revision:   "$Revision: 1.3 $"
+	date:       "$Date: 2000/02/02 10:42:57 $"
+	revision:   "$Revision: 1.4 $"
 
 deferred class DS_TRAVERSABLE [G]
 
@@ -59,8 +59,6 @@ feature -- Status report
 			a_cursor_not_void: a_cursor /= Void
 		do
 			Result := a_cursor.container = Current
-		ensure
-			definition: Result = (a_cursor.container = Current)
 		end
 
 feature -- Cursor movement
@@ -78,8 +76,10 @@ feature -- Cursor movement
 
 feature {NONE} -- Implementation
 
-	internal_cursor: like new_cursor
+	internal_cursor: like new_cursor is
 			-- Internal cursor
+		deferred
+		end
 
 feature {DS_CURSOR} -- Implementation
 

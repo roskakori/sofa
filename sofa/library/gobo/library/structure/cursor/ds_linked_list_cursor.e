@@ -8,8 +8,8 @@ indexing
 	author:     "Eric Bezault <ericb@gobosoft.com>"
 	copyright:  "Copyright (c) 1999, Eric Bezault and others"
 	license:    "Eiffel Forum Freeware License v1 (see forum.txt)"
-	date:       "$Date: 1999/09/01 12:33:25 $"
-	revision:   "$Revision: 1.3 $"
+	date:       "$Date: 1999/11/27 14:13:10 $"
+	revision:   "$Revision: 1.4 $"
 
 class DS_LINKED_LIST_CURSOR [G]
 
@@ -115,8 +115,8 @@ feature -- Cursor movement
 			was_off: BOOLEAN
 		do
 			was_off := off
-			before := False
 			current_cell := container.first_cell
+			before := False
 			after := (current_cell = Void)
 			if not after and was_off then
 				container.add_traversing_cursor (Current)
@@ -130,8 +130,8 @@ feature -- Cursor movement
 			was_off: BOOLEAN
 		do
 			was_off := off
-			after := False
 			current_cell := container.last_cell
+			after := False
 			before := (current_cell = Void)
 			if not before and was_off then
 				container.add_traversing_cursor (Current)
@@ -146,8 +146,8 @@ feature -- Cursor movement
 		do
 			if before then
 				was_off := True
-				before := False
 				current_cell := container.first_cell
+				before := False
 			else
 				current_cell := current_cell.right
 			end
@@ -170,8 +170,8 @@ feature -- Cursor movement
 		do
 			if after then
 				was_off := True
-				after := False
 				current_cell := container.last_cell
+				after := False
 			elseif is_first then
 				before := True
 				current_cell := Void

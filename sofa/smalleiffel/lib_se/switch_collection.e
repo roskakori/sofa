@@ -47,7 +47,7 @@ feature {CALL_PROC_CALL}
          else
             current_type := run_feature.current_type;
             if current_type.is_reference then
-               running := current_type.run_class.running;
+               running := run_feature.run_class.running;
                if running /= Void and then running.count > 1 then
                   update_with(run_feature);
                end;
@@ -116,7 +116,7 @@ feature {SMALL_EIFFEL}
          end;
       end;
 
-feature {CECIL_POOL,ADDRESS_OF_POOL}
+feature {CECIL_FILE,ADDRESS_OF_POOL}
 
    update_with(run_feature: RUN_FEATURE) is
       require
@@ -128,7 +128,7 @@ feature {CECIL_POOL,ADDRESS_OF_POOL}
          running: ARRAY[RUN_CLASS];
       do
          current_type := run_feature.current_type;
-         running := current_type.run_class.running;
+         running := run_feature.run_class.running;
          if running /= Void and then running.count > 1 then
             key1 := current_type.run_time_mark;
             key2 := run_feature.name.to_key;
@@ -156,12 +156,10 @@ feature {C_PRETTY_PRINTER}
       require
          run_feature /= Void
       local
-         current_type: TYPE;
          key1, key2: STRING;
          dictionary2: DICTIONARY[RUN_FEATURE,STRING];
       do
-         current_type := run_feature.current_type;
-         key1 := current_type.run_time_mark;
+         key1 := run_feature.run_class.run_time_mark;
          if dictionary.has(key1) then
             dictionary2 := dictionary.at(key1);
             key2 := run_feature.name.to_key;

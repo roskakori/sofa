@@ -171,7 +171,7 @@ feature {NONE}
       do
          rf3 := t.expanded_initializer;
          if rf3 /= Void then
-            cpp.expanded_writable(rf3,writable);
+            cpp.put_proc_call_0(rf3,writable,Void);
          end;
       end;
 

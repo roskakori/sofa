@@ -8,8 +8,8 @@ indexing
 	author:     "Eric Bezault <ericb@gobosoft.com>"
 	copyright:  "Copyright (c) 1999, Eric Bezault and others"
 	license:    "Eiffel Forum Freeware License v1 (see forum.txt)"
-	date:       "$Date: 1999/10/02 13:56:19 $"
-	revision:   "$Revision: 1.3 $"
+	date:       "$Date: 2000/02/09 18:36:29 $"
+	revision:   "$Revision: 1.4 $"
 
 class LX_FILE_BUFFER
 
@@ -63,7 +63,7 @@ feature -- Element change
 				end_of_file := True
 				content := ""
 			end
-			position := 1
+			index := 1
 		end
 
 invariant

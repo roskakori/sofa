@@ -1441,22 +1441,6 @@ feature {NONE}
 
 feature {NATIVE_SMALL_EIFFEL}
 
-   runtime_se_getenv is
-      local
-         point1: INTEGER;
-         cp: like constant_pool;
-         idx: INTEGER;
-      do
-         cp := constant_pool;
-         idx := cp.idx_methodref3(fz_se_runtime,"se_getenv",
-                                  "(Ljava/lang/Object;)Ljava/lang/String;");
-         opcode_invokestatic(idx,0);
-         opcode_dup;
-         point1 := opcode_ifnull;
-         opcode_java_string2eiffel_string;
-         resolve_u2_branch(point1);
-      end;
-
    read_byte is
       local
          cp: like constant_pool;

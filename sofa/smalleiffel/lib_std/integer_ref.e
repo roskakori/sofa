@@ -95,13 +95,21 @@ feature
 
    one: like Current is
       do
-         !!Result;
-         Result.set_item(1);
+         Result := 1;
       end;
 
    zero: like Current is
       do
          Result := 0;
+      end;
+
+   sign: INTEGER is
+      do
+	 if item < 0 then
+	    Result := -1;
+	 elseif item > 0 then
+	    Result := 1;
+	 end;
       end;
 
    out_in_tagged_out_memory, fill_tagged_out_memory is

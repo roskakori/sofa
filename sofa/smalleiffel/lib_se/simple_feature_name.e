@@ -20,7 +20,7 @@ class SIMPLE_FEATURE_NAME
    -- attribute as a left hand side of an assignment.
    --
 
-inherit FEATURE_NAME; EXPRESSION redefine is_writable end;
+inherit FEATURE_NAME; EXPRESSION;
 
 creation make, unknown_position, with
 
@@ -40,6 +40,11 @@ feature
    is_writable: BOOLEAN is true;
 
    use_current: BOOLEAN is true;
+
+   to_integer_or_error: INTEGER is
+      do
+	 to_integer_error;
+      end;
 
    stupid_switch(r: ARRAY[RUN_CLASS]): BOOLEAN is
       local
@@ -118,8 +123,9 @@ feature
             rf2 ?= rf;
             if rf2 = Void then
                eh.add_position(rf.start_position);
-               error(start_position,
-                     "Feature found is not writable.");
+               eh.add_position(start_position);
+	       eh.append("Feature found is not writable.");
+	       eh.print_as_fatal_error;
             end;
          end;
          if run_feature_2 = Void then
@@ -274,6 +280,17 @@ feature
          end;
          idx := constant_pool.idx_fieldref(rf2);
          ca.opcode_putfield(idx,-(space + 1));
+      end;
+
+feature {RUN_CLASS}
+
+   set_run_feature_2(rf2: RUN_FEATURE_2) is
+      require
+	 rf2 /= Void
+      do
+	 run_feature_2 := rf2;
+      ensure
+	 run_feature_2 = rf2
       end;
 
 feature {TYPE_BIT_2}

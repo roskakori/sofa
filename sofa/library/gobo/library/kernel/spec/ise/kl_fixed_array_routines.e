@@ -10,8 +10,8 @@ indexing
 	author:     "Eric Bezault <ericb@gobosoft.com>"
 	copyright:  "Copyright (c) 1999, Eric Bezault and others"
 	license:    "Eiffel Forum Freeware License v1 (see forum.txt)"
-	date:       "$Date: 1999/10/02 13:45:32 $"
-	revision:   "$Revision: 1.3 $"
+	date:       "$Date: 2000/02/02 10:24:01 $"
+	revision:   "$Revision: 1.4 $"
 
 class KL_FIXED_ARRAY_ROUTINES [G]
 
@@ -26,10 +26,10 @@ feature -- Initialization
 		require
 			non_negative_n: n >= 0
 		local
-			an_array: ARRAY [G]
+			to_special: TO_SPECIAL [G]
 		do
-			!! an_array.make (0, n - 1)
-			Result := an_array.area
+			!! to_special.make_area (n)
+			Result := to_special.area
 		ensure
 			fixed_array_not_void: Result /= Void
 			valid_fixed_array: valid_fixed_array (Result)
@@ -42,11 +42,9 @@ feature -- Initialization
 			an_array_not_void: an_array /= Void
 		local
 			array_routines: KL_ARRAY_ROUTINES [G]
-			a: ARRAY [G]
 		do
 			!! array_routines
-			a := array_routines.make_from_array (an_array, 0)
-			Result := a.area
+			Result := array_routines.make_from_array (an_array, 0).area
 		ensure
 			fixed_array_not_void: Result /= Void
 			valid_fixed_array: valid_fixed_array (Result)
@@ -74,6 +72,23 @@ feature -- Conversion
 		end
 
 feature -- Status report
+
+	has (an_array: like FIXED_ARRAY_TYPE; v: G): BOOLEAN is
+			-- Does `v' appear in `an_array'?
+		require
+			an_array_not_void: an_array /= Void
+		local
+			i: INTEGER
+		do
+			from
+				i := an_array.count - 1
+			until
+				Result or i < 0
+			loop
+				Result := an_array.item (i) = v
+				i := i - 1
+			end
+		end
 
 	valid_fixed_array (an_array: like FIXED_ARRAY_TYPE): BOOLEAN is
 			-- Make sure that the lower bound of `an_array' is zero.

@@ -61,6 +61,11 @@ feature
          Result := as_current;
       end;
 
+   frozen to_integer_or_error: INTEGER is
+      do
+	 to_integer_error;
+      end;
+
    frozen static_value: INTEGER is
       do
       end;
@@ -178,8 +183,6 @@ feature
       do
          if result_type = Void then
             result_type := ct;
-            Result := Current
-         elseif result_type = ct then
             Result := Current
          else
             !!Result.make(start_position);

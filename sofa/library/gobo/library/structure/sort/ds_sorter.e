@@ -6,17 +6,24 @@ indexing
 
 	library:    "Gobo Eiffel Structure Library"
 	author:     "Eric Bezault <ericb@gobosoft.com>"
-	copyright:  "Copyright (c) 1999, Eric Bezault and others"
+	copyright:  "Copyright (c) 2000, Eric Bezault and others"
 	license:    "Eiffel Forum Freeware License v1 (see forum.txt)"
-	date:       "$Date: 1999/09/01 12:51:20 $"
-	revision:   "$Revision: 1.3 $"
+	date:       "$Date: 2000/04/16 13:55:06 $"
+	revision:   "$Revision: 1.5 $"
 
 deferred class DS_SORTER [G]
 
 feature -- Status report
 
 	sorted (a_container: DS_SORTABLE [G]): BOOLEAN is
-			-- Is `a_container' sorted?
+			-- Is `a_container' sorted in increasing order?
+		require
+			a_container_not_void: a_container /= Void
+		deferred
+		end
+
+	reverse_sorted (a_container: DS_SORTABLE [G]): BOOLEAN is
+			-- Is `a_container' sorted in decreasing order?
 		require
 			a_container_not_void: a_container /= Void
 		deferred
@@ -25,12 +32,21 @@ feature -- Status report
 feature -- Sort
 
 	sort (a_container: DS_SORTABLE [G]) is
-			-- Sort `a_container'.
+			-- Sort `a_container' in increasing order.
 		require
 			a_container_not_void: a_container /= Void
 		deferred
 		ensure
 			sorted: sorted (a_container)
+		end
+
+	reverse_sort (a_container: DS_SORTABLE [G]) is
+			-- Sort `a_container' in decreasing order.
+		require
+			a_container_not_void: a_container /= Void
+		deferred
+		ensure
+			sorted: reverse_sorted (a_container)
 		end
 
 end -- class DS_SORTER

@@ -209,6 +209,14 @@ feature
          end;
       end;
    
+   set_in(bc: like base_class) is
+	 -- Assign `Current' in `bc'. This routine is used to create implicit 
+	 -- Eiffel code. As an example, this is used to define pseudo 
+	 -- code of class TUPLE which is not truly written.
+      do
+	 set(1,1,bc.id,bc);
+      end;
+
 feature {EIFFEL_PARSER}
    
    set(li, co, class_id: INTEGER; bc: like base_class) is

@@ -127,6 +127,12 @@ feature {CALL_PROC_CALL}
 
    collect_c_tmp is
       do
+	 if result_type.is_user_expanded then
+	    if result_type.is_dummy_expanded then
+	    else
+	       cpp.se_tmp_add(Current);
+	    end;
+	 end;
       end;
 
 feature {NONE}

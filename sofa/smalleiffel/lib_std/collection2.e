@@ -22,7 +22,7 @@ deferred class COLLECTION2[E]
    --
 
 inherit
-   ANY
+   SAFE_EQUAL[E]
       undefine copy, is_equal
       redefine fill_tagged_out_memory
       end;
@@ -392,7 +392,8 @@ feature {COLLECTION2} -- For `same_as' implementation :
                until
                   not Result or else column < lower2
                loop
-                  Result := equal_like(item(line,column),other.item(line,column));
+                  Result := safe_equal(item(line,column),
+				       other.item(line,column));
                   column := column - 1;
                end;
                line := line - 1;
@@ -412,23 +413,4 @@ feature {COLLECTION2} -- For `same_as' implementation :
       deferred
       end;
    
-feature {NONE}
-   
-   frozen equal_like(e1, e2: like item): BOOLEAN is
-         -- Note: this feature is called to avoid calling `equal'
-         -- on expanded types (no automatic conversion to 
-         -- corresponding reference type).
-      do
-         if e1.is_basic_expanded_type then
-            Result := e1 = e2;
-         elseif e1.is_expanded_type then
-            Result := e1.is_equal(e2);
-         elseif e1 = e2 then
-            Result := true;
-         elseif e1 = Void or else e2 = Void then
-         else
-            Result := e1.is_equal(e2);
-         end;
-      end;
-
 end -- COLLECTION2[E]

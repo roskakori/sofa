@@ -16,17 +16,27 @@ class LARGE_NEGATIVE_INTEGER
        
 inherit LARGE_INTEGER;
    
-creation make_from_fixed_array, make_smaller, make_from_product, make_big
+creation make_from_fixed_array, make_smaller, make_from_large_product, make_from_product, make_big
 
 feature
 
    is_positive: BOOLEAN is false;
    
    is_negative: BOOLEAN is true;
-       
+   
+   is_integer_value:BOOLEAN is
+      local
+	 d_1_mi: INTEGER;
+      do
+	 if value.upper <= 1 then
+	    d_1_mi := (Minimum_integer // Base).abs;
+	    Result := (value.item(value.upper) < d_1_mi) or else ((value.item(value.upper) = d_1_mi) and then (value.item(value.lower) <= (Minimum_integer \\ Base).abs));
+	 end;
+      end;
+   
    to_integer: INTEGER is
       do
-	 Result := Minimum_integer;
+	 Result := -storage.item(0) - storage.item(1) * Base;
       end;
    
    to_double: DOUBLE is
@@ -46,26 +56,78 @@ feature
       end;
  
    infix "@+" (other: INTEGER): NUMBER is
-      do	 
-	 if (other = 0 ) then
-	    Result := clone( Current )
-	 elseif (other > 0) then
-	    temp_1_digint.put(other, 0);
-	    difference_between_fixed_arrays(value, temp_1_digint);
-	    Result := create_negative(temp);
+      local
+	 oth: NUMBER;
+	 i, calcul:INTEGER;
+	 tmp: FIXED_ARRAY[INTEGER];
+	 transit: INTEGER;
+      do
+	 if other = 0 then
+	    Result := Current;
 	 else
-	    if (other /= Minimum_integer) then
-	       temp_1_digint.put(other.abs, 0);
-	       add_fixed_arrays(value, temp_1_digint);
-   
+	    if other >= Base then
+	       -- Boostable
+	       !LARGE_POSITIVE_INTEGER!oth.make_smaller(other);
+	       Result := oth.add_with_large_negative_integer(Current);
+	    elseif other <= -Base then
+	       !LARGE_NEGATIVE_INTEGER!oth.make_smaller(other);
+	       Result := oth.add_with_large_negative_integer(Current);
 	    else
-	       temp_2_digints.put(0,0);
-	       temp_2_digints.put(1,1);
-	       add_fixed_arrays(value, temp_2_digints);
+	       transit := -other;
+	       if transit > 0 then
+		  !!tmp.make(storage.count + 1);
+		  from
+		     i := storage.lower - 1;
+		     calcul := transit;
+		  until
+		     i = storage.upper
+		  loop
+		     i := i + 1;
+		     calcul := storage.item(i) + calcul;
+		     if calcul >= Base then
+			tmp.put(calcul - Base, i);
+			calcul := 1;
+		     else
+			tmp.put(calcul, i);
+			calcul := 0;
+		     end;
+		  end;
+		  if calcul = 0 then
+		     tmp.remove_last;
+		  else
+		     tmp.put(calcul, tmp.upper);
+		  end;
+		  !LARGE_NEGATIVE_INTEGER!Result.make_from_fixed_array(tmp);
+	       else
+		  !!tmp.make(storage.count);
+		  from
+		     i := storage.lower - 1;
+		     calcul := transit;
+		  until
+		     i = storage.upper
+		  loop
+		     i := i + 1;
+		     calcul := storage.item(i) + calcul;
+		     if calcul < 0 then
+			tmp.put(calcul + Base, i);
+			calcul := -1;
+		     else
+			tmp.put(calcul, i);
+			calcul := 0;
+		     end;
+		  end;
+		  if tmp.item(tmp.upper) = 0 then
+		     tmp.remove_last;
+		  end;
+		  if tmp.count = 1 then
+		     !SMALL_INTEGER!Result.make(-tmp.item(0));
+		  else
+		     !LARGE_NEGATIVE_INTEGER!Result.make_from_fixed_array(tmp);
+		  end;
+	       end;
 	    end;
-	    !LARGE_NEGATIVE_INTEGER!Result.make_from_fixed_array(clone(temp));
 	 end;
-      end; 
+      end;
 
    infix "*" (other: NUMBER): NUMBER is
       do
@@ -77,15 +139,20 @@ feature
 	 if (other = 0) then
 	    Result := zero;
 	 elseif (other > 0) then 
-	    mult_fixed_with_integer(value, other);
-	    !LARGE_NEGATIVE_INTEGER!Result.make_from_fixed_array(clone(temp));
-	 else
-	    if (other = Minimum_integer) then
-	       mult_2_fixed(value, smaller_correct_fixed);
-	       !LARGE_POSITIVE_INTEGER!Result.make_from_fixed_array(clone(temp_from_mult));
+	    if (other >= Base) then 
+	       temp_2_digints.put(other \\ Base, 0);
+	       temp_2_digints.put(other // Base, 1);
+	       !LARGE_NEGATIVE_INTEGER!Result.make_from_fixed_array(mult_2_fixed(value, temp_2_digints));
 	    else
-	       mult_fixed_with_integer(value, other.abs);
-	       !LARGE_POSITIVE_INTEGER!Result.make_from_fixed_array(clone(temp));
+	       !LARGE_NEGATIVE_INTEGER!Result.make_from_fixed_array(mult_fixed_with_integer(value, other));
+	    end;
+	 elseif other < 0 then
+	    if other <= -Base then
+	       temp_2_digints.put((other \\ Base).abs, 0);
+	       temp_2_digints.put((other // Base).abs, 1);
+	       !LARGE_POSITIVE_INTEGER!Result.make_from_fixed_array(mult_2_fixed(value, temp_2_digints));
+	    else
+	       !LARGE_POSITIVE_INTEGER!Result.make_from_fixed_array(mult_fixed_with_integer(value, other.abs));
 	    end;
 	 end;
       end;
@@ -101,7 +168,13 @@ feature
 	 elseif (other = -1) then
 	    Result := -Current;
 	 else
-	    !SMALL_INTEGER!d.make(other);
+	    if other >= Base then
+	       !LARGE_POSITIVE_INTEGER!d.make_smaller(other);
+	    elseif other <= -Base then
+	       !LARGE_NEGATIVE_INTEGER!d.make_smaller(other.abs);
+	    else
+	       !SMALL_INTEGER!d.make(other);
+	    end;
 	    Result := Current / d;
 	 end;
       end;
@@ -116,8 +189,15 @@ feature
    
    infix "@//" (other: INTEGER): NUMBER is
       do
-	 if (other = Minimum_integer) then
-	    divise_fixed_array(value, smaller_correct_fixed);
+	 if other >= Base then
+	    temp_2_digints.put(other \\ Base, 0);
+	    temp_2_digints.put(other // Base, 1);
+	    divise_fixed_array(value, temp_2_digints);
+	    Result := create_negative(temp_quotient);
+	 elseif other <= -Base then
+	    temp_2_digints.put(-(other \\ Base), 0);
+	    temp_2_digints.put(-(other // Base), 1);
+	    divise_fixed_array(value, temp_2_digints);
 	    Result := create_positive(temp_quotient);
 	 else	
 	    temp_1_digint.put(other.abs,0);
@@ -147,16 +227,15 @@ feature {NUMBER}
    
    add_with_large_negative_integer(other: LARGE_NEGATIVE_INTEGER): NUMBER is
       do
-	 add_fixed_arrays(value, other.value);
-	 !LARGE_NEGATIVE_INTEGER!Result.make_from_fixed_array(clone(temp));
+	 !LARGE_NEGATIVE_INTEGER!Result.make_from_fixed_array(add_fixed_arrays(value, other.value));
       end;
    
-   add_with_small_fraction(other: SMALL_FRACTION): NUMBER is
+   add_with_small_fraction(other: INTEGER_FRACTION): NUMBER is
       do
 	 Result := other.add_with_large_negative_integer( Current );
       end;
    
-   add_with_large_fraction(other: LARGE_FRACTION): NUMBER is
+   add_with_large_fraction(other: NUMBER_FRACTION): NUMBER is
       do
 	 Result := other.add_with_large_negative_integer( Current );
       end;
@@ -168,33 +247,27 @@ feature {NUMBER}
    
    multiply_with_large_negative_integer(other: LARGE_NEGATIVE_INTEGER): NUMBER is
       do 
-	 mult_2_fixed(value, other.value);
-	 !LARGE_POSITIVE_INTEGER!Result.make_from_fixed_array(clone(temp_from_mult));
+	!LARGE_POSITIVE_INTEGER!Result.make_from_fixed_array(mult_2_fixed(value, other.value));
       end;
    
-   multiply_with_small_fraction (other: SMALL_FRACTION): NUMBER is
+   multiply_with_small_fraction (other: INTEGER_FRACTION): NUMBER is
       do
 	 Result := other.multiply_with_large_negative_integer(Current);
       end;
    
-   multiply_with_large_fraction (other: LARGE_FRACTION): NUMBER is
+   multiply_with_large_fraction (other: NUMBER_FRACTION): NUMBER is
       do
 	 Result := other.multiply_with_large_negative_integer(Current);
       end;
    
    integer_divide_small_integer(other: SMALL_INTEGER): ABSTRACT_INTEGER is
       do
-	 if (other @= Minimum_integer) then
-	    divise_fixed_array(smaller_correct_fixed, value);
+	 temp_1_digint.put(other.to_integer.abs,0); 
+	 divise_fixed_array(temp_1_digint, value);
+	 if (other.to_integer < 0) then
 	    Result := create_positive(temp_quotient);
-	 else	
-	    temp_1_digint.put(other.to_integer.abs,0); 
-	    divise_fixed_array(temp_1_digint, value);
-	    if (other @< 0) then
-	       Result := create_positive(temp_quotient);
-	    else
-	       Result := create_negative(temp_quotient);
-	    end;
+	 else
+	    Result := create_negative(temp_quotient);
 	 end;
       end; 
       
@@ -212,17 +285,12 @@ feature {NUMBER}
    
    remainder_of_divide_small_integer(other: SMALL_INTEGER): ABSTRACT_INTEGER is
       do
-	 if (other @= Minimum_integer) then
-	    divise_fixed_array(smaller_correct_fixed, value);
+	 temp_1_digint.put(other.to_integer.abs,0);
+	 divise_fixed_array(temp_1_digint, value);
+	 if (other @< 0) then
 	    Result := create_negative(temp_remainder);
-	 else	
-	    temp_1_digint.put(other.to_integer.abs,0);
-	    divise_fixed_array(temp_1_digint, value);
-	    if (other @< 0) then
-	       Result := create_negative(temp_remainder);
-	    else
-	       Result := create_positive(temp_remainder);
-	    end;
+	 else
+	    Result := create_positive(temp_remainder);
 	 end;
       end; 
       
@@ -240,9 +308,16 @@ feature {NUMBER}
 
    infix "@\\" (other: INTEGER): NUMBER is
       do
-	 if (other = Minimum_integer) then
-	    divise_fixed_array(value, smaller_correct_fixed);
-	    Result := create_negative(temp_remainder);
+	 if other >= Base then
+	    temp_2_digints.put(other \\ Base, 0);
+	    temp_2_digints.put(other // Base, 1);
+	    divise_fixed_array(value, temp_2_digints);
+	    Result := create_positive(temp_quotient);
+	 elseif other <= -Base then
+	    temp_2_digints.put(-(other \\ Base), 0);
+	    temp_2_digints.put(-(other // Base), 1);
+	    divise_fixed_array(value, temp_2_digints);
+	    Result := create_negative(temp_quotient);
 	 else	
 	    temp_1_digint.put(other.abs,0);
 	    divise_fixed_array(value, temp_1_digint);
@@ -264,7 +339,7 @@ feature {NUMBER} -- inverse
       do
 	 den ?= abs;
 	 num ?= one;
-	 !LARGE_FRACTION!Result.make_simply(num, den, true);
+	 !NUMBER_FRACTION!Result.make_simply(num, den, true);
       end;
    
    
@@ -272,31 +347,27 @@ feature -- Comparisons with INTEGER
    
    infix "@=" (other: INTEGER): BOOLEAN is
       do
-         if (other = Minimum_integer) then
-	    Result := ((value.upper = 1) 
-		       and then (value.item(1) = 1) 
-		       and then (value.item(0) = 0));
-	 else
-	 end;
+	 Result := is_integer_value and then (-value.item(value.upper) * Base - value.item(value.lower) = other);
       end;
    
    infix "@<" (other: INTEGER): BOOLEAN is
       do
-         Result := (other /= Minimum_integer) or else not( same_as(greater_large_negative_integer) );
+	 Result := (not is_integer_value)  or else ((-value.item(1) * Base - value.item(0)) < other);
       end;
    
    infix "@>" (other: INTEGER): BOOLEAN is
       do
+	 Result := is_integer_value and then ((-value.item(1) * Base - value.item(0)) > other);
       end; 
    
    infix "@<=" (other: INTEGER): BOOLEAN is
       do
-	 Result := true
+	 Result := (not is_integer_value) or else ((-value.item(1) * Base - value.item(0)) <= other);
       end; 
    
    infix "@>=" (other: INTEGER): BOOLEAN is
       do
-	 Result := Current @= other
+	 Result := is_integer_value and then ((-value.item(1) * Base - value.item(0)) >= other);
       end; 
    
 feature -- Comparisons with NUMBER
@@ -310,7 +381,7 @@ feature -- Comparisons with DOUBLE
    
    infix "#=" (other: DOUBLE): BOOLEAN is
       do
-	 if other > Minimum_integer then
+	 if other >= -Base then
 	 else
 	    Result := to_double = other;
 	 end;
@@ -318,7 +389,7 @@ feature -- Comparisons with DOUBLE
    
    infix "#<" (other: DOUBLE): BOOLEAN is
       do
-	 if other > Minimum_integer then
+	 if other >= -Base then
 	    Result := true 
 	 else
 	    Result := to_double < other;
@@ -327,7 +398,7 @@ feature -- Comparisons with DOUBLE
    
    infix "#<=" (other: DOUBLE): BOOLEAN is
       do
-	 if other > Minimum_integer then
+	 if other >= -Base then
 	    Result := true
 	 else
 	    Result := to_double <= other;
@@ -336,7 +407,7 @@ feature -- Comparisons with DOUBLE
    
    infix "#>" (other: DOUBLE): BOOLEAN is
       do
-	 if other > Minimum_integer then
+	 if other >= -Base then
 	 else
 	    Result := to_double > other;
 	 end;
@@ -344,7 +415,7 @@ feature -- Comparisons with DOUBLE
    
    infix "#>=" (other: DOUBLE): BOOLEAN is
       do
-	 if other > Minimum_integer then
+	 if other > -Base then
 	 else
 	    Result := to_double >= other;
 	 end;
@@ -377,24 +448,14 @@ feature{NUMBER}
 	 end;
       end;
 
-   greater_with_small_fraction(other: SMALL_FRACTION): BOOLEAN is 
+   greater_with_small_fraction(other: INTEGER_FRACTION): BOOLEAN is 
       do
       end;
    
-   greater_with_large_fraction(other: LARGE_FRACTION): BOOLEAN is 
+   greater_with_large_fraction(other: NUMBER_FRACTION): BOOLEAN is 
       do
 	    Result := not(other.greater_with_large_negative_integer(Current));
       end;
    
 
 end -- LARGE_NEGATIVE_INTEGER
-
-
-
-
-
-
-
-
-
-

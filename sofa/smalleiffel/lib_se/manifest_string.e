@@ -89,6 +89,11 @@ feature
       do
       end;
 
+   to_integer_or_error: INTEGER is
+      do
+	 to_integer_error;
+      end;
+
    static_value: INTEGER is
       do
       end;

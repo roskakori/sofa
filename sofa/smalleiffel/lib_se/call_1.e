@@ -22,21 +22,22 @@ inherit CALL;
 
 feature
 
-   arguments: EFFECTIVE_ARG_LIST;
-
-feature
-
    arg_count: INTEGER is 1;
 
    can_be_dropped: BOOLEAN is false;
 
    is_pre_computable: BOOLEAN is false;
 
-feature
+   arguments: EFFECTIVE_ARG_LIST;
 
    frozen arg1: EXPRESSION is
       do
          Result := arguments.first;
+      end;
+
+   frozen to_integer_or_error: INTEGER is
+      do
+	 to_integer_error;
       end;
 
 feature {NONE}

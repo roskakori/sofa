@@ -23,7 +23,7 @@ inherit  TYPE;
 
 creation make
 
-creation {TYPE_GENERIC} make_runnable
+creation {TYPE_GENERIC} set, make_runnable
 
 feature
 
@@ -37,6 +37,38 @@ feature {NONE}
 
    run_type_memory: like Current;
          -- The final `is_written_runnable' corresponding type when runnable.
+
+   is_written_runnable: BOOLEAN is
+      local
+         i: INTEGER;
+         t: TYPE;
+      do
+         if run_type_memory = Current then
+            Result := true;
+         elseif run_type_memory = Void then
+            from
+               Result := true;
+               i := generic_list.upper;
+            until
+               not Result or else i = 0
+            loop
+               t := generic_list.item(i);
+               if t.is_run_type then
+                  if t.run_type = t then
+                  else
+                     Result := false;
+                  end;
+               else
+                  Result := false;
+               end;
+               i := i - 1;
+            end;
+            if Result then
+               run_type_memory := Current;
+               basic_checks;
+            end;
+         end;
+      end;
 
 feature
 
@@ -93,12 +125,14 @@ feature {NONE}
          written_mark /= Void
       end;
 
-   make_runnable(model: like Current; gl: like generic_list) is
+   make_runnable(model: like Current; bcm: like base_class_memory;
+		 gl: like generic_list) is
       local
          i: INTEGER;
          t: TYPE;
       do
          base_class_name := model.base_class_name;
+	 base_class_memory := bcm;
          generic_list := gl;
          from
             tmp_mark.copy(base_class_name.to_string);
@@ -122,6 +156,31 @@ feature {NONE}
          is_written_runnable
       end;
 
+   set(bcm: like base_class_memory; rcm: like run_class_memory;
+       bcn: like base_class_name; gl: like generic_list;
+       wm: like written_mark; rtm: like run_type_memory) is
+      require
+	 
+	 rcm /= Void;
+	 bcn /= Void
+	 gl /= Void;
+	 rtm.is_run_type
+      do
+	 base_class_memory := bcm;
+	 run_class_memory := rcm;
+	 base_class_name := bcn;
+	 generic_list := gl;
+	 written_mark := wm;
+	 run_type_memory := rtm;
+      ensure
+	 base_class_memory = bcm;
+	 run_class_memory = rcm;
+	 base_class_name = bcn;
+	 generic_list = gl;
+	 written_mark = wm;
+	 run_type_memory = rtm
+      end;
+
 feature
 
    pretty_print is
@@ -142,38 +201,6 @@ feature
          Result := base_class_name;
       end;
 
-   is_written_runnable: BOOLEAN is
-      local
-         i: INTEGER;
-         t: TYPE;
-      do
-         if run_type_memory = Current then
-            Result := true;
-         elseif run_type_memory = Void then
-            from
-               Result := true;
-               i := generic_list.upper;
-            until
-               not Result or else i = 0
-            loop
-               t := generic_list.item(i);
-               if t.is_run_type then
-                  if t.run_type = t then
-                  else
-                     Result := false;
-                  end;
-               else
-                  Result := false;
-               end;
-               i := i - 1;
-            end;
-            if Result then
-               run_type_memory := Current;
-               basic_checks;
-            end;
-         end;
-      end;
-
    is_run_type: BOOLEAN is
       do
          if run_type_memory /= Void then
@@ -190,21 +217,24 @@ feature
          end;
       end;
 
-   run_class: RUN_CLASS is
-      do
-         if is_run_type then
-            Result := small_eiffel.run_class(run_type_memory);
-         end;
-      end;
-
    to_runnable(ct: TYPE): like Current is
       local
          i: INTEGER;
          rgl: like generic_list;
          t1, t2: TYPE;
-         rt: like Current;
+         rtm: like Current;
       do
          if is_written_runnable then
+	    from
+	       i := generic_list.upper;
+	    until
+	       i < generic_list.lower
+	    loop
+	       t1 := generic_list.item(i);
+	       t2 := t1.to_runnable(ct);
+	       check t1 = t2 end;
+	       i := i - 1;
+	    end;
             Result := Current;
          else
             from
@@ -228,13 +258,17 @@ feature
                end;
                i := i - 1;
             end;
-            !!rt.make_runnable(Current,rgl);
+            !!rtm.make_runnable(Current,base_class_memory,rgl);
             if run_type_memory = Void then
-               run_type_memory := rt;
+               run_type_memory := rtm;
                Result := Current;
             else
-               Result := twin;
-               Result.set_run_type_memory(rt);
+	       !!Result.set(base_class_memory,
+			    rtm.run_class,
+			    base_class_name,
+			    generic_list,
+			    written_mark,
+			    rtm);
             end;
             Result.run_type.basic_checks;
          end;
@@ -504,6 +538,7 @@ feature
       local
          i: INTEGER;
          t1, t2: TYPE;
+	 gl1, gl2: ARRAY[TYPE];
       do
          if other.is_none then
          elseif run_class = other.run_class then
@@ -512,17 +547,20 @@ feature
             if base_class = other.base_class then
                from
                   Result := true;
-                  i := generic_list.upper
+		  gl1 := run_type.generic_list;
+		  gl2 := other.run_type.generic_list;
+                  i := gl1.upper
                until
                   not Result or else i = 0
                loop
-                  t1 := generic_list.item(i).run_type;
-                  t2 := other.generic_list.item(i).run_type;
+                  t1 := gl1.item(i).run_type;
+                  t2 := gl2.item(i).run_type;
                   if t1.is_a(t2) then
                      i := i - 1;
                   else
                      Result := false;
                      eh.append(fz_bga);
+		     eh.extend(' ');
                   end;
                end;
             elseif base_class.is_subclass_of(other.base_class) then
@@ -660,24 +698,6 @@ feature {TYPE_GENERIC}
          end;
       end;
 
-feature {TYPE_GENERIC}
-
-   set_run_type_memory(rt: like Current) is
-      require
-         rt /= Void
-      do
-         run_type_memory := rt;
-      ensure
-         run_type_memory = rt
-      end;
-
-feature {NONE}
-
-   tmp_mark: STRING is
-      once
-         !!Result.make(16);
-      end;
-
 feature {TYPE}
 
    frozen short_hook is
@@ -698,6 +718,13 @@ feature {TYPE}
             i := i + 1;
          end;
          short_print.hook_or("close_sb","]");
+      end;
+
+feature {NONE}
+
+   tmp_mark: STRING is
+      once
+         !!Result.make(16);
       end;
 
 end -- TYPE_GENERIC

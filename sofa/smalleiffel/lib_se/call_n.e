@@ -25,55 +25,18 @@ creation make, with
 
 feature
 
-   arguments: EFFECTIVE_ARG_LIST;
-
-   run_feature: RUN_FEATURE;
-
-feature
-
    is_pre_computable: BOOLEAN is false;
 
    can_be_dropped: BOOLEAN is false;
 
-feature {NONE}
+   arguments: EFFECTIVE_ARG_LIST;
 
-   make(t: like target; sn: like feature_name; a: like arguments) is
-      require
-         t /= void;
-         sn /= void;
-         a.count > 1;
+   run_feature: RUN_FEATURE;
+
+   to_integer_or_error: INTEGER is
       do
-         target := t;
-         feature_name := sn;
-         arguments := a;
-      ensure
-         target = t;
-         feature_name = sn;
-         arguments = a
+	 to_integer_error;
       end;
-
-   with(t: like target; sn: like feature_name; a: like arguments;
-        rf: RUN_FEATURE; ct: TYPE) is
-      require
-         t /= void;
-         sn /= void;
-         a.count > 1;
-         rf /= Void;
-         ct /= Void
-      do
-         target := t;
-         feature_name := sn;
-         arguments := a;
-         run_feature := rf;
-         run_feature_match(ct);
-      ensure
-         target = t;
-         feature_name = sn;
-         arguments = a;
-         run_feature = rf
-      end;
-
-feature
 
    result_type: TYPE is
       local
@@ -222,11 +185,47 @@ feature {RUN_FEATURE_3,RUN_FEATURE_4}
          rf: RUN_FEATURE;
       do
          rf := run_feature;
-         rc := rf.current_type.run_class;
+         rc := rf.run_class;
          run_feature := rc.running.first.dynamic(rf);
       end;
 
 feature {NONE}
+
+   make(t: like target; sn: like feature_name; a: like arguments) is
+      require
+         t /= void;
+         sn /= void;
+         a.count > 1;
+      do
+         target := t;
+         feature_name := sn;
+         arguments := a;
+      ensure
+         target = t;
+         feature_name = sn;
+         arguments = a
+      end;
+
+   with(t: like target; sn: like feature_name; a: like arguments;
+        rf: RUN_FEATURE; ct: TYPE) is
+      require
+         t /= void;
+         sn /= void;
+         a.count > 1;
+         rf /= Void;
+         ct /= Void
+      do
+         target := t;
+         feature_name := sn;
+         arguments := a;
+         run_feature := rf;
+         run_feature_match(ct);
+      ensure
+         target = t;
+         feature_name = sn;
+         arguments = a;
+         run_feature = rf
+      end;
 
    run_feature_match(ct: TYPE) is
       do

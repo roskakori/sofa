@@ -154,7 +154,7 @@ feature
       end;
    
    is_letter: BOOLEAN is
-         -- Is it a letter ?
+         -- Is it a letter ('a' .. 'z' or 'A' .. 'Z') ?
       do
          if Current >= 'a' then
             Result := Current <= 'z';
@@ -236,18 +236,18 @@ feature
       do
          inspect
             Current
-         when ' ','%T','%N','%R','%U' then
+         when ' ','%T','%N','%R','%U', '%F' then
             Result := true;
          else
          end;
       end;
    
    is_letter_or_digit: BOOLEAN is 
-      -- Is character a letter or digit ?
+	 -- Is it a letter (see `is_letter') or a digit (see `is_digit') ?
       do  
          Result := is_letter or else is_digit;
       ensure 
-         valid: Result = (is_letter or is_digit); 
+         definition: Result = (is_letter or is_digit); 
       end; 
 
    is_hex_digit: BOOLEAN is 
@@ -287,7 +287,7 @@ feature
       end;
 
    previous: CHARACTER is
-         -- Give the next character (the following `code');
+         -- Give the previous character (the `code' before);
       require
          code > 0
       do
@@ -358,6 +358,17 @@ feature -- Hashing :
    hash_code: INTEGER is
       do
          Result := code;
+      end;
+
+feature -- Miscellaneous : 
+
+   is_alpha: BOOLEAN is
+	 -- See `is_letter' (yes this is just a call to `is_letter').
+	 -- Isn't `is_letter' better English ;-)
+      do
+	 Result := is_letter;
+      ensure
+	 Result = is_letter
       end;
 
 end -- CHARACTER

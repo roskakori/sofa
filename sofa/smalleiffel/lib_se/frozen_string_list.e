@@ -94,7 +94,6 @@ feature {NONE}
    fz_cbe:               STRING is " cannot be expanded. ";
    fz_cnf:               STRING is "Class not found.";
    fz_dot:               STRING is ".";
-   fz_desc:              STRING is "Deleted extra semi-colon.";
    fz_dtideena: STRING is " has no compiler-defined `deep_twin' or `is_deep_equal' %
 		%because the corresponding allocated size is not part of the %
 		%NATIVE_ARRAY object. The client class of this NATIVE_ARRAY %
@@ -281,8 +280,6 @@ feature {NONE}
    fz_b4: STRING is "(Ljava/io/File;)Z";
    fz_b6: STRING is ".%N";
    fz_b7: STRING is "((T";
-   fz_b8: STRING is "*)";
-   fz_b9: STRING is ",%N";
 
 end -- FROZEN_STRING_LIST
 

@@ -101,11 +101,6 @@ feature
          str.extend('5');
       end;
 
-   cast_to_ref is
-      do
-         type_double_ref.mapping_cast;
-      end;
-
    jvm_descriptor_in(str: STRING) is
       do
          str.extend('D');

@@ -1,120 +1,715 @@
-#!/usr/local/bin/perl
+#!/usr/bin/ruby
+#  sec : SmallEiffel compiler driver  for edb,gobo,eGTK
 #
-#$gc =   "";      #-- No GC
-$gc =   "b";      #-- SmallEiffel builtin gc
-#$gc =   "c";     #-- Conservative gc lib
+# for SmallEiffel Release -0.76Beta#5 (Thu 16th October 2000)
+#-------perl version --------------------------------------
+# 	00-00	May 15,1997	Masato Mogaki	first version
+# 	00-01	Aug 28,1997	Masato Mogaki	for -0.85
+# 	00-02	Jul 09,1998	Masato Mogaki	for -0.80
+# 	00-03	Sep 08,1998	Masato Mogaki	for -0.79
+# 	00-04	Dec 29,1999	Masato Mogaki	for -0.77
+#-------ruby version --------------------------------------
+# 	00-05   Oct 18,2000	Masato Mogaki	for -0.76b4
+# 	00-06   Oct 27,2000	Masato Mogaki	for -0.76b5 + eGTK
+#-----------------------------------------------------------------------------
 
-$HOME = $ENV{'HOME'};
-$ENV{'SmallEiffel'} = "$HOME/SmallEiffel/";
-$ENV{'PATH'} = "$HOME/SmallEiffel/bin:/usr/local/bin:/bin:/usr/bin:$HOME/bin";
-$e_flags  = "-require_check";
+##-- Configureable switches
+## change these flags to your need
+$debug = TRUE;
+
+# default gc
+#$gc =	"";	#-- No GC
+#$gc =	"b";	#-- SmallEiffel builtin gc
+$gc =	"c";	#-- Conservative gc lib
+
+$, = " "; # separtor for printing array
+$opt_dir=".seopt";
+$prg_dir=".seprg";
+$src_dir=".sesrc";
+
+### Do not touch codes below unless you understand how it works.
+#---------------------------------
+$use_gobo=FALSE;  #-- (not checked yet.)
+$use_egtk=FALSE;  #-- (works fine! but do not forget include EGTK path in `loadpath.se'
+
 $dbg_flags = "-g";
+$with_line_directive = TRUE;
 
-if ($gc eq "b") {
-    $ld_flags = "-z";
+home = ENV['HOME'];
+ENV['SmallEiffel'] = "/usr/local/SmallEiffel/sys/system.se";
+ENV['PATH'] = "/usr/local/SmallEiffel/bin:#{home}/bin:/usr/local/bin:/usr/bin:/bin";
+
+def main(argv)
+  help=FALSE
+  rest = ''
+  extra = ''
+  e_flags = ''
+  target= ''
+  root  = ''
+  creation = ''
+  e_flags = '-require_check'
+  c_flags = '';
+  ld_flags = '';
+  while argv != []
+    arg = argv.shift
+    if    arg =~ /^-hel/	then help=TRUE
+    elsif arg =~ /^-deb/	then e_flags = "-debug_check"
+    elsif arg =~ /^-all/	then e_flags = "-all_check"
+    elsif arg =~ /^-loo/	then e_flags = "-loop_check"
+    elsif arg =~ /^-inv/	then e_flags = "-invariant_check"
+    elsif arg =~ /^-ens/	then e_flags = "-ensure_check"
+    elsif arg =~ /^-req/	then e_flags = "-require_check"
+    elsif arg =~ /^-no/		then e_flags = "-no_check"
+    elsif arg =~ /^-boo/	then e_flags = "-boost"
+    elsif arg =~ /^-opt/	then e_flags = "-boost";$dbg_flags = "-g -O"
+    elsif arg =~ /^-ver/	then e_flags = e_flags + " -verbose"
+    elsif arg =~ /^-gob/	then $use_gobo = TRUE
+    elsif arg =~ /^-gtk/	then $use_egtk = TRUE
+    elsif arg =~ /^-gc=(.)/	then $gc=$1
+    elsif arg =~ /^-c/	   	then c = argv.shift; e_flags = e_flags + " -cecil #{c}.ce"; extra = extra + " #{c}.c"
+    elsif arg =~ /^-o/	   	then target = argv.shift
+    elsif arg =~ /\.w+$/        then rest = rest + " "
+                                     if arg !~ /^\// then rest = rest + "../" end;
+                                     rest = rest + arg 
+    elsif arg =~ /^-/           then rest = rest + ' ' + arg;
+    elsif root == ""     	then root = arg
+    elsif creation == ""     	then creation = arg
+    else                             rest = rest + " " + arg;
+    end
+  end
+
+  if(root == "") then
+    help = TRUE
+  elsif target=="" then
+    target= root
+  end
+  
+  if creation == "" then
+    creation = "make"
+  end
+
+  if help then
+    print "Usage: sec {-options} [-o target] root [make]\n";
+    exit
+  end
+
+  # set gc compilation flag
+  if ($gc == "b") then
+    ld_flags = "";
     $gc_flags = "";
+    $with_gc = FALSE;
 
-} elsif($gc eq "c") {
-    $c_flags  = "-I/usr/local/include";
-    $ld_flags = "-z /user/local/lib/libgc.a";
-    $gc_flags  = " -no_gc";
+  elsif($gc == "c") then
+    ld_flags = " -lgc";
+    $gc_flags = " -no_gc";
+    $with_gc = TRUE;
+  else
+    ld_flags = ""
+    $gc_flags = " -no_gc";
+    $with_gc = FALSE;
+  end
 
-} else {
-    $gc_flags  .= " -no_gc";
-}
+  if File.exist?(target) then
+    target_age = File.mtime(target);
+  else
+    # Target does not exist
+    # Assuming it is very old, program will create it from source.
+    target_age = Time.at(0)
+  end
 
-mkdir("A",0755); #prepare boost souce dir
-mkdir("B",0755); #prepare orginal source dir
-mkdir("C",0755); #prepare converted source dir
-$debug = 1;
-$target = shift(@ARGV);
-$root   = shift(@ARGV);
-if(!$target) {
-    $help++;
-} else {
-    if(!$root) {
-        $root = $target;
-    }
-    if(@ARGV) {
-	$e_flags = "";
-	while($fl = shift(@ARGV)) {
-	    if($fl =~ /^-?hel/) {$help++;}
-	    elsif($fl =~ /^-?deb/) {$e_flags = "-debug_check";}
-	    elsif($fl =~ /^-?all/) {$e_flags = "-all_check";}
-	    elsif($fl =~ /^-?loo/) {$e_flags = "-loop_check";}
-	    elsif($fl =~ /^-?inv/) {$e_flags = "-invariant_check";}
-	    elsif($fl =~ /^-?ens/) {$e_flags = "-ensure_check";}
-	    elsif($fl =~ /^-?req/) {$e_flags = "-require_check";}
-	    elsif($fl =~ /^-?no/)  {$e_flags = "-no_check";}
-	    elsif($fl =~ /^-?boo/) {$e_flags = "-boost";}
-	    elsif($fl =~ /^-?opt/) {$e_flags = "-boost";$dbg_flags = "-g -O";}
-	    elsif($fl =~ /^-?ver/) {$e_flags .= " -verbose";}
-	    elsif($fl =~ /^-c/)    {$c = shift(@ARGV); $e_flags .= " -cecil $c.ce"; $extra .= " $c.c";}
-	    elsif($fl =~ /^[^\/].*.o$/) {$rest .= " ../$fl";}
-	    else {$rest .= " $fl";}
-	}
-    }
-}
-if($help) {
-    print "Usage: sec target root [-daliernbO]\n";
+  if $use_gobo then
+    $stderr.print "What I have to do?\n";
     exit;
-}
-if(-f $target) {
-    $target_age = -M $target;
-} else {
-    $target_age = 10000000;
-}
+  end
+
+  if $use_egtk then
+    egtk = ENV['EGTK']
+    e_flags = e_flags + " -no_style_warning -case_insensitive -cecil #{egtk}/C/se/cecil.se";
+    c_flags  = c_flags  + " -I#{egtk}/C/se "         + `gtk-config --cflags`;
+    c_flags.chomp!;
+    ld_flags = ld_flags + " #{egtk}/C/se/eif_gtk.a " + `gtk-config --libs`;
+    ld_flags.chomp!;
+  end
+
+  cwd = Dir.getwd; # current directory
+  new_sources = Dir.glob("*.e").delete_if{|file| File.mtime(file) <= target_age}
+  if(new_sources != []) then
+    do_command("compile_to_c #{e_flags} #{$gc_flags} -o #{target} #{root} #{creation}");
+  end
+
+  c_files = Dir.glob("#{root}*.[ch]").sort
+  if c_files == [] then exit end
+  if($use_egtk) then
+    c_files.push("eiffel.h");
+  end
+  opt_files = ["#{root}.id", "#{root}.make"];
+
+  if $gc == "" then
+    out = open("#{root}.h","a");
+    out.print "int gc_is_off;\n";
+    out.close;
+  end
+
+  if(e_flags == "-boost") then
+    if($gc == "c") then
+      out = open("#{root}.h","a");
+      out.print $gc_inc;
+      out.close
+    end
+
+    #prepare boost source dir
+    Dir.mkdir($opt_dir) if !File.exist?($opt_dir)
+    move_if_changed(c_files,$opt_dir)
+    system("rm -f #{c_files}")
+    dir = $opt_dir;
+  else
+    Dir.mkdir($prg_dir) if !File.exist?($prg_dir)
+    Dir.mkdir($src_dir) if !File.exist?($src_dir)
+    add_line_directive(c_files);
+    dir = $src_dir
+  end
+  
+  system("rm -f #{opt_files}")
+
+  if(extra  != "") then
+    extra.gsub!(/\.c\b/, ".o");
+    do_command("make #{extra}");
+    extra.gsub!(%r!(\S+)!,"../\\1");
+  end
+  
+  Dir.chdir(dir);
+
+  new_c_files = c_files.delete_if{|file| file !~ /#{root}\d+.c$/}
+  new = []
+  for s in new_c_files 
+    o = s.sub(/\.c$/,".o");
+    if !File.exist?(o) or File.mtime(o) < File.mtime(s) then
+      new.push(s)
+    end
+  end
+
+  if new != [] then
+    success = do_command("gcc -ansi #{$dbg_flags} #{c_flags} -c #{new}");
+  else
+    success = TRUE;
+  end
+
+  if success then
+    if($use_egtk) then
+      do_command("gcc -ansi #{$dbg_flags} #{c_flags} -I./ -c #{egtk}/C/se/eif_gtk_se.c -o eif_gtk_se.o");
+    end
+    objects = c_files.collect{|file| file.sub(/\.c$/, ".o")}
+    if($use_egtk) then
+      objects.push("eif_gtk_se.o");
+    end
+    do_command("gcc -o ../#{target} #{$dbg_flags} #{objects} #{extra} #{ld_flags} #{rest} -lm");
+  end
+end
 
 
-chomp($cwd = `pwd`);
-opendir(DIR,$cwd);
-@sources = grep(/.e$/,readdir(DIR));
-@new_sources = grep {(-M $_) < $target_age} @sources;
-closedir(DIR);
+def do_command(com)
+  print  com, "\n" if $debug;
+  system(com);
+end
 
-if(@new_sources) {
-    do_command("compile_to_c $e_flags $gc_flags -o $target $root make");
-    opendir(DIR,$cwd);
-    @cfiles = grep {(-M $_) < $target_age} grep(/^$root\d*.[ch]$/,readdir(DIR));
-    closedir(DIR);
-    if(!@cfiles) { exit; }
-    if($e_flags ne "-boost") {
-        $dir = "C";
-	do_command("add-line-directive $gc @cfiles");
-    } else {
-        $dir = "A";
-	do_command("cat /usr/local/include/gc-inc >>$root.h");
-	do_command("move-if-changed @cfiles A");
-	unlink @cfiles;
-    }
-    if($extra) {
-	do_command("gcc -ansi -c $extra");
-	$extra =~ s?(\S+).c?../$1.o?;
-    }
-    chdir $dir;
-    @new_cfiles = grep(/^$root\d+.c$/,@cfiles);
-    @new = ();
-    foreach $s (@new_cfiles) {
-	$o = $s;
-	$o =~ s/\.c$/.o/;
-	if(!-f $o || (-M $o) > (-M $s)) {
-	    push(@new,$s);
-	}
-    }
-    $ret = 0;
-    if(@new) {
-	$ret = do_command("gcc -ansi $dbg_flags $c_flags -c @new");
-    }
+def different_file?(a,b)
+  if File.size?(a) != File.size?(b) then
+    return TRUE;
+  elsif !system("cmp -s #{a} #{b}") then
+    return TRUE;
+  else
+    return FALSE;
+  end
+end
 
-    if(!$ret) {
-	@objects = grep{s/(.*)\.c$/$1.o/} @cfiles;
-	do_command("gcc -o ../$target $dbg_flags @objects $extra $ld_flags $rest -lm");
-    }
-}
+def move_if_changed(files, dir)
+  for file in files
+    target = dir + "/" + file;
+    if different_file?(file,target) then
+      File.rename(file,target)
+      print "#{file} --> #{target}\n";
+    end
+  end
+end
+#----(add_line_directive begin)------------------------
+# 
+$err_inc = <<'--EOF--';
+#define se_evobt(_o,_p) (_o)
+#define ci(_d,_o,_p) (_o)
+#define error0(_m,_v) fprintf(stderr,"%s\n",_m),abort()
+#define error1(_m,_p) error0(_m,_p)
+--EOF--
+  $gc_inc = <<'--EOF--';
+#include <gc.h>
+#define malloc(n) GC_malloc(n)
+#define calloc(m,n) GC_malloc((m)*(n))
+#define realloc(p,n) GC_realloc((p),(n))
+#define free(p) GC_free(p)
+#define gc_is_off GC_dont_gc
+#define gc_start() GC_gcollect()
+--EOF--
 
-sub do_command {
-    my($com) = @_;
-    print "$com\n" if $debug;
-    $ret = system($com);
-    return $ret;
-}
+def add_line_directive(sources)
+  c_sources  = [];
+  c_includes = [];
+  for s in sources 
+    if   (s =~ /\.c$/) then
+      c_sources.push(s)
+    elsif(s =~ /\.h$/) then
+      c_includes.push(s)
+    elsif(s == "-n") then
+      $with_line_directive = FALSE;
+    end
+  end
+  #find eiffel source file name from the lines like  p[123]="./test.e";
+  $src_name = [];
+  for s in c_sources
+    inf = open(s)
+    se_init = 0
+    while inf.gets
+      if se_init != 0 then
+	if(/^p\[(\d+)\]="(.*)";/) then
+	  $src_name[$1.to_i] = $2;
+	elsif(/^p\[(\d+)\]=p\[(\d+)\];/) then
+	  $src_name[$1.to_i] = $src_name[$2.to_i];
+	elsif(/^g\[(\d+)\]="(.*)";/) then
+	  se_init = -1;
+	end
+      elsif(/^void initialize_eiffel_runtime/) then
+	se_init = 1;
+      end
+      last if(se_init<0);
+    end
+    inf.close
+    last if (se_init<0);
+  end
+
+  # convert header file.
+  #   + change prototype of routines
+  #   + change macro
+
+  for s in c_includes
+    o = "#{$prg_dir}/#{s}";
+    t = "#{$src_dir}/#{s}";
+    if different_file?(s,o) then
+	$stderr.print "#{s}:changed\n";
+      File.rename(s,o);
+      convert_h(o,t);
+    else
+      File.unlink(s);
+    end
+  end
+
+  # convert c source.
+  #  remove runtime trace code
+  #  rename routine arguments
+  #  add line directive #line NN "source.e"
+
+  $in_routine = 0;
+  last_file = "";
+  for s in c_sources
+    o = "#{$prg_dir}/#{s}";
+    t = "#{$src_dir}/#{s}";
+    if different_file?(s,o) then # s is changed
+      if(last_file != "")  then
+	# We need scan one file after the changed file to look
+        # after se_frame_descripter
+	# scan all contents for simplicity.
+	$stderr.print "#{last_file}:checked\n";
+	inf = open(last_file);
+	convert_c(last_file, "/dev/null");
+	File.unlink(last_file);
+	last_file = "";
+      end
+      $stderr.print "#{s}:change to #{o}\n";
+      File.rename(s,o);
+      convert_c(o,t)
+    else
+      if last_file != ""  then File.unlink(last_file) end
+      last_file = s;
+    end
+  end
+  if last_file != "" then File.unlink(last_file) end
+end
+
+#---------------------------------------------------------------
+def convert_h(infile, outfile)
+  i_strm = open(infile);
+  o_strm = open(outfile,"w");
+  while(i_strm.gets) 
+    sub!(/(r\d+\w+\()se_dump_stack\*caller,?/,"\\1");
+    sub!(/(X\d+\w+\()se_dump_stack\*caller,se_position position,/,"\\1");
+    o_strm.print $_;
+  end
+  i_strm.close;
+
+  o_strm.print $err_inc;
+  if ($with_gc) then
+    o_strm.print $gc_inc;
+  end
+  o_strm.close;
+end
+
+def convert_c(infile,outfile)
+  i_strm = open(infile);
+  o_strm = open(outfile,"w");
+  special_func = FALSE;
+  $o_count = 0;
+  while i_strm.gets 
+    chomp!;
+    ## print "#{$in_routine}|#{$_}|\n" if special_func;
+
+    if(/^\/\*.*\*\/$/)  then
+      # Ignore it
+    elsif(/^\#include/)  then
+      o_strm.print "#{$_}\n";	
+    elsif($in_routine == 0)  then
+      if(/^(T0\*|T\d+|int|char|void|void\*) r(\d+)(\w+)\(.*\)\{$/)  then
+	sub!(/se_dump_stack\*caller,?/,"")
+	$body = [$_];
+	$lvars = [];
+	$in_routine = 1;
+	$e_fno = 0;
+	$e_lno = 0;
+	e_local = "";
+      elsif(/^(T0\*|T\d+|int|char|void|void\*) (\w+)\(void\s*\*\s*C.*\)\{$/)  then
+	$body = [$_];
+	$lvars = [];
+	special_func = TRUE;
+	$in_routine = 1;
+	$e_fno = 0;
+	$e_lno = 0;
+	e_local = "";
+      elsif (/^(T0\*|T\d+|int|char|void|void\*) (X\d+\w+\()se_dump_stack\*caller,se_position position,/)  then
+	sub!(/^(T0\*|T\d+|int|char|void|void\*) (X\d+\w+\()se_dump_stack\*caller,se_position position,/,"\\1 \\2");
+	o_strm.print "#{$_}\n";
+	$o_count = $o_count+1;
+	$in_routine = 100;
+
+      elsif(/^(void error[01]|T0\* ci|void se_evobt)/)  then
+	# function to be removed.
+	while i_strm.gets 
+	  if(/^\}/)  then
+	    break
+	  end
+	end
+      else
+	if(!/^ms\d+/)  then
+	  gsub!(/exit\([^0()]*\)/,"abort()");
+	  gsub!(/\(&ds,?/,"(");
+	  sub!(/se_trace\(\d+\);/,"");
+	end
+	o_strm.print "#{$_}\n";
+	$o_count = $o_count+1;
+      end
+
+      ## STATE 1
+    elsif ($in_routine == 1)  then
+      if(/^se_dump_stack ds/)  then
+	if(e_local != "")  then
+	  e_local = e_local + "\n";
+	  $body.push(e_local);
+	end
+	$in_routine = 2;
+      elsif(/^void\*\*locals\[(\d+)\];/)  then
+	n_local = $1;
+      else
+	e_local = e_local + $_;
+      end
+
+      ## STATE 2
+    elsif ($in_routine == 2)  then
+      if(/^\(?ds\.(\w+)=(.*)\)?;/)  then
+	attr = $1;
+	val  = $2;
+	if(attr == "p")  then
+	  val = val.to_i
+	  $e_fno = position2fno(val);
+	  $e_lno = position2lno(val);
+	  if($with_line_directive)  then
+	    r_post = "<#{$e_fno},#{$e_lno}>\n";
+	    $body.unshift(r_post);
+	  end
+	end
+	$_ = "";
+      elsif(/^locals\[(\d+)\]=\(void\*\*\)\&(\w+);/)  then
+	l = $1.to_i;
+	v  = $2;
+	if(v !~ /^oBC/)  then
+	  $lvars[l] = v;
+	else
+	  $lvars[l] = "___Result";
+	end
+      elsif(/^se_dst=\&ds;/)  then
+	$in_routine = 3;
+      end
+
+    elsif ($in_routine < 100)  then
+      # inside the routine
+
+      if(/^if\(!se_af_rlr\)\{se_af_rlr=1/)  then
+	$in_routine = $in_routine+1;
+      elsif(/^\{static int se_af=1/)  then
+	$in_routine = $in_routine+1;
+      elsif(/^if\(se_af\)\{/)  then
+	$in_routine = $in_routine+1;
+      elsif($in_routine>3 && /^\}/)  then
+	$in_routine = $in_routine-1;
+      elsif(/se_dst=ds\.caller;/)  then
+	$in_routine=3
+      elsif(special_func && $in_routine==3 && /^\}/)  then
+	special_func = FALSE;
+	$body.push($_);
+	output_routine(o_strm,"","","","");
+	$in_routine = 0;
+      elsif(/^se_frame_descriptor f\d+\w+=\{\"(.+ of .+)\",(\d+),(\d+),\"(.*)\",\d+\};/)  then
+	output_routine(o_strm, $1,$2,$3,$4);
+	o_strm.print "#{$_}\n";
+	if($with_line_directive) then
+	  o_strm.print "#line #{$o_count} \"#{outfile}\"\n";
+	  $o_count = $o_count+1;
+	end
+	$in_routine = 0;
+      elsif(/se_af/)  then
+	$_ = "";
+	# Ignore
+      else
+	while(/\(?ds\.p=(\d+)\)?[,;]/) 
+	  v = $1.to_i;
+	  f = position2fno(v);
+	  l = position2lno(v);
+	  sub!(/\(?ds\.p=(\d+)\)?[,;]/,"<#{f}:#{l}>");
+	end
+	while(/se_trace\(\&ds,(\d+)\)[,;]/) 
+	  v = $1.to_i;
+	  f = position2fno(v);
+	  l = position2lno(v);
+	  sub!(/se_trace\(\&ds,(\d+)\)[,;]/,"<#{f}:#{l}>");
+	end
+	while(/X\d+\w+\(\&ds\,(\d+)/) 
+	  v = $1.to_i;
+	  l = position2lno(v);
+	  f = position2fno(v);
+	  sub!(/(X\d+\w+\()\&ds,(\d+),/,"<#{f}:#{l}>\\1");
+	end
+	while(/ci\(\d+,([^,]+),(\d+)\)/) 
+	  h = $1;
+	  v = $2.to_i;
+	  l = position2lno(v);
+	  f = position2fno(v);
+	  sub!(/ci\(\d+,([^,]+),(\d+)\)/,"<#{f}:#{l}>#{h}");
+	end
+	gsub!(/\/\*\w+\*\//,"");
+	sub!(/ds\.caller=caller;/,"");
+	sub!(/se_dst=caller;/,"");
+	gsub!(/\(&ds,?/,"(");
+	if(/\S/)  then
+	  if($with_line_directive)  then
+	    sub!(/(.+?)(<\d+:\d+>)/, "\\2\\1");
+	    $_ = update_fl($_);
+	  else
+	    gsub!(/<\d+:\d+>/,"");
+	  end
+	  $body.push($_);
+	end
+      end
+
+    ## State 100 in selector funtion
+    elsif($in_routine == 100)  then
+      if (/^se_dst=caller;$/)  then
+	$in_routine = 0;
+      elsif (/^ds\.caller=caller;$/)  then
+	# skip
+      elsif(/se_dump_stack ds=\*caller;/)  then
+	# skip
+      elsif(/^\{Tid id=vc\(C,position\)->id;/)  then
+	o_strm.print "{Tid id=((T0*)C)->id;\n";
+	$o_count = $o_count+1;
+      else
+	gsub!(/\(&ds,?/,"(");
+	o_strm.print "#{$_}\n";
+	$o_count = $o_count+1;
+      end
+    end
+  end
+  
+  i_strm.close;
+  o_strm.close;
+end
+
+def update_fl (s)
+  while(s =~ /<(\d+):(\d+)>/ ) do
+    if($e_fno != $1 || $e_lno != $2)  then
+      fl = "\n<#{$1},#{$2}>\n";
+      $e_fno = $1;
+      $e_lno = $2;
+    else
+      fl = "";
+    end
+    s.sub!(/<(\d+):(\d+)>/,"#{fl}");
+  end
+  return s;
+end
+
+# print out
+
+def output_routine (o_strm, rout, use_current, nlocal, l_desc)
+  $name_map = {};
+  if (use_current)  then
+    l_desc.sub!(/^%\w+%/,"");
+  end
+  l_desc.gsub!(/%[A-Z]\d+/,"");
+  l_descs = l_desc.split(/%/);
+  i = 0;
+  for  l in l_descs
+    $name_map[$lvars[i]] = "_"+l;
+    i = i + 1;
+  end
+
+  b1 = split_lines($body);
+  b2 = merge_lines(b1);
+  for l in b2
+    l.gsub!(/<\d+,\d+>/,"");
+    l = replace_name(l);
+    o_strm.print "#{l}\n";
+    $o_count = $o_count+1;
+  end
+end
+
+# replace name of local variables.
+def replace_name (line)
+  if(!/^\#/)  then
+    for v in $name_map.keys
+      n = $name_map[v];
+      line.gsub!(/\b#{v}\b/,n);
+    end
+  end
+  return line;
+end
+
+# split embedded line number
+def split_lines(lines)
+  new_lines = [];
+  for l in lines
+    ls = l.split(/\n/);
+    for s in ls
+      if(s =~ /\S/)  then
+	new_lines.push(s)
+      end
+    end
+  end
+  return (new_lines);
+end
+
+#-- Merge inline code to one line.
+def merge_lines(lines)
+  merged = [];
+  wl = [];
+  last_lno = 0;
+  last_fno = -1;
+  while (lines != []) 
+    l = lines.shift;
+    if(l =~ /<(\d+),(\d+)>/)  then
+      merged = merged+wl;
+      fno = $1.to_i;
+      lno = $2.to_i;
+      last_lno = last_lno + wl.length;
+      wl = [];
+
+      if(fno != last_fno || lno < last_lno)  then
+	merged.push(source_line_directive(fno,lno));
+	last_fno = fno;
+	last_lno = lno;
+      elsif(lno > last_lno)  then
+	while(lno > last_lno) 
+	  merged.push("");
+	  last_lno = last_lno + 1;
+	end
+      end
+    elsif(l =~ /\S/)  then
+      # Creation call (gc)
+      if(l =~ /^\{T\d+\*n=new\d+\(\);$/)  then
+	ll = '';
+	while(l != '' && l !~ /\}$/) 
+	  ll = ll+ l;
+	  l = lines.shift;
+	end
+	l = ll + l;
+	
+	# Creation call (-no_gc)
+      elsif(l =~ /^.T\d+.n=..T\d+..se_malloc.sizeof..n../) then
+	ll = '';
+	while(l != '' && l !~ /\}$/) 
+	  ll = ll+l;
+	  l = lines.shift;
+	end
+	l = ll + l;
+	
+      # Reverse assignment to attribute
+      elsif(l        =~ /^if.NULL!=.C->_\w+..{$/ &&  lines != [] && 
+	    lines[0] =~ /^..switch...T0..C->_\w+.->id.\{$/        )  then
+	ll = wl.pop + l + lines.shift;
+	while(lines != []);
+	  l = lines.shift;
+	  ll = ll + l;
+	  break if (l =~ /^}$/) 
+	end
+	l = ll;
+
+      # Reverse assignment to local variable
+      elsif(l        =~ /^if.NULL!=.\w+..{$/ && lines != [] && 
+            lines[0] =~ /^switch...T0\*.\w+.->id.\{$/        )  then
+	ll = wl.pop + l + lines.shift;
+	while(lines != []);
+	  l = lines.shift;
+	  ll = ll + l;
+	  break if (l =~ /^}$/) 
+	end
+	l = ll;
+	
+      elsif(l =~ /^ ?else/)  then
+	if(wl != []) then
+	  l = wl.pop + l;
+	end
+      elsif(l =~ /^if \(fBC\d+\w+==0\)\{$/)  then
+	while(lines != [])
+	  ll = lines.shift;
+	  l = l + ll;
+	  break if (ll =~ /^fBC\d+\w+=1;$/);
+	end
+      end
+      wl.push(l);
+    end
+  end
+  return merged+wl;
+end
+
+
+def source_line_directive (f,l)
+  if $with_line_directive then
+    return "#line #{l} \"#{$src_name[f]}\"";
+  else
+    return "";
+  end
+end
+
+def position2fno (v)
+  if(v & 1 != 0)  then
+    return (v >> 17);
+  else
+    return (v >> 21);
+  end
+end
+
+def position2lno (v)
+  if(v & 1 != 0)  then
+    return ((v >> 1) & 0x7FFF);
+  else
+    return ((v >> 8) & 0x1FFF);
+  end
+end
+
+#--(add_line_directive end)-----------
+
+main(ARGV);
+#-------- sec.rb END 

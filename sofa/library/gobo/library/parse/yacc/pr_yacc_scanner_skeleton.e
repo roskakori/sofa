@@ -8,8 +8,8 @@ indexing
 	author:     "Eric Bezault <ericb@gobosoft.com>"
 	copyright:  "Copyright (c) 1999, Eric Bezault and others"
 	license:    "Eiffel Forum Freeware License v1 (see forum.txt)"
-	date:       "$Date: 1999/10/02 14:06:50 $"
-	revision:   "$Revision: 1.4 $"
+	date:       "$Date: 1999/10/10 17:49:20 $"
+	revision:   "$Revision: 1.5 $"
 
 deferred class PR_YACC_SCANNER_SKELETON
 
@@ -196,6 +196,21 @@ feature {NONE} -- Error handling
 			an_error: PR_INVALID_DOLLAR_N_ERROR
 		do
 			!! an_error.make (filename, line_nb, n)
+			error_handler.report_error (an_error)
+			successful := False
+		ensure
+			not_successful: not successful
+		end
+
+	report_invalid_string_token_error (a_string: STRING) is
+			-- Report that a literal string token must 
+			-- have at least two characters.
+		require
+			a_string_not_void: a_string /= Void
+		local
+			an_error: PR_INVALID_STRING_TOKEN_ERROR
+		do
+			!! an_error.make (filename, line_nb, a_string)
 			error_handler.report_error (an_error)
 			successful := False
 		ensure

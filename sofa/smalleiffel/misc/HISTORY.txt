@@ -3,7 +3,7 @@
 
      Lastest version first.
      For a note on version numbering, see the [1]SmallEiffel FAQ.
-   Work in progress.
+   New! Release - 0.76 - Sunday November 5th, 2000
      * Full compatibility with the new ELKS'2000 ARRAY class. Most
        modifications are simple renamings which are automatically pointed
        out by obsolete warnings. For obvious uniformity reasons, some
@@ -19,11 +19,24 @@
        DICTIONARY. This is the replacement for the old implementation of
        is_equal (ie. is_equal_map use is_equal to compare elements).
      * Added feature reindex in class ARRAY.
+     * Added a brand new class SET[E->HASHABLE].
+     * Added support for the Elate (Amiga) system as well as the vpcc C
+       compiler.
+     * Added support for the QNX real time operating system.
      * For feature dispose of class MEMORY (as well as redefinitions),
        the class invariant is no longer triggered.
+     * Added features atan2 and pow both in class REAL and DOUBLE.
+     * Internal implementation of BASIC_TIME revisited (using now a
+       double for memorization).
+     * Implementation of class DICTIONARY completely revisited. Also
+       added features add, item_map_in and key_map_in in the new class
+       DICTIONARY.
+     * Added feature reverse in class COLLECTION (thus, this feature is
+       available for all subclasses of COLLECTION (i.e. ARRAY,
+       FIXED_ARRAY, LINKED_LIST and TWO_WAY_LINKED_LIST).
      * Various bug fixes and improvements.
 
-   New! Release - 0.77 - Saturday February 12th, 2000
+   Release - 0.77 - Saturday February 12th, 2000
      * Added in directory SmallEiffel the new [2]install command (class
        install.e with a precompiled install.exe for Windows). This
        install.e class is the code for the installer of the SmallEiffel
@@ -491,12 +504,11 @@
      * The very first bootstrap. SmallEiffel is born.
 
 
-
                                    [Line]
 
              Copyright © Dominique COLNET and Suzanne COLLIN -
                            [24]<colnet@loria.fr>
-                   Last update: March 21th 2000, by DC.
+                  Last update: November 5th 2000, by DC.
 
 References
 

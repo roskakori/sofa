@@ -46,7 +46,7 @@ feature
             short_print.hook_or("hook412","");
          else
             short_print.hook_or("hook413","");
-            header_comment.short("hook414","         -- ","hook415","%N");
+            header_comment.short("hook414","         --","hook415","%N");
             short_print.hook_or("hook416","");
          end;
          if list = Void then
@@ -67,7 +67,7 @@ feature
                                   "hook425",";", -- after expression except last
                                   "hook426","%N", -- no comment
                                   "hook427","", -- before comment
-                                  "hook428"," -- ", -- comment begin line
+                                  "hook428"," --", -- comment begin line
                                   "hook429","%N", -- comment end of line
                                   "hook430","", -- after comment
                                   "hook431",""); -- end of each assertion
@@ -83,7 +83,7 @@ feature
                                "hook432","", -- after expression except last
                                "hook426","%N", -- no comment
                                "hook427","", -- before comment
-                               "hook428"," -- ", -- comment begin line
+                               "hook428"," --", -- comment begin line
                                "hook429","%N", -- comment end of line
                                "hook430","", -- after comment
                                "hook431","");

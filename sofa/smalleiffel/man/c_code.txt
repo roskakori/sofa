@@ -79,8 +79,7 @@ A 1  T37   E NATIVE_ARRAY[STRING] 37
           number varies.
 
    Reference
-
-   Is the type a Reference or an Expanded one?
+          Is the type a Reference or an Expanded one?
 
    Full type name
           Self-explanatory...

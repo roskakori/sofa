@@ -17,15 +17,13 @@ class HANOI
    --
    -- The classic Tower of Hanoi game.
    --
-   -- Compile with :
+   -- Compile with:
    --    compile -o hanoi hanoi -boost
-   -- Run with :
+   -- Run with:
    --    hanoi
    --
 
-inherit
-   ANY redefine out_in_tagged_out_memory
-      end;
+inherit ANY redefine out_in_tagged_out_memory end;
 
 creation make
 
@@ -33,22 +31,32 @@ feature {NONE}
 
    nb: INTEGER;
 
-   t1, t2, t3 : TOWER;
+   tower1, tower2, tower3: TOWER;
 
 feature
 
    make is
       do
-         io.put_string("Type the number of discus, please : ");
-         io.flush;
-         io.read_integer;
-         nb := io.last_integer;
-         !!t1.full(nb);
-         !!t2.empty(nb);
-         !!t3.empty(nb);
-         io.put_string("Situation at the beginning : %N");
-         move(nb,t1,t2,t3);
-         io.put_string("Situation at the end : %N");
+	 if argument_count = 0 then
+	    io.put_string("Number of discus: ");
+	    io.flush;
+	    io.read_integer;
+	    nb := io.last_integer;
+	 elseif argument_count /= 1 then
+	    io.put_string("Usage: hanoi <NumberOfDiscus>%N");
+	    die_with_code(exit_failure_code);
+	 elseif argument(1).is_integer then
+	    nb := argument(1).to_integer.max(1);
+	 else
+	    io.put_string("hanoi: bad argument (not an integer)%N");
+	    die_with_code(exit_failure_code);
+	 end;
+	 !!tower1.full(nb);
+         !!tower2.empty(nb);
+         !!tower3.empty(nb);
+         io.put_string("Situation at the beginning:%N");
+         move(nb,tower1,tower2,tower3);
+         io.put_string("Situation at the end:%N");
          print_on(io);
       end;
 
@@ -76,11 +84,11 @@ feature
             i = 0
          loop
             tagged_out_memory.extend(' ');
-            t1.show_a_discus(i,tagged_out_memory);
+            tower1.show_a_discus(i,tagged_out_memory);
             tagged_out_memory.extend(' ');
-            t2.show_a_discus(i,tagged_out_memory);
+            tower2.show_a_discus(i,tagged_out_memory);
             tagged_out_memory.extend(' ');
-            t3.show_a_discus(i,tagged_out_memory);
+            tower3.show_a_discus(i,tagged_out_memory);
             tagged_out_memory.extend('%N');
             i := i - 1;
          end;
@@ -94,4 +102,5 @@ feature
          end;
          tagged_out_memory.extend('%N');
       end;
+
 end -- HANOI

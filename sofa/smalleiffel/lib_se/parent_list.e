@@ -33,35 +33,9 @@ feature
    heading_comment: COMMENT;
          -- Global comment of the inherit clause.
 
-feature {NONE}
-
-   list: ARRAY[PARENT];
-
-feature {NONE}
-
-   make(bc: like base_class; sp: like start_position;
-        hc: like heading_comment; l: like list) is
-      require
-         bc /= Void;
-         not sp.is_unknown;
-         l.lower = 1 and not l.is_empty;
-      do
-         base_class := bc;
-         heading_comment := hc;
-         start_position := sp;
-         list := l;
-      ensure
-         base_class = bc;
-         start_position = sp;
-         heading_comment = hc;
-         list = l;
-      end;
-
-feature
-
    count: INTEGER is
       do
-         Result := list.upper;
+         Result := list.count;
       end;
 
    up_to_any_in(pl: FIXED_ARRAY[BASE_CLASS]) is
@@ -73,7 +47,7 @@ feature
          from
             i := list.upper;
          until
-            i = 0
+            i < list.lower
          loop
             p := list.item(i);
             bc := p.base_class;
@@ -85,7 +59,7 @@ feature
          from
             i := list.upper;
          until
-            i = 0
+            i < list.lower
          loop
             p := list.item(i);
             bc := p.base_class;
@@ -108,12 +82,12 @@ feature
          i: INTEGER;
       do
          from
-            i := 1;
+            i := list.upper;
          until
-            Result or else i > list.upper
+            Result or else i < list.lower
          loop
             Result := list.item(i).has_redefine(fn);
-            i := i + 1;
+            i := i - 1;
          end;
       end;
 
@@ -126,7 +100,7 @@ feature {BASE_CLASS}
          sfw.put_integer(count);
          sfw.put_string(" parents: ");
          from
-            i := 1;
+            i := list.lower;
          until
             i > list.upper
          loop
@@ -145,7 +119,7 @@ feature {BASE_CLASS}
          from
             i := list.upper;
          until
-            i = 0 or else fn1 /= Void
+            i < list.lower or else fn1 /= Void
          loop
             p1 := list.item(i);
             fn1 := p1.up_to_original(bottom,top_fn);
@@ -153,7 +127,7 @@ feature {BASE_CLASS}
          end;
          from
          until
-            i = 0
+            i < list.lower
          loop
             p2 := list.item(i);
             fn2 := p2.up_to_original(bottom,top_fn);
@@ -187,7 +161,7 @@ feature {BASE_CLASS}
          from
             i := list.upper;
          until
-            i = 0 or else fn1 /= Void
+            i < list.lower or else fn1 /= Void
          loop
             p1 := list.item(i);
             fn1 := p1.original_name(top,bottom_fn);
@@ -213,7 +187,7 @@ feature {BASE_CLASS}
          from
             i := list.upper;
          until
-            i = 0
+            i < list.lower
          loop
             cl := list.item(i).clients_for(fn);
             if Result = Void then
@@ -224,7 +198,7 @@ feature {BASE_CLASS}
             if Result = Void then
                i := i - 1;
             elseif Result.gives_permission_to_any then
-               i := 0;
+               i := list.lower - 1;
             else
                eh.cancel;
                i := i - 1;
@@ -245,7 +219,7 @@ feature {BASE_CLASS}
          from
             i := list.upper;
          until
-            fn1 /= Void or else i = 0
+            fn1 /= Void or else i < list.lower
          loop
             p1 := list.item(i);
             fn1 := p1.going_up(trace,top,top_fn);
@@ -253,7 +227,7 @@ feature {BASE_CLASS}
          end;
          from
          until
-            i = 0
+            i < list.lower
          loop
             p2 := list.item(i);
             fn2 := p2.going_up(trace,top,top_fn);
@@ -280,7 +254,7 @@ feature {BASE_CLASS}
          from
             i := list.upper;
          until
-            Result or else i = 0
+            Result or else i < list.lower
          loop
             Result := list.item(i).is_a_vncg(t1,t2);
             i := i - 1;
@@ -296,7 +270,7 @@ feature {BASE_CLASS}
          from
             i := list.upper;
          until
-            Result /= Void or else i = 0
+            Result /= Void or else i < list.lower
          loop
             Result := list.item(i).e_feature(fn);
             i := i - 1;
@@ -312,7 +286,7 @@ feature {BASE_CLASS}
          from
             i := list.upper;
          until
-            i = 0
+            i < list.lower
          loop
             list.item(i).base_class.collect_invariant(rc);
             i := i - 1;
@@ -328,10 +302,10 @@ feature {BASE_CLASS}
          from
             i := list.upper;
          until
-            i = 0
+            i < list.lower
          loop
             p := list.item(i);
-            bc := p.base_class;
+            bc := p.type.base_class;
             if bc = Void then
                eh.add_position(p.start_position);
                fatal_error(fz_cnf);
@@ -352,15 +326,13 @@ feature {BASE_CLASS}
          from
             i := list.upper;
          until
-            i = 0
+            Result or else i < list.lower
          loop
             bc := list.item(i).base_class;
             if c = bc then
                Result := true;
-               i := 0;
-            elseif bc.is_subclass_of_aux(c) then
+            elseif bc.is_subclass_of(c) then
                Result := true;
-               i := 0;
             else
                i := i - 1;
             end;
@@ -374,7 +346,7 @@ feature {BASE_CLASS}
          pbc: BASE_CLASS;
       do
          from
-            i := 1;
+            i := list.lower;
          until
             Result /= Void
          loop
@@ -399,7 +371,7 @@ feature {BASE_CLASS}
       do
          from
             from
-               i := 1;
+               i := list.lower;
             until
                Result = previous
             loop
@@ -408,7 +380,7 @@ feature {BASE_CLASS}
             end;
             Result := Void;
          until
-            Result /= Void or else i > list.count
+            Result /= Void or else i > list.upper
          loop
             Result := list.item(i);
             pbc := Result.base_class;
@@ -428,7 +400,7 @@ feature {BASE_CLASS}
          from
             i := list.upper;
          until
-            i = 0 or else ci.header_comment /= Void
+            i < list.lower or else ci.header_comment /= Void
          loop
             list.item(i).base_class.header_comment_for(ci);
             i := i - 1;
@@ -443,20 +415,20 @@ feature {BASE_CLASS}
          from
             i1 := list.upper;
          until
-            i1 = 0
+            i1 < list.lower
          loop
             list.item(i1).get_started(Current);
             i1 := i1 - 1;
          end;
-         if list.upper > 1 then
+         if list.count > 1 then
             -- Checking select :
             from
                i2 := list.upper;
             until
-               i2 = 1
+               i2 = list.lower
             loop
                from
-                  i1 := 1;
+                  i1 := list.lower;
                invariant
                   i1 < i2 + 1
                variant
@@ -484,7 +456,7 @@ feature {BASE_CLASS}
          from
             i := list.upper;
          until
-            f1 /= Void or else i = 0
+            f1 /= Void or else i < list.lower
          loop
             p1 := list.item(i);
             f1 := p1.look_up_for(rc,fn);
@@ -492,7 +464,7 @@ feature {BASE_CLASS}
          end;
          from
          until
-            i = 0
+            i < list.lower
          loop
             p2 := list.item(i);
             f2 := p2.look_up_for(rc,fn);
@@ -547,7 +519,7 @@ feature {BASE_CLASS}
          from
             i := list.upper;
          until
-            i = 0
+            i < list.lower
          loop
             p2 := list.item(i);
             fn2 := p2.name_in_parent(fn);
@@ -563,7 +535,7 @@ feature {BASE_CLASS}
             from
                i := list.upper;
             until
-               i = 0
+               i < list.lower
             loop
                p1 := list.item(i);
                fn1 := p1.name_in_parent(fn);
@@ -592,7 +564,7 @@ feature {BASE_CLASS}
             heading_comment.pretty_print;
          end;
          from
-            i := 1;
+            i := list.lower;
          until
             i > list.upper
          loop
@@ -606,24 +578,22 @@ feature {BASE_CLASS}
          type.base_class.parent_list = Current;
          other.base_class.parent_list /= Void;
          type.is_run_type;
-         other.is_run_type;
+         other.is_run_type
       local
-         i: INTEGER;
-         p: PARENT;
-         sa: TYPE;
+         i: INTEGER; p: PARENT; sa: TYPE;
       do
          from
             i := list.upper;
          until
-            i <= 0
+            i < list.lower
          loop
             p := list.item(i);
             sa := p.runnable_type(other);
-            if Result = Void then
+	    if sa.run_time_mark = other.run_time_mark then
 	       Result := sa;
-	    elseif sa.run_time_mark = other.run_time_mark then
-	       Result := sa;
-	       i := 0;
+	       i := list.lower - 1;
+            elseif Result = Void then
+	       Result := sa.smallest_ancestor(other);
             elseif sa.is_a(other) then
 	       if Result.is_a(other) then
 		  Result := sa.smallest_ancestor(Result);
@@ -640,12 +610,12 @@ feature {BASE_CLASS}
          Result.is_run_type;
       end;
 
-feature {E_PRECURSOR}
+feature {PRECURSOR_CALL}
 
-   precursor_for(p: E_PRECURSOR; wrf: RUN_FEATURE): EFFECTIVE_ROUTINE is
-         -- Look for the feature for `p' which is written inside `wrf'.
+   precursor_for(pc: PRECURSOR_CALL; wrf: RUN_FEATURE): EFFECTIVE_ROUTINE is
+         -- Look for the feature for `pc' which is written inside `wrf'.
       require
-         p /= Void;
+         pc /= Void;
          wrf /= Void
       local
          i: INTEGER;
@@ -655,25 +625,25 @@ feature {E_PRECURSOR}
          from
             i := list.upper;
          until
-            Result /= Void or else i = 0
+            Result /= Void or else i < list.lower
          loop
             parent := list.item(i);
-            Result := parent.precursor_for(p,wrf);
+            Result := parent.precursor_for(pc,wrf);
             i := i - 1;
          end;
          if Result = Void then
-            eh.add_position(p.start_position);
+            eh.add_position(pc.start_position);
             fatal_error("Precursor routine not found.");
          end;
          if run_control.all_check then
             from
             until
-               i = 0
+               i < list.lower
             loop
                parent := list.item(i);
-               f2 := parent.precursor_for(p,wrf);
+               f2 := parent.precursor_for(pc,wrf);
                if f2 /= Void and then f2 /= Result then
-                  eh.add_position(p.start_position);
+                  eh.add_position(pc.start_position);
                   eh.add_position(Result.start_position);
                   eh.add_position(f2.start_position);
                   fatal_error("Multiple Precursor found (must use %
@@ -685,6 +655,26 @@ feature {E_PRECURSOR}
       end;
 
 feature {NONE}
+
+   list: FIXED_ARRAY[PARENT];
+
+   make(bc: like base_class; sp: like start_position;
+        hc: like heading_comment; l: like list) is
+      require
+         bc /= Void;
+         not sp.is_unknown;
+         not l.is_empty
+      do
+         base_class := bc;
+         heading_comment := hc;
+         start_position := sp;
+         list := l;
+      ensure
+         base_class = bc;
+         start_position = sp;
+         heading_comment = hc;
+         list = l;
+      end;
 
    repeated_inheritance(p1: PARENT; fn1, top_fn: FEATURE_NAME): FEATURE_NAME is
       require
@@ -700,7 +690,7 @@ feature {NONE}
             bc1 := p1.base_class;
             i := list.upper;
          until
-            i = 0
+            i < list.lower
          loop
             p2 := list.item(i);
             if p1 /= p2 then
@@ -726,8 +716,6 @@ feature {NONE}
 invariant
 
    base_class /= Void;
-
-   list.lower = 1;
 
    not list.is_empty;
 

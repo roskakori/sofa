@@ -15,46 +15,45 @@
 --
 class LEVEL
 
-creation {ANY}
-   make
+creation make
 
-feature {ANY}
+feature
 
    count: INTEGER;
          -- Total count of occupied places.
-
+   
    free_count: INTEGER is
       do
          Result := park.count - count;
       end;
-
+   
    capacity : INTEGER is
       do
          Result := count + free_count;
       end;
-
+   
    full: BOOLEAN is
       do
          Result := count = capacity;
       end;
-
-feature {ANY} -- Modifications :
+   
+feature -- Modifications:
 
    make(max_cars: INTEGER) is
       require
-         max_cars > 0;
+         max_cars > 0
       do
          !!park.make(1,max_cars);
          !!tickets.make(park.lower,park.upper);
          count := 0;
       ensure
-         count = 0;
+         count = 0
       end;
 
    arrival(car: INTEGER; arrival_time: DATE) is
       require
          not full;
-         car > 0;
+         car > 0
       local
          i: INTEGER;
          stop: BOOLEAN;
@@ -76,18 +75,18 @@ feature {ANY} -- Modifications :
             i := i + 1;
          end;
       ensure
-         count >= old count + 1;
+         count >= old count + 1
       end;
 
    departure(car: INTEGER; departure_time: DATE; hour_price: REAL): REAL is
          -- Gives price to pay or -1 when car is not at this level.
       require
-         car > 0;
+         car > 0
       local
          i: INTEGER;
       do
          i := park.index_of(car);
-         if (i > park.upper) then
+         if i > park.upper then
             Result := -1;
          else
             Result := (tickets @ i).price(departure_time,hour_price);
@@ -108,11 +107,11 @@ invariant
    count >= 0;
 
    free_count >= 0;
-
+   
    capacity = count + free_count;
-
+   
    capacity >= 1;
-
+   
    tickets.count = park.count;
-
+   
 end -- LEVEL

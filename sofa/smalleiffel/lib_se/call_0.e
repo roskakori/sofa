@@ -18,7 +18,7 @@ deferred class CALL_0
    -- For calls without argument (only Current).
    --
 
-inherit CALL redefine to_integer end;
+inherit CALL;
 
 feature
 
@@ -42,15 +42,15 @@ feature
          end;
       end;
 
-   frozen to_integer: INTEGER is
+   frozen to_integer_or_error: INTEGER is
       local
          rf1: RUN_FEATURE_1;
       do
          rf1 ?= run_feature;
          if rf1 = Void then
-            error(start_position,fz_iinaiv);
+            to_integer_error;
          else
-            Result := rf1.value.to_integer;
+            Result := rf1.value.to_integer_or_error;
          end;
       end;
 
@@ -87,7 +87,7 @@ feature {RUN_FEATURE_3,RUN_FEATURE_4}
          rf: RUN_FEATURE;
       do
          rf := run_feature;
-         rc := rf.current_type.run_class;
+         rc := rf.run_class;
          run_feature := rc.running.first.dynamic(rf);
       end;
 

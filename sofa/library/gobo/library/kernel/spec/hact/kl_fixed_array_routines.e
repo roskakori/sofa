@@ -10,8 +10,8 @@ indexing
 	author:     "Eric Bezault <ericb@gobosoft.com>"
 	copyright:  "Copyright (c) 1999, Eric Bezault and others"
 	license:    "Eiffel Forum Freeware License v1 (see forum.txt)"
-	date:       "$Date: 1999/10/02 13:45:32 $"
-	revision:   "$Revision: 1.3 $"
+	date:       "$Date: 2000/02/02 10:24:01 $"
+	revision:   "$Revision: 1.4 $"
 
 class KL_FIXED_ARRAY_ROUTINES [G]
 
@@ -73,6 +73,23 @@ feature -- Conversion
 		end
 
 feature -- Status report
+
+	has (an_array: like FIXED_ARRAY_TYPE; v: G): BOOLEAN is
+			-- Does `v' appear in `an_array'?
+		require
+			an_array_not_void: an_array /= Void
+		local
+			i: INTEGER
+		do
+			from
+				i := an_array.count - 1
+			until
+				Result or i < 0
+			loop
+				Result := an_array.item (i) = v
+				i := i - 1
+			end
+		end
 
 	valid_fixed_array (an_array: like FIXED_ARRAY_TYPE): BOOLEAN is
 			-- Make sure that the lower bound of `an_array' is zero.

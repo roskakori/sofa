@@ -8,8 +8,8 @@ indexing
 	author:     "Eric Bezault <ericb@gobosoft.com>"
 	copyright:  "Copyright (c) 1999, Eric Bezault and others"
 	license:    "Eiffel Forum Freeware License v1 (see forum.txt)"
-	date:       "$Date: 1999/10/02 14:01:22 $"
-	revision:   "$Revision: 1.2 $"
+	date:       "$Date: 2000/02/04 22:08:53 $"
+	revision:   "$Revision: 1.3 $"
 
 class PR_CONFLICT
 
@@ -72,8 +72,10 @@ feature -- Output
 			a_file.put_string (" between rule ")
 			a_file.put_integer (rule.id)
 			a_file.put_string (" and token ")
-			a_file.put_integer (token.id)
-			a_file.put_string (" resolved as ")
+			a_file.put_integer (token.token_id)
+			a_file.put_string (" (")
+			a_file.put_string (token.name)
+			a_file.put_string (") resolved as ")
 			a_file.put_string (resolution)
 			a_file.put_string (".%N")
 		end

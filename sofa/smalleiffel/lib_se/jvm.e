@@ -631,7 +631,7 @@ feature {RUN_FEATURE,NATIVE}
             opcode_check_id_for(target);
          when C_switch then
             code_attribute.opcode_aload_0;
-            rc := stack_rf.item(top).current_type.run_class;
+            rc := stack_rf.item(top).run_class;
             rc.opcode_checkcast;
          when C_expanded_initialize then
             code_attribute.opcode_dup;

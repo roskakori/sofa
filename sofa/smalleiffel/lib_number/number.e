@@ -328,13 +328,14 @@ feature -- To know more about a NUMBER :
    
    frozen is_integer: BOOLEAN is
 	 -- Does `Current' value fit on an INTEGER ?
+      local
+	 abstract_integer: ABSTRACT_INTEGER;
       do
-	 if is_abstract_integer then
-	    if Current @<= Maximum_integer then
-	       Result := Current @>= Minimum_integer;
-	    end;
+	 abstract_integer ?= Current;
+	 if abstract_integer /= Void then
+	    Result := abstract_integer.is_integer_value;
 	 end;
-      ensure
+       ensure
 	 Result implies is_abstract_integer;
       end;   
    
@@ -461,12 +462,10 @@ feature -- To mix NUMBER and INTEGER :
    
    infix "@-" (other: INTEGER): NUMBER is
 	 -- Difference of `Current' and `other'.
-      local
-	 num: ABSTRACT_INTEGER;
       do
 	 if other = Minimum_integer then
-	    !LARGE_POSITIVE_INTEGER!num.make_smaller(0);
-	    Result := Current + num;
+	    Result := (Current @+ 1);
+	    Result := Result @+ Maximum_integer;
 	 else
 	    Result := Current @+ (- other);
 	 end;
@@ -668,6 +667,34 @@ feature -- Misc :
    
 feature {NUMBER} -- Implementation :
    
+   nb_c(int: INTEGER): INTEGER is
+      -- Return the number of chiffers in int.
+      local
+	 i: INTEGER;
+      do
+	 from
+	    i := int;
+	    Result := 1;
+	 until
+	    i < 10
+	 loop
+	    i := i // 10;
+	    Result := Result + 1;
+	 end;
+      end;
+   
+   frozen is_small_integer: BOOLEAN is
+	 -- Does `Current' value fit on an INTEGER ?
+      do
+	 if is_abstract_integer then
+	    if Current @<= (Base - 1) then
+	       Result := Current @>= (- (Base - 1));
+	    end;
+	 end;
+      ensure
+	 Result implies is_abstract_integer;
+      end;   
+   
    frozen add_with_small_integer(other: SMALL_INTEGER): NUMBER is
       require
 	 other /= Void
@@ -693,7 +720,7 @@ feature {NUMBER} -- Implementation :
 	 Result /= Void
       end;
    
-   add_with_small_fraction(other: SMALL_FRACTION): NUMBER is
+   add_with_small_fraction(other: INTEGER_FRACTION): NUMBER is
       require
 	 other /= Void
       deferred
@@ -701,7 +728,7 @@ feature {NUMBER} -- Implementation :
 	 Result /= Void
       end;
    
-   add_with_large_fraction(other: LARGE_FRACTION): NUMBER is
+   add_with_large_fraction(other: NUMBER_FRACTION): NUMBER is
       require
 	 other /= Void
       deferred
@@ -734,7 +761,7 @@ feature {NUMBER} -- Implementation :
 	 Result /= Void
       end;
    
-   multiply_with_small_fraction(other: SMALL_FRACTION): NUMBER is
+   multiply_with_small_fraction(other: INTEGER_FRACTION): NUMBER is
       require
 	 other /= Void
       deferred
@@ -742,7 +769,7 @@ feature {NUMBER} -- Implementation :
 	 Result /= Void
       end;
    
-   multiply_with_large_fraction(other: LARGE_FRACTION): NUMBER is
+   multiply_with_large_fraction(other: NUMBER_FRACTION): NUMBER is
       require
 	 other /= Void
       deferred
@@ -769,13 +796,13 @@ feature {NUMBER} -- Implementation :
       deferred
       end;
    
-   greater_with_small_fraction(other: SMALL_FRACTION): BOOLEAN is
+   greater_with_small_fraction(other: INTEGER_FRACTION): BOOLEAN is
       require
 	 other /= Void;
       deferred
       end;
    
-   greater_with_large_fraction(other: LARGE_FRACTION): BOOLEAN is
+   greater_with_large_fraction(other: NUMBER_FRACTION): BOOLEAN is
       require
 	 other /= Void;
       deferred
@@ -839,79 +866,100 @@ feature {NONE}
 	 !LARGE_NEGATIVE_INTEGER!Result.make_smaller(0);
       end;
    
-   Base: INTEGER is 
+   Base : INTEGER is
+	 -- The Base is the grater number which is like 10^x and 
+	 -- which is inferior to the Maximu_integer value.
+	 --
+	 -- So if Maximum_number is 2147483647 :
+	 -- The Base is :           1000000000.
+	 -- A number has a value between 0-9 so a number in a
+	 -- item of a FIXED_ARRAY[INTEGER] must be a succession 
+	 -- of 9 so the value of the greater item is 999999999.
+         -- And the Base is the greater value of a item + 1.
       once
-	 Result := Minimum_integer;
-      end;
+	 Result := 10 ^ (nb_c(Maximum_integer) - 1);
+      end; -- Base
    
    Half_base: INTEGER is
+	 -- It's the value of the greater number like 10^x which is
+	 -- inferior to Base.sqrt
+	 -- For the multiplication, we can make multiplication without 
+	 -- depassement of capacity.
       once
-	 from
-	    Result := 1;
-	 until
-	    ((Result.to_double * 2)^2) > Double_base
-	 loop
-	    Result := Result * 2;
-	 end;
+	    Result := 10^(Base.sqrt.log10.truncated_to_integer);
+      end;
+   
+   Half_base_2: INTEGER is
+      once
+	 Result := Half_base ^ 2;
+      end;
+   
+   Rest_base: INTEGER is
+      once
+	 Result := Base // (Half_base ^ 2);
       end;
    
    Double_base: DOUBLE is
+	 -- It's the double value of the Base.
+	 -- The conversion integer to double of the Base value.
+	 -- This value is necessary to the division.
       once
-	 Result := Maximum_integer.to_double + 1;
+	 Result := Base.to_double;
       end
    
-   smaller_correct_fixed: FIXED_ARRAY[INTEGER] is
+   Log_base: DOUBLE is
       once
-	 !!Result.make(2);
-	 Result.put(1,1);
+	 Result := Base.log;
       end;
    
-   tmp_string: STRING is 
+   Base_is_impair: BOOLEAN is
       once
-	 !!Result.make(128);
+	 Result := (Rest_base = 10);
       end;
+   
+   -- This global variable is necessary to have a good memory gestion
    
    temp_2_digints: FIXED_ARRAY[INTEGER] is
+	 -- Global variable to put an integer in a large_integer
       once
 	 !!Result.make(2);
       end;
    
    temp_1_digint: FIXED_ARRAY[INTEGER] is
+	 -- Global varaible to put an integer in a small_integer
+	 -- for few operations
       once
 	 !!Result.make(1);
       end;
    
-   temp: FIXED_ARRAY[INTEGER] is
+   temp_from_mult: FIXED_ARRAY[INTEGER] is
+	 -- Global variable
       once
-	 !!Result.make(3);
+	 !!Result.make(0);
       end;
    
-   temp_from_mult: FIXED_ARRAY[INTEGER] is
+   temp_after_mult: FIXED_ARRAY[INTEGER] is
+	 -- Global variable
       once
 	 !!Result.make(0);
       end;
    
    temp_quotient: FIXED_ARRAY[INTEGER] is
+	 -- Global variable
       once
 	 !!Result.make(0);
       end;
    
    temp_remainder: FIXED_ARRAY[INTEGER] is
+	 -- Global variable
       once
 	 !!Result.make(0);
       end;
    
    temp_division: FIXED_ARRAY[INTEGER] is
+	 -- Global variable
       once
 	 !!Result.make(0);
       end;
    
 end -- NUMBER
-
-
-
-
-
-
-
-

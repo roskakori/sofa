@@ -59,7 +59,7 @@
    receiver is not used. The "alias" field of the feature is used to
    indicate the Java class, the Java function name and the corresponding
    Java bytecode descriptor. Syntax to use in the alias string is :
-   alias "<JavaClassPath>.<MethodName> <Descriptor>"
+          alias "<JavaClassPath>.<MethodName> <Descriptor>"
 
    A dot is the separator between <JavaClassPath> and <MethodName>.
    A blank character is the separator between <MethodName> and

@@ -8,8 +8,8 @@ indexing
 	author:     "Eric Bezault <ericb@gobosoft.com>"
 	copyright:  "Copyright (c) 1999, Eric Bezault and others"
 	license:    "Eiffel Forum Freeware License v1 (see forum.txt)"
-	date:       "$Date: 1999/10/02 14:05:26 $"
-	revision:   "$Revision: 1.6 $"
+	date:       "$Date: 2000/02/04 22:09:01 $"
+	revision:   "$Revision: 1.7 $"
 
 class PR_GRAMMAR
 
@@ -194,7 +194,7 @@ feature -- Output
 			end
 			a_file.put_string ("%NTerminals, with rules where they appear%N%N")
 				-- EOF token.
-			a_file.put_string ("$ (0)%N")
+			a_file.put_string ("$ (token 0)%N")
 			nb := tokens.count
 			from i := 1 until i > nb loop
 				tokens.item (i).print_token (Current, a_file)

@@ -38,8 +38,8 @@ void se_deep_twin_start(void) {
       int s;
       se_deep_twin_memory_sizeof = SE_DEEP_TWIN_BUFFER_SIZE;
       s = (se_deep_twin_memory_sizeof * sizeof(void*));
-      se_deep_twin_memory1 = ((void**)malloc(s));
-      se_deep_twin_memory2 = ((void**)malloc(s));
+      se_deep_twin_memory1 = ((void**)se_malloc(s));
+      se_deep_twin_memory2 = ((void**)se_malloc(s));
     }
   }
   se_deep_twin_start_counter++;
@@ -58,6 +58,7 @@ void* se_deep_twin_search(void* object) {
 void se_deep_twin_register(void* object, void* deep_twin) {
   if (object != NULL) {
     if (se_deep_twin_search(object) == NULL) {
+      se_deep_twin_memory_last++;
       if (se_deep_twin_memory_last == se_deep_twin_memory_sizeof) {
 	int s;
 	se_deep_twin_memory_sizeof *= 2;
@@ -65,7 +66,6 @@ void se_deep_twin_register(void* object, void* deep_twin) {
 	se_deep_twin_memory1 = ((void**)realloc(se_deep_twin_memory1,s));
 	se_deep_twin_memory2 = ((void**)realloc(se_deep_twin_memory2,s));
       }
-      se_deep_twin_memory_last++;
       se_deep_twin_memory1[se_deep_twin_memory_last] = object;
       se_deep_twin_memory2[se_deep_twin_memory_last] = deep_twin;
     }
@@ -105,14 +105,15 @@ void se_deep_equal_start(void) {
       int s;
       se_deep_equal_memory_sizeof = SE_DEEP_TWIN_BUFFER_SIZE;
       s = (se_deep_equal_memory_sizeof * sizeof(void*));
-      se_deep_equal_memory1 = ((void**)malloc(s));
-      se_deep_equal_memory2 = ((void**)malloc(s));
+      se_deep_equal_memory1 = ((void**)se_malloc(s));
+      se_deep_equal_memory2 = ((void**)se_malloc(s));
     }
   }
   se_deep_equal_start_counter++;
 }
 
 static void se_deep_equal_register(void* object, void* deep) {
+  se_deep_equal_memory_last++;
   if (se_deep_equal_memory_last == se_deep_equal_memory_sizeof) {
     int s;
     se_deep_equal_memory_sizeof *= 2;
@@ -120,7 +121,6 @@ static void se_deep_equal_register(void* object, void* deep) {
     se_deep_equal_memory1 = ((void**)realloc(se_deep_equal_memory1,s));
     se_deep_equal_memory2 = ((void**)realloc(se_deep_equal_memory2,s));
   }
-  se_deep_equal_memory_last++;
   se_deep_equal_memory1[se_deep_equal_memory_last] = object;
   se_deep_equal_memory2[se_deep_equal_memory_last] = deep;
 }

@@ -87,6 +87,7 @@ feature {NONE}
 
    make is
       do
+         id_memory.put(0,as_none);
          id_memory.put(1,as_general);
          id_memory.put(2,as_integer);
          id_memory.put(3,as_character);
@@ -97,7 +98,13 @@ feature {NONE}
          id_memory.put(8,as_pointer);
          id_memory.put(9,as_native_array_character);
          id_memory.put(10,as_any);
-         max_id := 10;
+         id_memory.put(11,as_tuple);
+         id_memory.put(12,as_gui_color);
+         id_memory.put(13,as_gui_event);
+         id_memory.put(14,as_gui_font);
+         id_memory.put(15,as_gui_gc);
+         id_memory.put(16,as_gui_pixmap);
+         max_id := 16;
          disk_restore;
       end;
 

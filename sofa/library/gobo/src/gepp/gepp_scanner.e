@@ -7,8 +7,8 @@ indexing
 	author:     "Eric Bezault <ericb@gobosoft.com>"
 	copyright:  "Copyright (c) 1999, Eric Bezault and others"
 	license:    "Eiffel Forum Freeware License v1 (see forum.txt)"
-	date:       "$Date: 1999/10/02 14:17:15 $"
-	revision:   "$Revision: 1.18 $"
+	date:       "$Date: 2000/02/09 18:39:52 $"
+	revision:   "$Revision: 1.19 $"
 
 deferred class GEPP_SCANNER
 
@@ -347,6 +347,12 @@ feature {NONE} -- Constants
 
 	yyEnd_of_buffer: INTEGER is 22
 			-- End of buffer rule code
+
+	yyLine_used: BOOLEAN is false
+			-- Are line and column numbers used?
+
+	yyPosition_used: BOOLEAN is false
+			-- Is `position' used?
 
 	INITIAL: INTEGER is 0
 	S_PREPROC: INTEGER is 1

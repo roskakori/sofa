@@ -34,7 +34,12 @@ void se_prinT2(EIF_INTEGER* o) {
 }
 
 void se_prinT3(EIF_CHARACTER* o) {
-  fprintf(SE_ERR,"'%c'",*o);
+  if ((*o <= 31) || (*o >= 127)) {
+    fprintf(SE_ERR,"'%%/%d/'",*o);
+  }
+  else {
+    fprintf(SE_ERR,"'%c'",*o);
+  }
 }
 
 void se_prinT4(EIF_REAL* o) {
@@ -86,10 +91,10 @@ EIF_INTEGER se_position2line(se_position position) {
      Computes the line number using the given `position'.
   */
   if (position & 1) {
-    return (EIF_INTEGER) ((position >> 1) & 0x7FFF);
+    return ((EIF_INTEGER)((position >> 1) & 0x7FFF));
   }
   else{
-    return (EIF_INTEGER) ((position >> 8) & 0x1FFF);
+    return ((EIF_INTEGER)((position >> 8) & 0x1FFF));
   }
 }
 
@@ -101,7 +106,7 @@ EIF_INTEGER se_position2column(se_position position) {
     return 0; /* Not memorized. */
   }
   else{
-    return (EIF_INTEGER) ((position >> 1) & 0x7F);
+    return ((EIF_INTEGER)((position >> 1) & 0x7F));
   }
 }
 
@@ -109,7 +114,9 @@ EIF_INTEGER se_position2path_id(se_position position) {
   /*
      Computes the file path id using the given `position'.
   */
-  return (EIF_INTEGER) ((position & 1) ? (position >> 17) : (position >> 21));
+  return ((EIF_INTEGER)((position & 1) ?
+			(position >> 17) :
+			(position >> 21)));
 }
 
 /*
@@ -483,7 +490,7 @@ void se_evobt(void*o,se_position position) {
 void sigrsp(int sig) {
   printf("Received signal %d (man signal).\n",sig);
   se_print_run_time_stack();
-  exit(1);
+  exit(EXIT_FAILURE);
 }
 
 void se_gc_check_id(void*o,int id) {
@@ -496,7 +503,7 @@ void se_gc_check_id(void*o,int id) {
     se_print_run_time_stack();
     fprintf(SE_ERR,"System-validity error detected during GC cycle.\n");
     se_print_bad_target(SE_ERR,id,(T0*)o,0,0,0);
-    exit(1);
+    exit(EXIT_FAILURE);
 #endif
   }
 }

@@ -20,22 +20,14 @@ class E_WHEN
 
 inherit GLOBALS;
 
-creation {EIFFEL_PARSER}
-   make
+creation {EIFFEL_PARSER} make
 
-creation {E_WHEN,WHEN_LIST}
-   from_e_when
+creation {E_WHEN,WHEN_LIST} from_e_when
 
 feature
 
    start_position: POSITION;
          -- Of the first character of keyword "when".
-
-feature {E_WHEN}
-
-   list: ARRAY[WHEN_ITEM];
-
-feature
 
    header_comment: COMMENT;
          -- Of the when clause.
@@ -46,8 +38,14 @@ feature
    when_list: WHEN_LIST;
          -- Corresponding one when checked.
 
-   values: ARRAY[BOOLEAN];
-         -- True when the corresponding index is in the when.
+feature {NONE}
+
+   values: ARRAY[INTEGER];
+	 -- To store pairs of range values.
+
+feature {E_WHEN}
+
+   list: ARRAY[WHEN_ITEM];
 
 feature {NONE}
 
@@ -128,7 +126,7 @@ feature {WHEN_LIST}
    compile_to_jvm(else_position: POSITION; remainder: INTEGER) is
          -- Where `remainder' is the number of E_WHEN after Current.
       local
-         point3, point4, bi, bs: INTEGER;
+         point3, point4, bi: INTEGER;
          must_test: BOOLEAN;
          ca: like code_attribute;
       do
@@ -147,35 +145,20 @@ feature {WHEN_LIST}
             until
                bi > values.upper
             loop
-               from
-                  bs := bi + 1;
-               until
-                  bs > values.upper or else not values.item(bs)
-               loop
-                  bs := bs + 1;
-               end;
-               bs := bs - 1;
-               --
-               if bi = bs then
+               if values.item(bi) = values.item(bi+1) then
                   ca.opcode_dup;
-                  ca.opcode_push_integer(bi);
+                  ca.opcode_push_integer(values.item(bi));
                   points1.add_last(ca.opcode_if_icmpeq);
                else
                   ca.opcode_dup;
-                  ca.opcode_push_integer(bi);
+                  ca.opcode_push_integer(values.item(bi));
                   point3 := ca.opcode_if_icmplt;
                   ca.opcode_dup;
-                  ca.opcode_push_integer(bs);
+                  ca.opcode_push_integer(values.item(bi+1));
                   points1.add_last(ca.opcode_if_icmple);
                   ca.resolve_u2_branch(point3);
                end;
-               from
-                  bi := bs + 1;
-               until
-                  bi > values.upper or else values.item(bi)
-               loop
-                  bi := bi + 1;
-               end;
+               bi := bi + 2;
             end;
             point4 := ca.opcode_goto;
          end;
@@ -196,7 +179,7 @@ feature {WHEN_LIST}
 
    compile_to_c is
       local
-         bi, bs: INTEGER;
+         bi: INTEGER;
       do
          cpp.put_string("%Nif(");
          from
@@ -204,41 +187,26 @@ feature {WHEN_LIST}
          until
             bi > values.upper
          loop
-            from
-               bs := bi + 1;
-            until
-               bs > values.upper or else not values.item(bs)
-            loop
-               bs := bs + 1;
-            end;
-            bs := bs - 1;
-            --
             cpp.put_character('(');
-            if bi = bs then
-               cpp.put_integer(bi);
+            if values.item(bi) = values.item(bi+1) then
+               cpp.put_integer(values.item(bi));
                cpp.put_string("==");
                cpp.put_inspect;
             else
                cpp.put_character('(');
-               cpp.put_integer(bi);
+               cpp.put_integer(values.item(bi));
                cpp.put_string("<=");
                cpp.put_inspect;
                cpp.put_string(")&&(");
                cpp.put_inspect;
                cpp.put_string("<=");
-               cpp.put_integer(bs);
+               cpp.put_integer(values.item(bi+1));
                cpp.put_character(')');
             end;
             cpp.put_character(')');
             --
-            from
-               bi := bs + 1;
-            until
-               bi > values.upper or else values.item(bi)
-            loop
-               bi := bi + 1;
-            end;
-            if bi <= values.upper then
+            bi := bi + 2;
+            if bi < values.upper then
                cpp.put_string("||");
             end;
          end;
@@ -247,6 +215,33 @@ feature {WHEN_LIST}
             compound.compile_to_c;
          end;
          cpp.put_string(fz_12);
+      end;
+
+   compile_to_c_switch is
+      local
+         bi, v: INTEGER;
+      do
+         from
+            bi := values.lower;
+         until
+            bi > values.upper
+         loop
+            from
+               v := values.item(bi)
+            until
+               v > values.item(bi+1)
+            loop
+               cpp.put_string("case ");
+               cpp.put_integer(v);
+               cpp.put_string(":%N");
+               v := v + 1;
+            end;
+            bi := bi + 2;
+         end;
+         if compound /= Void then
+            compound.compile_to_c;
+         end;
+         cpp.put_string("break;%N");
       end;
 
    pretty_print is
@@ -281,10 +276,69 @@ feature {WHEN_LIST}
       end;
 
    includes_integer(v: INTEGER): BOOLEAN is
+      local
+         i: INTEGER
       do
-         Result := ((values /= Void) and then
-                    values.valid_index(v) and then
-                    values.item(v));
+         if 
+            values /= Void
+               and then
+            v >= values.item(values.lower)
+               and then
+            v <= values.item(values.upper)
+         then
+            from
+               i := values.lower
+            until
+               Result or else i > values.upper
+            loop
+               Result := values.item(i) <= v and v <= values.item(i+1)
+               i := i + 2
+            end
+         end
+      end;
+
+   includes_integer_between(l,u: INTEGER): BOOLEAN is
+      require
+         invalid_range: l < u
+      local
+         i: INTEGER
+      do
+         if 
+            values /= Void
+               and then
+            u >= values.item(values.lower)
+               and then
+            l <= values.item(values.upper)
+         then
+            from
+               i := values.lower
+            until
+               Result or else i > values.upper
+            loop
+               Result := values.item(i) <= u and l <= values.item(i+1)
+               i := i + 2
+            end
+         end
+      end;
+
+   largest_range_of_values: INTEGER is
+         -- The largest number of consecutive values - returns 0 if none
+      local
+         i, range: INTEGER
+      do
+         if values /= Void then
+            from
+               i := values.lower;
+            until
+               i > values.upper
+            loop
+               range := values.item(i+1) - values.item(i) + 1;
+               if range > Result then
+                  Result := range;
+               end
+               i := i + 2;
+            end;
+         end;
       end;
 
 feature {WHEN_LIST,E_WHEN}
@@ -385,16 +439,61 @@ feature {WHEN_ITEM_1}
       require
          wi1 /= Void
       local
-         v: INTEGER;
+         i, v: INTEGER;
       do
          v := wi1.expression_value;
          if e_inspect.includes(v) then
             err_occ(v,wi1.start_position);
          elseif values = Void then
-            !!values.make(v,v);
-            values.put(true,v);
+            !!values.make(501,502);
+            values.put(v,values.lower);
+            values.put(v,values.upper);
          else
-            values.force(true,v);
+            i := locate_in_values(v)
+            if i = values.lower then  -- v is lower than lowest value
+               if v = values.item(i) - 1 then  -- just change lower
+                  values.put(v,i)
+               else
+                  values.resize(values.lower-2, values.upper);
+                  values.put(v,values.lower);
+                  values.put(v,values.lower+1);
+               end
+            elseif i > values.upper then  -- v is higher than highest value
+               if v = values.item(i-1) + 1 then  -- just change upper
+                  values.put(v,i-1)
+               else
+                  values.resize(values.lower, values.upper+2);
+                  values.put(v,values.upper-1);
+                  values.put(v,values.upper);
+               end
+            else
+               if v = values.item(i-1) + 1 and v = values.item(i) - 1 then
+                  values.put(values.item(i+1),i-1)
+                  from until i > values.upper-2 loop
+                     values.put(values.item(i+2),i)
+                     values.put(values.item(i+3),i+1)
+                     i := i + 2
+                  end
+                  values.resize(values.lower, values.upper-2)
+               elseif v = values.item(i-1) + 1 then  -- just change upper
+                  values.put(v,i-1)
+               elseif v = values.item(i) - 1 then  -- just change lower
+                  values.put(v,i)
+               else
+                  values.resize(values.lower, values.upper+2)
+                  from
+                     i := values.upper - 1
+                  until
+                     v > values.item(i-1)
+                  loop
+                     values.put(values.item(i-2),i)
+                     values.put(values.item(i-1),i+1)
+                     i := i - 2
+                  end
+                  values.put(v,i)
+                  values.put(v,i+1)
+               end
+            end
          end;
       ensure
          e_inspect.includes(wi1.expression_value);
@@ -412,30 +511,71 @@ feature {WHEN_ITEM_2}
          u := wi2.upper_value;
          if l >= u then
             error(wi2.start_position,"Not a good slice.");
-         end;
-         if nb_errors = 0 then
-            from
-               i := l;
+         elseif e_inspect.includes_between(l,u) then
+            from 
+               i := l
             until
-               i > u
+               e_inspect.includes(i)  -- try to locate the exact problem
             loop
-               if e_inspect.includes(i) then
-                  err_occ(i,wi2.start_position);
-                  i := u + 1;
+                if i = l then
+                   l := l + 1
+                   i := u
+                else
+                   u := u - 1
+                   i := l
+                end
+            end
+            err_occ(i,wi2.start_position);
+         elseif values = Void then
+            !!values.make(501,502);
+            values.put(l,values.lower);
+            values.put(u,values.upper);
+         else
+            i := locate_in_values(l)
+            if i = values.lower then  -- l and u are lower than lowest value
+               if u = values.item(i) - 1 then  -- just change lower
+                  values.put(l,i)
                else
-                  i := i + 1;
-               end;
-            end;
-         end;
-         if nb_errors = 0 then
-            if values = Void then
-               !!values.make(l,u);
-               values.set_all_with(true);
+                  values.resize(values.lower-2, values.upper);
+                  values.put(l,values.lower);
+                  values.put(u,values.lower+1);
+               end
+            elseif i > values.upper then  -- l and u are higher than highest
+               if l = values.item(i-1) + 1 then  -- just change upper
+                  values.put(u,i-1)
+               else
+                  values.resize(values.lower, values.upper+2);
+                  values.put(l,values.upper-1);
+                  values.put(u,values.upper);
+               end
             else
-               values.force(true,l);
-               values.force(true,u);
-               values.set_slice_with(true,l,u);
-            end;
+               if l = values.item(i-1) + 1 and u = values.item(i) - 1 then
+                  values.put(values.item(i+1),i-1)
+                  from until i > values.upper-2 loop
+                     values.put(values.item(i+2),i)
+                     values.put(values.item(i+3),i+1)
+                     i := i + 2
+                  end
+                  values.resize(values.lower, values.upper-2)
+               elseif l = values.item(i-1) + 1 then  -- just change upper
+                  values.put(u,i-1)
+               elseif u = values.item(i) - 1 then  -- just change lower
+                  values.put(l,i)
+               else
+                  values.resize(values.lower, values.upper+2)
+                  from
+                     i := values.upper - 1
+                  until
+                     l > values.item(i-1)
+                  loop
+                     values.put(values.item(i-2),i)
+                     values.put(values.item(i-1),i+1)
+                     i := i - 2
+                  end
+                  values.put(l,i)
+                  values.put(u,i+1)
+               end
+            end
          end;
       end;
 
@@ -484,6 +624,26 @@ feature {NONE}
          eh.append(v.to_string);
          error(p,") in the same inspect.");
       end;
+
+   locate_in_values(v: INTEGER): INTEGER is
+        -- returns index in values table where v would be inserted
+      require
+         values /= Void
+      do
+         from
+            Result := values.lower
+         until
+            Result > values.upper
+               or else
+            v < values.item(Result)
+         loop
+            Result := Result + 2
+         end
+      ensure
+         (Result - values.lower) \\ 2 = 0
+         Result < values.upper implies v < values.item(Result)
+         Result > values.upper implies v > values.item(Result-1)
+      end
 
 feature {NONE}
 

@@ -8,8 +8,8 @@ indexing
 	author:     "Eric Bezault <ericb@gobosoft.com>"
 	copyright:  "Copyright (c) 1999, Eric Bezault and others"
 	license:    "Eiffel Forum Freeware License v1 (see forum.txt)"
-	date:       "$Date: 1999/10/02 13:57:08 $"
-	revision:   "$Revision: 1.14 $"
+	date:       "$Date: 2000/04/16 13:02:20 $"
+	revision:   "$Revision: 1.17 $"
 
 deferred class YY_SCANNER
 
@@ -77,13 +77,6 @@ feature -- Access
 			correct_count: Result.count = text_count
 		end
 
-	text_count: INTEGER is
-			-- Length of last token read
-		deferred
-		ensure
-			positive_count: Result >= 0
-		end
-
 	text_item (i: INTEGER): CHARACTER is
 			-- `i'-th character of last token read
 		require
@@ -107,13 +100,47 @@ feature -- Access
 		deferred
 		ensure
 			text_substring_not_void: Result /= Void
-			text_substring_empty: (s > e) implies Result.empty
+			text_substring_empty: (s > e) implies (Result.count = 0)
 			definition: s <= e implies Result.is_equal (text.substring (s, e))
 		end
 
 	start_condition: INTEGER is
 			-- Start condition
 		deferred
+		end
+
+feature -- Measurement
+
+	text_count: INTEGER is
+			-- Number of characters in last token read
+		deferred
+		ensure
+			positive_count: Result >= 0
+		end
+
+	line: INTEGER is
+			-- Line number of last token read when
+			-- '%option line' has been specified
+		deferred
+		ensure
+			line_positive: Result >= 1
+		end
+
+	column: INTEGER is
+			-- Column number of last token read when
+			-- '%option line' has been specified
+		deferred
+		ensure
+			column_positive: Result >= 1
+		end
+
+	position: INTEGER is
+			-- Position of last token read (i.e. number of
+			-- characters from the start of the input source)
+			-- when '%option position' has been specified
+		deferred
+		ensure
+			position_positive: Result >= 1
 		end
 
 feature -- Status report
@@ -332,6 +359,48 @@ feature -- Output
 			-- Output `text' using feature `output'.
 		do
 			output (text)
+		end
+
+feature -- Action
+
+	pre_action is
+			-- Action executed before every semantic action
+			-- when '%option pre-action' has been specified.
+			-- (Note: this routine can be redefined in descendant
+			-- classes. Default: do nothing.)
+		do
+		end
+
+	post_action is
+			-- Action executed after every semantic action
+			-- when '%option post-action' has been specified.
+			-- (Note: this routine can be redefined in descendant
+			-- classes. Default: do nothing.)
+		do
+		end
+
+	pre_eof_action is
+			-- Action executed before every end-of-file semantic action
+			-- (i.e. <<EOF>>) when '%option pre-eof-action' has been specified.
+			-- (Note: this routine can be redefined in descendant classes.
+			-- Default: do nothing.)
+		do
+		end
+
+	post_eof_action is
+			-- Action executed after every end-of-file semantic action
+			-- (i.e. <<EOF>>) when '%option post-eof-action' has been specified.
+			-- (Note: this routine can be redefined in descendant classes.
+			-- Default: do nothing.)
+		do
+		end
+
+	default_action is
+			-- Action executed when default rule is matched.
+			-- (Note: this routine can be redefined in descendant classes.
+			-- Default: print last character read to standard output.)
+		do
+			echo
 		end
 
 feature -- Error handling

@@ -20,77 +20,9 @@ class FORMAL_ARG_LIST
 
 inherit DECLARATION_LIST;
 
-creation make, with
+creation make
 
-feature {NONE} -- Parsing creation procedure :
-
-   make(l: like list) is
-      require
-         l.lower = 1;
-         not l.is_empty
-      local
-         an: like name;
-         tlf: TYPE_LIKE_FEATURE;
-         tla, tla2: TYPE_LIKE_ARGUMENT;
-         i, rank: INTEGER;
-         an2: ARGUMENT_NAME2;
-      do
-         declaration_list_make(l);
-         -- Substitution TYPE_LIKE_FEATURE/TYPE_LIKE_ARGUMENT :
-         from
-            i := count;
-         until
-            i = 0
-         loop
-            an := name(i);
-            tlf ?= an.result_type;
-            if tlf /= Void then
-               rank := rank_of(tlf.like_what.to_string);
-               if rank = i then
-                  eh.add_position(tlf.start_position);
-                  fatal_error(fz_cad);
-               elseif rank > 0 then
-                  !!an2.refer_to(tlf.like_what.start_position,Current,rank);
-                  !!tla.make(tlf.start_position,an2);
-                  an.set_result_type(tla);
-               end;
-            end;
-            i := i - 1;
-         end;
-         if run_control.all_check then
-            from
-               i := count;
-            until
-               i = 0
-            loop
-               tla ?= name(i).result_type;
-               if tla /= Void then
-                  rank := rank_of(tla.like_what.to_string);
-                  tla2 ?= name(rank).result_type;
-                  if tla2 /= Void then
-                     eh.add_position(tla.start_position);
-                     eh.add_position(tla2.start_position);
-                     fatal_error(fz_cad);
-                  end;
-               end;
-               i := i - 1;
-            end;
-         end;
-      ensure
-         list = list;
-         flat_list /= Void
-      end;
-
-feature {NONE} -- Runnable creation procedure :
-
-   with(model: like Current; ct: TYPE) is
-      require
-         not model.is_runnable(ct)
-      do
-         standard_copy(model);
-         dynamic_runnable(ct);
-         check_name_clash(ct);
-      end;
+creation {RUN_FEATURE} with
 
 feature
 
@@ -106,7 +38,7 @@ feature
          fmt.put_character('(');
          fmt.level_incr;
          from
-            i := 1;
+            i := list.lower;
          until
             i > list.upper
          loop
@@ -126,7 +58,7 @@ feature
       do
          short_print.hook_or("hook302"," (");
          from
-            i := 1;
+            i := list.lower;
          until
             i > list.upper
          loop
@@ -334,10 +266,77 @@ feature {SWITCH}
 
 feature {NONE}
 
+   make(l: like list) is
+	 -- Parsing creation procedure.
+      require
+         l.lower = 1;
+         not l.is_empty
+      local
+         an: like name;
+         tlf: TYPE_LIKE_FEATURE;
+         tla, tla2: TYPE_LIKE_ARGUMENT;
+         i, rank: INTEGER;
+         an2: ARGUMENT_NAME2;
+      do
+         declaration_list_make(l);
+         -- Substitution TYPE_LIKE_FEATURE/TYPE_LIKE_ARGUMENT :
+         from
+            i := count;
+         until
+            i = 0
+         loop
+            an := name(i);
+            tlf ?= an.result_type;
+            if tlf /= Void then
+               rank := rank_of(tlf.like_what.to_string);
+               if rank = i then
+                  eh.add_position(tlf.start_position);
+                  fatal_error(fz_cad);
+               elseif rank > 0 then
+                  !!an2.refer_to(tlf.like_what.start_position,Current,rank);
+                  !!tla.make(tlf.start_position,an2);
+                  an.set_result_type(tla);
+               end;
+            end;
+            i := i - 1;
+         end;
+         if run_control.all_check then
+            from
+               i := count;
+            until
+               i = 0
+            loop
+               tla ?= name(i).result_type;
+               if tla /= Void then
+                  rank := rank_of(tla.like_what.to_string);
+                  tla2 ?= name(rank).result_type;
+                  if tla2 /= Void then
+                     eh.add_position(tla.start_position);
+                     eh.add_position(tla2.start_position);
+                     fatal_error(fz_cad);
+                  end;
+               end;
+               i := i - 1;
+            end;
+         end;
+      ensure
+         list = list;
+         flat_list /= Void
+      end;
+
+   with(model: like Current; ct: TYPE) is
+	 -- Runnable creation procedure.
+      require
+         not model.is_runnable(ct)
+      do
+         standard_copy(model);
+         dynamic_runnable(ct);
+         check_name_clash(ct);
+      end;
+
    tmp_string: STRING is
       once
          !!Result.make(32);
       end;
 
 end -- FORMAL_ARG_LIST
-

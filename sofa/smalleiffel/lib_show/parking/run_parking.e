@@ -15,29 +15,27 @@
 --
 class RUN_PARKING
    --
-   -- Sert de programme principal pour runr le fonctionnement d'un
-   -- Parking a trois levelx.
+   -- Main loop to run the PARKING example.
    --
-creation {ANY}
-   make
+creation make
 
-feature {ANY}
+feature {NONE}
 
    make is
       local
          p: PARKING;
-         l1, l2, l3: LEVEL;
+         level1, level2, level3: LEVEL;
          command: COMMAND;
          price: REAL;
          i, value: INTEGER;
       do
          from
-            !!l1.make(14);
-            !!l2.make(18);
-            !!l3.make(25);
-            !!p.make(<<l1,l2,l3>>);
+            !!level1.make(14);
+            !!level2.make(18);
+            !!level3.make(25);
+            !!p.make(<<level1,level2,level3>>);
             !!command.make;
-            io.put_string("Simulation du fonctionnement d'un parking.%N%N");
+            io.put_string("Parking simulation.%N%N");
             command.print_help_on(io);
             command.get_command(io);
          until

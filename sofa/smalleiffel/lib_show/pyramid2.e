@@ -14,16 +14,12 @@
 -- Boston, MA 02111-1307, USA.
 --
 class PYRAMID2
---
---| Auteur : Christophe Alexandre
---|  date  : Tue Feb 27 14:39:12 1996
---|
---| Run faster than pyramid.e
-
+   --
+   -- Run faster than pyramid.e
+   --
 inherit ANY redefine print_on end;
 
-creation {ANY}
-   make
+creation make
 
 feature {NONE}
 
@@ -32,47 +28,43 @@ feature {NONE}
    used: ARRAY[BOOLEAN]; -- Already used numbers in `pyramid'.
 
    make is
+      local
+	 size: INTEGER;
       do
-         from
-            ask
-         until
-            io.last_integer > 1
-         loop
-            ask;
-         end
+         if argument_count = 0 then
+	    io.put_string("Size of the pyramid %
+			  % (a small number greater than 1) : ");
+	    io.flush;
+	    io.read_integer;
+	    io.put_new_line;
+	    size := io.last_integer;
+	 else
+	    size := argument(1).to_integer;
+	 end;
          io.put_string("I am working...%N");
-         fill(io.last_integer);
-      end; -- make
+         fill(size);
+      end;
 
-   ask is
-      do
-         io.put_string("Size of the pyramid %
-                        % (a small number greater than 1) : ");
-         io.flush;
-         io.read_integer;
-         io.put_new_line;
-      end; -- ask
-
-   fill(size : INTEGER) is
+   fill(size: INTEGER) is
          -- Fill in a `pyramid' of `size' elements.
       require
-         size > 1;
+         size > 1
       do
-         !!used.make(1,(size+1)*size // 2);
+         !!used.make(1, (size+1) * size // 2);
          !!pyramid.make(1,size,1,size);
          if solution(1) then
             print_on(std_output)
          else
             io.put_string("Sorry I can't find a solution.%N");
          end;
-      end; -- fill
+      end;
 
-   put(value,line,column: INTEGER) is
+   put(value, line, column: INTEGER) is
          -- Updtate `pyramid' and `used'.
       do
          used.put(true,value);
          pyramid.put(value,line,column);
-      end; -- put
+      end;
 
    remove(line,column :INTEGER) is
          -- Updtate `pyramid' and `used'.
@@ -81,12 +73,12 @@ feature {NONE}
             used.put(false,pyramid.item(line,column));
             pyramid.put(0,line,column);
          end;
-      end; -- remove
+      end;
 
    solution(column:INTEGER): BOOLEAN is
          -- Search a solution using a back-tracking algorithm.
       local
-         nb,i: INTEGER;
+         nb, i: INTEGER;
       do
          if column > pyramid.upper1 then
             Result := true;
@@ -112,9 +104,9 @@ feature {NONE}
                nb := nb - 1;
             end;
          end;
-      end; -- solution
+      end;
 
-   fill_column(col,val: INTEGER): BOOLEAN is
+   fill_column(col, val: INTEGER): BOOLEAN is
       local
          v, i: INTEGER;
       do
@@ -129,7 +121,7 @@ feature {NONE}
                Result := true;
             else
                put(v,i,col);
-               i := i+1;
+               i := i + 1;
             end;
          end;
          if Result then
@@ -144,13 +136,13 @@ feature {NONE}
          else
             Result := solution(col+1);
          end;
-      end; -- fill_column
+      end;
 
    print_on(file: OUTPUT_STREAM) is
-         -- display the pyramid to the standart output.
+         -- Display the pyramid to the standart output.
       local
-         line,column : INTEGER;
-         blanks : STRING;
+         line, column: INTEGER;
+         blanks: STRING;
       do
          from
             file.put_string("%NSolution found : %N");
@@ -169,12 +161,12 @@ feature {NONE}
                   file.put_integer(pyramid.item(line,column));
                   file.put_string(" ");
                end;
-               column := column+1;
+               column := column + 1;
             end;
             file.put_new_line;
             line := line+1;
             blanks.add_last(' ');
          end;
-      end; -- print_on
+      end;
 
 end -- PYRAMID2

@@ -463,10 +463,12 @@ feature --  Bitwise Logical Operators :
              word := storage.item(i) implies other.storage.item(i);
              storage.put(word,i);
              i := i - 1;
-         end;
-         mask := (not mask) @>> (Integer_bits - (count \\ Integer_bits));
-         i := storage.upper;
-         storage.put(storage.last and mask,i);
+	 end;
+	 if (count \\ Integer_bits) /= 0 then
+	     mask := (not mask) @>> (Integer_bits - (count \\ Integer_bits));
+	     i := storage.upper;
+	     storage.put(storage.last and mask,i)
+	 end;
       end;
 
    or_mask(other: like Current) is
@@ -609,10 +611,14 @@ feature -- Others :
 	    Result := storage.item(i).all_set;
 	    i := i - 1;
 	 end;
-         if Result then
-            mask := (not mask) @>> (Integer_bits - (count \\ Integer_bits)); 
-            Result := storage.last = mask;
-         end;
+	 if Result then
+	    if count \\ Integer_bits = 0 then
+	       Result := storage.last.all_set
+	    else
+	       mask := (not mask) @>> (Integer_bits - (count \\ Integer_bits));
+	       Result := storage.last = mask;
+	    end
+	 end;
       end;
    
    set_all is
@@ -621,8 +627,10 @@ feature -- Others :
 	 mask: BIT Integer_bits;
       do
 	 storage.set_all_with((-1).to_bit);
-	 mask := (not mask) @>> (Integer_bits - (count \\ Integer_bits));
-	 storage.put(mask, storage.upper);
+	 if count \\ Integer_bits /= 0 then
+	    mask := (not mask) @>> (Integer_bits - (count \\ Integer_bits));
+	    storage.put(mask, storage.upper);
+	 end
       ensure
 	 all_set
       end;

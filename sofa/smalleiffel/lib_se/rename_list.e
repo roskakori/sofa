@@ -19,20 +19,6 @@ inherit GLOBALS;
 
 creation make
 
-feature {NONE}
-
-   list: ARRAY[RENAME_PAIR];
-
-   make(first: RENAME_PAIR) is
-      require
-         first /= Void
-      do
-         !!list.with_capacity(4,1);
-	 list.add_last(first);
-      ensure
-         list.first = first
-      end;
-
 feature
 
    pretty_print is
@@ -43,7 +29,7 @@ feature
          fmt.indent;
          fmt.keyword("rename");
          from
-            i := 1;
+            i := list.lower;
          until
             i > list.upper
          loop
@@ -78,7 +64,7 @@ feature {PARENT}
          from
             i := list.upper;
          until
-            i = 0
+            i < list.lower
          loop
             rp := list.item(i);
             if rp.old_name.to_key = fn_to_key then
@@ -108,7 +94,7 @@ feature {PARENT}
          from
             i := list.upper;
          until
-            i = 0
+            i < list.lower
          loop
             rp := list.item(i);
             if rp.new_name.to_key = fn_to_key then
@@ -135,7 +121,7 @@ feature {PARENT}
          from
             i := list.upper;
          until
-            i = 0
+            i < list.lower
          loop
             rp := list.item(i);
             if rp.old_name.to_key = fn_to_key then
@@ -164,7 +150,7 @@ feature {PARENT}
          from
             i := list.upper;
          until
-            i = 0
+            i < list.lower
          loop
             rp1 := list.item(i);
             if not pbc.has(rp1.old_name) then
@@ -175,7 +161,7 @@ feature {PARENT}
             from
                j := i;
             until
-               j = 0
+               j < list.lower
             loop
                rp2 := list.item(j);
                if rp2.old_name.to_key = rp1.old_name.to_key then
@@ -188,9 +174,21 @@ feature {PARENT}
          end;
       end;
 
-invariant
+feature {NONE}
 
-   list.lower = 1;
+   list: FIXED_ARRAY[RENAME_PAIR];
+
+   make(first: RENAME_PAIR) is
+      require
+         first /= Void
+      do
+         !!list.with_capacity(4);
+	 list.add_last(first);
+      ensure
+         list.first = first
+      end;
+
+invariant
 
    not list.is_empty;
 

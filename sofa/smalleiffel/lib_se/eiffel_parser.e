@@ -69,7 +69,7 @@ feature {SMALL_EIFFEL}
 	 inside_function := false;
 	 inside_once_function := false;
 	 in_ensure := false;
-	 last_comments := Void;
+	 last_comment := Void;
 	 line := 1;
 	 column := 1;
 	 current_line := parser_buffer.item(line);
@@ -115,25 +115,24 @@ feature {COMMAND_FLAGS}
 	 no_style_warning := true;
       end;
 
-feature {CECIL_POOL}
+feature {CECIL_FILE}
 
-   connect_to_cecil: STRING is
-	 -- Return the cecil file path (first line).
+   connect_to_cecil(a_path: STRING): STRING is
+	 -- Return the cecil file user's include path (first information).
       require
 	 not is_running;
 	 nb_errors = 0;
-	 run_control.cecil_path /= Void
+	 a_path /= Void
       local
 	 path: STRING;
       do
-	 path := run_control.cecil_path;
 	 echo.put_string("Parsing Cecil File : ");
-	 echo.put_string(path);
+	 echo.put_string(a_path);
 	 echo.put_character('%N');
-	 parser_buffer.load_file(path);
+	 parser_buffer.load_file(a_path);
 	 if not parser_buffer.is_ready then
 	    fatal_error(
-	    "Cannot open Cecil file (use -verbose flag for details).");
+	       "Cannot open Cecil file (use -verbose flag for details).");
 	 end;
 	 path := parser_buffer.path;
 	 current_id := id_provider.item(path);
@@ -142,7 +141,7 @@ feature {CECIL_POOL}
 	 inside_function := false;
 	 inside_once_function := false;
 	 in_ensure := false;
-	 last_comments := Void;
+	 last_comment := Void;
 	 line := 1;
 	 column := 1;
 	 current_line := parser_buffer.item(line);
@@ -254,7 +253,7 @@ feature {NONE}
 
    end_of_text: CHARACTER is '%/0/'; -- Flag of the end of the `text'.
 
-   last_comments: COMMENT;
+   last_comment: COMMENT;
 	 -- Void or waiting comment.
 
    inside_function: BOOLEAN;
@@ -297,7 +296,6 @@ feature {NONE}
    last_feature_declaration: E_FEATURE;
    last_feature_name: FEATURE_NAME;
    last_feature_name_list: FEATURE_NAME_LIST;
-   last_keyword: STRING; -- Should be removed.
    last_type_formal_generic: TYPE_FORMAL_GENERIC;
    last_infix: INFIX_NAME;
    last_prefix: PREFIX_NAME;
@@ -467,7 +465,7 @@ feature {NONE}
 		     if rank > 0 then
 			eh.add_position(name.start_position);
 			error(arguments.name(rank).start_position,
-			      "Same identifier appears twice (local/formal).");
+			      em26);
 		     end;
 		  end;
 	       elseif cc = ',' or else cc = ';' then
@@ -506,7 +504,7 @@ feature {NONE}
 		     if rank > 0 then
 			eh.add_position(name.start_position);
 			eh.add_position(arguments.name(rank).start_position);
-			eh.append("Same identifier appears twice (local/formal).");
+			eh.append(em26);
 			eh.print_as_error;
 		     end;
 		  end;
@@ -581,10 +579,10 @@ feature {NONE}
 	 end;
       end;
 
-   get_comments: COMMENT is
+   get_comment: COMMENT is
       do
-	 Result := last_comments;
-	 last_comments := Void;
+	 Result := last_comment;
+	 last_comment := Void;
       end;
 
    start_line, start_column: INTEGER;
@@ -595,47 +593,52 @@ feature {NONE}
 	 -- Look for `keyword' beginning strictly at current position.
 	 -- A keyword is never followed by a character of
 	 -- this set : 'A'..'Z','a'..'z','0'..'9','_'.
-	 -- When Result is true, `last_keyword' is updated.
       require
-	 keyword.count >= 1
+	 keyword.count >= 1;
+	 not keyword.has('%N')
       local
-	 c, i: INTEGER;
-	 back_cc: CHARACTER;
+	 c, i, j: INTEGER;
       do
-	 from
-	    back_cc := cc;
-	    start_line := line;
-	    start_column := column;
-	    c := keyword.count;
-	    i := 1;
-	 until
-	    c <= 0
-	 loop
-	    if cc.same_as(keyword.item(i)) then
-	       i := i + 1;
-	       c := c - 1;
-	       next_char;
-	    else
-	       c := -1;
+	 i := column;
+	 c := keyword.count;
+	 if current_line.count - i + 1 >= c then
+	    from
+	       start_line := line;
+	       start_column := i;
+	       j := 1;
+	    until
+	       c <= 0
+	    loop
+	       if current_line.item(i).same_as(keyword.item(j)) then
+		  i := i + 1;
+		  j := j + 1;
+		  c := c - 1;
+	       else
+		  c := -1;
+	       end;
 	    end;
 	 end;
 	 if c = 0 then
-	    inspect
-	       cc
-	    when ' ','%N','%T','-' then
+	    if i > current_line.count then
 	       Result := true;
-	       last_keyword := keyword;
+	       cc := '%N';
+	       column := i;
 	       skip_comments;
-	    when 'a'..'z','A'..'Z','0'..'9','_' then
-	       column := start_column;
-	       cc := back_cc;
 	    else
-	       Result := true;
-	       last_keyword := keyword;
+	       inspect
+		  current_line.item(i)
+	       when ' ','%T','-' then
+		  Result := true;
+		  cc := current_line.item(i);
+		  column := i;
+		  skip_comments;
+	       when 'a'..'z','A'..'Z','0'..'9','_' then
+	       else
+		  Result := true;
+		  cc := current_line.item(i);
+		  column := i;
+	       end;
 	    end;
-	 else
-	    column := start_column;
-	    cc := back_cc;
 	 end;
       end;
 
@@ -678,15 +681,15 @@ feature {NONE}
       end;
 
    go_back_at(l, c: INTEGER) is
-	 -- Go back to some existing `l',`c'.
+	 -- Go back to some existing line `l', and column `c'.
       require
-	 l >= 1;
-	 c >= 1
+	 l >= 1; c >= 1
       do
 	 line := l;
 	 column := c;
 	 current_line := parser_buffer.item(l);
 	 cc := current_line.item(c);
+	 last_comment := Void;
       end;
 
    next_char is
@@ -756,11 +759,10 @@ feature {NONE}
       end;
 
    skip_comments is
-	 -- Skip separators and comments if any.
-	 -- Unless `drop_comments', comments are stored in `last_comments'.
+	 -- Skip separators and comments if any. Unless `drop_comments', 
+	 -- comments are stored in `last_comment'.
       local
-	 sp: POSITION;
-	 stop: BOOLEAN;
+	 sp: POSITION; stop: BOOLEAN;
       do
 	 from
 	 until
@@ -798,10 +800,10 @@ feature {NONE}
 			lcs.extend(cc);
 			next_char;
 		     end;
-		     if last_comments = Void then
-			!!last_comments.make(sp,lcs.twin);
+		     if last_comment = Void then
+			!!last_comment.make(sp,lcs.twin);
 		     else
-			last_comments.add_last(lcs.twin);
+			last_comment.add_last(lcs.twin);
 		     end;
 		  end;
 	       else
@@ -826,8 +828,8 @@ feature {NONE}
 	    from
 	       l := line;
 	       c := column;
-	       tmp_string.clear;
-	       tmp_string.extend(cc);
+	       buffer.clear;
+	       buffer.extend(cc);
 	    until
 	       state > 0
 	    loop
@@ -835,9 +837,9 @@ feature {NONE}
 	       inspect
 		  cc
 	       when '0','1' then
-		  tmp_string.extend(cc);
+		  buffer.extend(cc);
 	       when 'b','B' then
-		  !!last_bit_constant.make(pos(l,c),tmp_string.twin);
+		  !!last_bit_constant.make(pos(l,c),buffer.twin);
 		  next_char;
 		  skip_comments;
 		  state := 1;
@@ -1039,7 +1041,7 @@ feature {NONE}
 	 else
 	    fcp(em15);
 	 end;
-	 if forbidden_class.fast_has(cn.to_string) then
+	 if as_none = cn.to_string then
 	    eh.add_position(cn.start_position);
 	    fatal_error("Cannot write such a class.");
 	 end;
@@ -1060,7 +1062,7 @@ feature {NONE}
 	       fga := formal_generic_list.item(rank);
 	       if a_keyword(fga.name.to_string) then
 		  !!cn.make(fga.name.to_string,pos(start_line,start_column));
-		  !!last_type_formal_generic.make(cn,rank);
+		  !!last_type_formal_generic.make(cn,fga,rank);
 		  Result := true;
 	       end;
 	       rank := rank + 1;
@@ -1363,12 +1365,12 @@ feature {NONE}
 	    from
 	       l := line;
 	       c := column;
-	       tmp_string.clear;
+	       buffer.clear;
 	       if cc = '.' then
-		  tmp_string.append(fz_59);
+		  buffer.append(fz_59);
 		  state := 5;
 	       else
-		  tmp_string.extend(cc);
+		  buffer.extend(cc);
 	       end;
 	    until
 	       state > 11
@@ -1380,9 +1382,9 @@ feature {NONE}
 		  inspect
 		     cc
 		  when '0' .. '9' then
-		     tmp_string.extend(cc);
+		     buffer.extend(cc);
 		  when '.' then
-		     tmp_string.extend('.');
+		     buffer.extend('.');
 		     state := 4;
 		  else
 		     state := 13;
@@ -1391,7 +1393,7 @@ feature {NONE}
 		  inspect
 		     cc
 		  when '0'..'9' then
-		     tmp_string.extend(cc);
+		     buffer.extend(cc);
 		     state := 2;
 		  else
 		     fcp(em9);
@@ -1400,7 +1402,7 @@ feature {NONE}
 		  inspect
 		     cc
 		  when '0'..'9' then
-		     tmp_string.extend(cc);
+		     buffer.extend(cc);
 		     state := 3;
 		  else
 		     fcp(em9);
@@ -1409,7 +1411,7 @@ feature {NONE}
 		  inspect
 		     cc
 		  when '0'..'9' then
-		     tmp_string.extend(cc);
+		     buffer.extend(cc);
 		     state := 0;
 		  else
 		     fcp(em9);
@@ -1418,10 +1420,10 @@ feature {NONE}
 		  inspect
 		     cc
 		  when '0'..'9' then
-		     tmp_string.extend(cc);
+		     buffer.extend(cc);
 		     state := 6;
 		  when 'E','e' then
-		     tmp_string.extend('E');
+		     buffer.extend('E');
 		     state := 10;
 		  else
 		     state := 12;
@@ -1430,7 +1432,7 @@ feature {NONE}
 		  inspect
 		     cc
 		  when '0'..'9' then
-		     tmp_string.extend(cc);
+		     buffer.extend(cc);
 		     state := 6;
 		  else
 		     state := 13;
@@ -1439,9 +1441,9 @@ feature {NONE}
 		  inspect
 		     cc
 		  when '0'..'9' then
-		     tmp_string.extend(cc);
+		     buffer.extend(cc);
 		  when 'E','e' then
-		     tmp_string.extend('E');
+		     buffer.extend('E');
 		     state := 10;
 		  when '_' then
 		     state := 7;
@@ -1452,7 +1454,7 @@ feature {NONE}
 		  inspect
 		     cc
 		  when '0'..'9' then
-		     tmp_string.extend(cc);
+		     buffer.extend(cc);
 		     state := 8;
 		  else
 		     fcp(em1);
@@ -1461,7 +1463,7 @@ feature {NONE}
 		  inspect
 		     cc
 		  when '0'..'9' then
-		     tmp_string.extend(cc);
+		     buffer.extend(cc);
 		     state := 9;
 		  else
 		     fcp(em1);
@@ -1470,7 +1472,7 @@ feature {NONE}
 		  inspect
 		     cc
 		  when '0'..'9' then
-		     tmp_string.extend(cc);
+		     buffer.extend(cc);
 		     state := 6;
 		  else
 		     fcp(em1);
@@ -1481,10 +1483,10 @@ feature {NONE}
 		  when '+' then
 		     state := 11;
 		  when '-' then
-		     tmp_string.extend('-');
+		     buffer.extend('-');
 		     state := 11;
 		  when '0'..'9' then
-		     tmp_string.extend(cc);
+		     buffer.extend(cc);
 		     state := 11
 		  else
 		     fcp("Exponent of a real value expected.");
@@ -1494,14 +1496,14 @@ feature {NONE}
 		  inspect
 		     cc
 		  when '0'..'9' then
-		     tmp_string.extend(cc);
+		     buffer.extend(cc);
 		  else
 		     state := 12;
 		  end;
 	       end;
 	    end;
 	    if state = 12 then
-	       !!last_real_constant.make(pos(l,c),tmp_string.twin);
+	       !!last_real_constant.make(pos(l,c),buffer.twin);
 	       Result := true;
 	       skip_comments;
 	    else
@@ -1565,7 +1567,7 @@ feature {NONE}
 		  remainder.add_last(last_expression);
 	       end;
 	       if not skip1(',') and then cc /= ')' then
-	    wcp(em5);
+	          wcp(em5);
 	       end;
 	    end;
 	    if first_one = Void then
@@ -1671,6 +1673,12 @@ feature {NONE}
 	 end;
       end;
 
+   a_assertion_buffer: ARRAY[ASSERTION] is
+	 -- Used only inside `a_assertion'.
+      once
+	 !!Result.with_capacity(32,1);
+      end;
+
    a_assertion: ARRAY[ASSERTION] is
 	 --++ assertion -> {assertion_clause ";" ...}
 	 --++ assertion_clause -> [identifier ":"] [expression] [comment]
@@ -1687,6 +1695,7 @@ feature {NONE}
 	 -- state 4 : end;
       do
 	 from
+	    a_assertion_buffer.clear;
 	 until
 	    state > 3
 	 loop
@@ -1694,15 +1703,11 @@ feature {NONE}
 	       state
 	    when 0 then
 	       if cc = ';' then
-		  wcp(fz_desc);
+		  wcp(em24);
 		  ok := skip1(';');
-		  if last_comments /= Void then
-		     !!assertion.make(Void,Void,get_comments);
-		     if Result = Void then
-			!!Result.with_capacity(2,1);
-		     end;
-		     Result.add_last(assertion);
-		  end;
+	       elseif last_comment /= Void then
+		  !!assertion.make(Void,Void,get_comment);
+		  a_assertion_buffer.add_last(assertion);
 	       elseif a_tag_mark then
 		  tag := last_tag_mark;
 		  state := 1;
@@ -1714,95 +1719,65 @@ feature {NONE}
 	       end;
 	    when 1 then
 	       if skip1(';') then
-		  !!assertion.make(tag,Void,get_comments);
-		  if Result = Void then
-		     !!Result.with_capacity(2,1);
-		  end;
-		  Result.add_last(assertion);
+		  !!assertion.make(tag,Void,get_comment);
+		  a_assertion_buffer.add_last(assertion);
 		  state := 0;
 	       elseif a_tag_mark then
-		  !!assertion.make(tag,Void,get_comments);
-		  if Result = Void then
-		     !!Result.with_capacity(2,1);
-		  end;
-		  Result.add_last(assertion);
+		  !!assertion.make(tag,Void,get_comment);
+		  a_assertion_buffer.add_last(assertion);
 		  tag := last_tag_mark;
 	       elseif a_expression then
 		  expression := last_expression;
 		  state := 3;
 	       else
-		  !!assertion.make(tag,Void,get_comments);
-		  if Result = Void then
-		     !!Result.with_capacity(2,1);
-		  end;
-		  Result.add_last(assertion);
+		  !!assertion.make(tag,Void,get_comment);
+		  a_assertion_buffer.add_last(assertion);
 		  state := 4;
 	       end;
 	    when 2 then
 	       if skip1(';') then
-		  !!assertion.make(Void,expression,get_comments);
-		  if Result = Void then
-		     !!Result.with_capacity(2,1);
-		  end;
-		  Result.add_last(assertion);
+		  !!assertion.make(Void,expression,get_comment);
+		  a_assertion_buffer.add_last(assertion);
 		  state := 0;
 	       elseif a_tag_mark then
-		  !!assertion.make(Void,expression,get_comments);
-		  if Result = Void then
-		     !!Result.with_capacity(2,1);
-		  end;
-		  Result.add_last(assertion);
+		  !!assertion.make(Void,expression,get_comment);
+		  a_assertion_buffer.add_last(assertion);
 		  tag := last_tag_mark;
 		  state := 1;
 	       elseif a_expression then
-		  !!assertion.make(Void,expression,get_comments);
-		  if Result = Void then
-		     !!Result.with_capacity(2,1);
-		  end;
-		  Result.add_last(assertion);
+		  !!assertion.make(Void,expression,get_comment);
+		  a_assertion_buffer.add_last(assertion);
 		  expression := last_expression;
 		  state := 2;
 	       else
-		  !!assertion.make(Void,expression,get_comments);
-		  if Result = Void then
-		     !!Result.with_capacity(2,1);
-		  end;
-		  Result.add_last(assertion);
+		  !!assertion.make(Void,expression,get_comment);
+		  a_assertion_buffer.add_last(assertion);
 		  state := 4;
 	       end;
 	    else -- state = 3
 	       if skip1(';') then
-		  !!assertion.make(tag,expression,get_comments);
-		  if Result = Void then
-		     !!Result.with_capacity(2,1);
-		  end;
-		  Result.add_last(assertion);
+		  !!assertion.make(tag,expression,get_comment);
+		  a_assertion_buffer.add_last(assertion);
 		  state := 0;
 	       elseif a_tag_mark then
-		  !!assertion.make(tag,expression,get_comments);
-		  if Result = Void then
-		     !!Result.with_capacity(2,1);
-		  end;
-		  Result.add_last(assertion);
+		  !!assertion.make(tag,expression,get_comment);
+		  a_assertion_buffer.add_last(assertion);
 		  tag := last_tag_mark;
 		  state := 1;
 	       elseif a_expression then
-		  !!assertion.make(tag,expression,get_comments);
-		  if Result = Void then
-		     !!Result.with_capacity(2,1);
-		  end;
-		  Result.add_last(assertion);
+		  !!assertion.make(tag,expression,get_comment);
+		  a_assertion_buffer.add_last(assertion);
 		  expression := last_expression;
 		  state := 2;
 	       else
-		  !!assertion.make(tag,expression,get_comments);
-		  if Result = Void then
-		     !!Result.with_capacity(2,1);
-		  end;
-		  Result.add_last(assertion);
+		  !!assertion.make(tag,expression,get_comment);
+		  a_assertion_buffer.add_last(assertion);
 		  state := 4;
 	       end;
 	    end;
+	 end;
+	 if not a_assertion_buffer.is_empty then
+	    Result := a_assertion_buffer.twin;
 	 end;
       end;
 
@@ -1813,6 +1788,7 @@ feature {NONE}
 	 --++
       local
 	 sp: POSITION;
+	 types: ARRAY[TYPE];
       do
 	 Result := true;
 	 if a_keyword(as_any) then
@@ -1853,6 +1829,29 @@ feature {NONE}
 	    !TYPE_REAL!last_base_type.make(pos(start_line,start_column));
 	 elseif a_keyword(as_string) then
 	    !TYPE_STRING!last_base_type.make(pos(start_line,start_column));
+	 elseif a_keyword(as_tuple) then
+	    sp := pos(start_line,start_column);
+	    if skip1('[') then
+	       from 
+		  !!types.with_capacity(4,1);
+	       until 
+		  skip1(']')
+	       loop
+		  if a_type then
+		     types.add_last(last_type);
+		     if not skip1(',') then
+			if cc /= ']' then
+			   wcp(em5);
+			end;
+		     end;
+		  else
+		     eh.add_position(current_position);
+		     eh.append("Incorrect TUPLE (type expected).");
+		     eh.print_as_fatal_error;
+		  end;
+	       end;
+	    end;
+	    !TYPE_TUPLE!last_base_type.make(sp,types);
 	 else
 	    Result := false;
 	 end;
@@ -1946,7 +1945,7 @@ feature {NONE}
       do
 	 if a_keyword(fz_check) then
 	    sp := pos(start_line,start_column);
-	    hc := get_comments;
+	    hc := get_comment;
 	    al := a_assertion;
 	    if not a_keyword(fz_end) then
 	       eh.add_position(sp);
@@ -1978,7 +1977,7 @@ feature {NONE}
 	 sp: POSITION;
 	 hc: COMMENT;
 	 al: ARRAY[ASSERTION];
-	 drop_comments_save: BOOLEAN;
+	 drop_comments_save, end_of_class_flag: BOOLEAN;
       do
 	 a_indexing;
 	 if a_keyword(fz_deferred) then
@@ -1990,7 +1989,7 @@ feature {NONE}
 	       last_base_class.set_is_deferred;
 	    end;
 	 end;
-	 last_base_class.set_heading_comment1(get_comments);
+	 last_base_class.set_heading_comment1(get_comment);
 	 if not a_keyword(fz_class) then
 	    fcp("Keyword %"class%" expected.");
 	 end;
@@ -2003,36 +2002,40 @@ feature {NONE}
 	       fcp("Manifest string expected for %"obsolete%" clause.");
 	    end;
 	 end;
-	 last_base_class.set_heading_comment2(get_comments);
+	 last_base_class.set_heading_comment2(get_comment);
 	 if a_keyword(fz_inherit) then
-	    a_parent_list(pos(start_line,start_column),get_comments);
+	    end_of_class_flag := true;
+	    a_parent_list(pos(start_line,start_column),get_comment);
 	 end;
 	 from
 	 until
 	    not (a_keyword(fz_creation) or else a_keyword(fz_create))
 	 loop
 	    a_creation_clause(pos(start_line,start_column));
+	    end_of_class_flag := false;
 	 end;
 	 from
 	 until
 	    not a_keyword(fz_feature)
 	 loop
 	    a_feature_clause;
+	    end_of_class_flag := false;
 	 end;
 	 drop_comments_save := drop_comments;
 	 drop_comments := false;
 	 if a_keyword(fz_invariant) then
+	    end_of_class_flag := false;
 	    sp := pos(start_line,start_column);
-	    hc := get_comments;
+	    hc := get_comment;
 	    al := a_assertion;
 	    last_base_class.set_invariant(sp,hc,al);
 	 end;
-	 if a_keyword(fz_end) or else last_keyword = fz_end then
+	 if a_keyword(fz_end) or else end_of_class_flag then
 	    if cc = ';' then
-	       wcp(fz_desc);
+	       wcp(em24);
 	       ok := skip1(';');
 	    end;
-	    last_base_class.set_end_comment(get_comments);
+	    last_base_class.set_end_comment(get_comment);
 	    if cc /= end_of_text then
 	       fcp("End of text expected.");
 	    end;
@@ -2197,12 +2200,12 @@ feature {NONE}
 	 remainder: FIXED_ARRAY[INSTRUCTION];
       do
 	 from
-	    hc := get_comments;
+	    hc := get_comment;
 	    from
 	    until
 	       cc /= ';'
 	    loop
-	       wcp(fz_desc);
+	       wcp(em24);
 	       ok := skip1(';');
 	    end;
 	 until
@@ -2220,11 +2223,11 @@ feature {NONE}
 	    until
 	       cc /= ';'
 	    loop
-	       wcp(fz_desc);
+	       wcp(em24);
 	       ok := skip1(';');
 	    end;
 	    if nb_errors = 0 then
-	       instruction := instruction.add_comment(get_comments);
+	       instruction := instruction.add_comment(get_comment);
 	       if first_one = Void then
 		  first_one := instruction;
 	       else
@@ -2248,12 +2251,12 @@ feature {NONE}
 	 remainder: FIXED_ARRAY[INSTRUCTION];
       do
 	 from
-	    hc := get_comments;
+	    hc := get_comment;
 	    from
 	    until
 	       cc /= ';'
 	    loop
-	       wcp(fz_desc);
+	       wcp(em24);
 	       ok := skip1(';');
 	    end;
 	 until
@@ -2271,11 +2274,11 @@ feature {NONE}
 	    until
 	       cc /= ';'
 	    loop
-	       wcp(fz_desc);
+	       wcp(em24);
 	       ok := skip1(';');
 	    end;
 	    if nb_errors = 0 then
-	       instruction := instruction.add_comment(get_comments);
+	       instruction := instruction.add_comment(get_comment);
 	       if first_one = Void then
 		  first_one := instruction;
 	       else
@@ -2436,7 +2439,7 @@ feature {NONE}
 	 creation_clause: CREATION_CLAUSE;
       do
 	 clients := a_clients;
-	 comments := get_comments;
+	 comments := get_comment;
 	 if a_feature_name_list then
 	 end;
 	 !!creation_clause.make(sp,clients,comments,last_feature_name_list);
@@ -2449,7 +2452,7 @@ feature {NONE}
 	 --++
       local
 	 sp: POSITION;
-	 list: ARRAY[MANIFEST_STRING];
+	 list: FIXED_ARRAY[MANIFEST_STRING];
 	 e_debug: E_DEBUG;
       do
 	 if a_keyword(fz_debug) then
@@ -2460,7 +2463,7 @@ feature {NONE}
 		  not a_manifest_string
 	       loop
 		  if list = Void then
-		     !!list.with_capacity(2,1);
+		     !!list.with_capacity(4);
 		  end;
 		  list.add_last(last_manifest_string);
 		  ok := skip1(',');
@@ -2480,12 +2483,13 @@ feature {NONE}
 
    a_expression: BOOLEAN is
 	 --++ expression -> "<<" {Expression "," ...} ">>" |
+         --++               "[" {Expression "," ...} "]" |
 	 --++               Void |
 	 --++               e0
 	 --++
       local
 	 sp: POSITION;
-	 list: ARRAY[EXPRESSION];
+	 list: FIXED_ARRAY[EXPRESSION];
       do
 	 if skip2('<','<') then
 	    from
@@ -2495,7 +2499,7 @@ feature {NONE}
 	       not a_expression
 	    loop
 	       if list = Void then
-		  !!list.with_capacity(4,1);
+		  !!list.with_capacity(4);
 	       end;
 	       list.add_last(last_expression);
 	       ok := skip1(',');
@@ -2504,6 +2508,23 @@ feature {NONE}
 	       fcp("End of manifest array expected.");
 	    end;
 	    !MANIFEST_ARRAY!last_expression.make(sp,list);
+	 elseif skip1('[') then
+	    from
+	       Result := true;
+	       sp := pos(start_line,start_column);
+	    until
+	       not a_expression
+	    loop
+	       if list = Void then
+		  !!list.with_capacity(4);
+	       end;
+	       list.add_last(last_expression);
+	       ok := skip1(',');
+	    end;
+	    if not skip1(']') then
+	       fcp("End of TUPLE expression expected.");
+	    end;
+	    !TUPLE_EXPRESSION!last_expression.make(sp,list);
 	 else
 	    Result := a_e0;
 	 end;
@@ -2875,7 +2896,7 @@ feature {NONE}
       do
 	 from
 	    clients := a_clients;
-	    comment := get_comments;
+	    comment := get_comment;
 	    faof.clear;
 	 until
 	    not a_feature_declaration
@@ -2883,7 +2904,7 @@ feature {NONE}
 	    ok := skip1(';');
 	    if last_feature_declaration /= Void then
 	       faof.add_last(last_feature_declaration);
-	       last_feature_declaration.set_header_comment(get_comments);
+	       last_feature_declaration.set_header_comment(get_comment);
 	    end;
 	 end;
 	 if not faof.is_empty then
@@ -2893,7 +2914,6 @@ feature {NONE}
 	    !!feature_clause.make(clients,comment,Void);
 	    last_base_class.add_feature_clause(feature_clause);
 	 end;
-	 last_keyword := Void;
       end;
 
    a_feature_declaration: BOOLEAN is
@@ -2985,104 +3005,90 @@ feature {NONE}
 	 --++ formal_generic -> base_class_name ["->" class_type]
 	 --++
       local
-	 l, c: INTEGER;
-	 name: CLASS_NAME;
-	 constraint: TYPE;
 	 fga: FORMAL_GENERIC_ARG;
-	 list: ARRAY[FORMAL_GENERIC_ARG];
+	 formal_generic_name: CLASS_NAME;
+	 constraint: TYPE;
 	 state: INTEGER;
-	 -- state 0 : waiting for "[".
-	 -- state 1 : waiting for a base class `name'.
-	 -- state 2 : waiting for "->" or "," or "]".
-	 -- state 3 : waiting for "," or "]".
-	 -- state 4 : waiting for a `constraint' type.
-	 -- state 5 : end.
-	 -- state 6 : error.
+	 -- state 0 : waiting for a `formal_generic_name'.
+	 -- state 1 : waiting for "->" or "," or "]".
+	 -- state 2 : waiting for "," or "]".
+	 -- state 3 : waiting for a `constraint' type.
+	 -- state 4 : end.
+	 -- state 5 : error.
       do
-	 from
-	    formal_generic_list := Void;
-	 until
-	    state > 4
-	 loop
+	 formal_generic_list := Void;
+	 if skip1('[') then
+	    from
+	       !!formal_generic_list.make(pos(start_line,start_column));
+	       last_base_class.set_formal_generic_list(formal_generic_list);
+	    until
+	       state > 3
+	    loop
+	       inspect
+		  state
+	       when 0 then
+		  if a_base_class_name then
+		     formal_generic_name := last_class_name;
+		     state := 1;
+		  else
+		     state := 5;
+		  end;
+	       when 1 then
+		  if skip2('-','>') then
+		     state := 3;
+		  elseif cc = ',' or else cc = ']' then
+		     !!fga.make(formal_generic_name,constraint);
+		     constraint := Void;
+		     formal_generic_list.add_last(fga);
+		     inspect
+			cc
+		     when ',' then state := 0;
+		     when ']' then state := 4;
+		     end;
+		     ok := skip1(cc);
+		  else
+		     state := 5;
+		  end;
+	       when 2 then
+		  if cc = ',' or else cc = ']' then
+		     !!fga.make(formal_generic_name,constraint);
+		     constraint := Void;
+		     formal_generic_list.add_last(fga);
+		     inspect
+			cc
+		     when ',' then state := 0;
+		     when ']' then state := 4;
+		     end;
+		     ok := skip1(cc);
+		  else
+		     state := 5;
+		  end;
+	       when 3 then
+		  if a_type_formal_generic then
+		     constraint := last_type_formal_generic;
+		     state := 2;
+		  elseif a_class_type then
+		     constraint := last_class_type;
+		     state := 2;
+		  else
+		     fcp("Constraint Class name expected.");
+		     state := 5;
+		  end;
+	       end;
+	    end;
 	    inspect
 	       state
-	    when 0 then
-	       if skip1('%(') then
-		  l := start_line;
-		  c := start_column;
-		  state := 1;
-	       else
-		  state := 5;
+	    when 4 then
+	       if formal_generic_list.count = 0 then
+		  eh.add_position(formal_generic_list.start_position);
+		  eh.append("Empty formal generic list (deleted).");
+		  eh.print_as_warning;
+		  formal_generic_list := Void;
+		  last_base_class.set_formal_generic_list(Void);
 	       end;
-	    when 1 then
-	       if a_base_class_name then
-		  name := last_class_name;
-		  state := 2;
-	       else
-		  state := 6;
-	       end;
-	    when 2 then
-	       if skip2('-','>') then
-		  state := 4;
-	       elseif cc = ',' or else cc = ']' then
-		  !!fga.make(name,constraint);
-		  name := Void;
-		  constraint := Void;
-		  if list = Void then
-		     !!list.with_capacity(2,1);
-		  end;
-		  list.add_last(fga);
-		  fga := Void;
-		  if skip1(',') then
-		     state := 1;
-		  else
-		     ok := skip1('%)');
-		     state := 5;
-		  end;
-	       else
-		  state := 6;
-	       end;
-	    when 3 then
-	       if cc = ',' or else cc = ']' then
-		  !!fga.make(name,constraint);
-		  name := Void;
-		  constraint := Void;
-		  if list = Void then
-		     !!list.with_capacity(2,1);
-		  end;
-		  list.add_last(fga);
-		  fga := Void;
-		  if skip1(',') then
-		     state := 1;
-		  else
-		     ok := skip1('%)');
-		     state := 5;
-		  end;
-	       else
-		  state := 6;
-	       end;
-	    else -- state = 4
-	       if a_class_type then
-		  constraint := last_class_type;
-		  state := 3;
-	       else
-		  fcp("Constraint Class name expected.");
-		  state := 6;
-	       end;
+	    when 5 then
+	       check nb_errors > 0 end;
 	    end;
-	 end;
-	 if state = 6 then
-	    check
-	       nb_errors > 0;
-	    end;
-	 elseif l > 0 and then list = Void then
-	    warning(pos(l,c),"Empty formal generic list (deleted).");
-	 elseif l > 0 then
-	    check
-	       not list.is_empty;
-	    end;
-	    !!formal_generic_list.make(pos(l,c),list);
-	    last_base_class.set_formal_generic_list(formal_generic_list);
 	 end;
       end;
 
@@ -3206,7 +3212,7 @@ feature {NONE}
 	    Result := true;
 	    sp := pos(start_line,start_column);
 	    if a_expression then
-	       last_expression := last_expression.add_comment(get_comments);
+	       last_expression := last_expression.add_comment(get_comment);
 	    else
 	       fcp("Expression expected (%"inspect ... %").");
 	    end;
@@ -3296,7 +3302,7 @@ feature {NONE}
 	    if a_keyword(fz_invariant) then
 	       l2 := start_line;
 	       c2 := start_column;
-	       hc := get_comments;
+	       hc := get_comment;
 	       al := a_assertion;
 	       if hc /= Void or else al /= Void then
 		  !!ic.make(pos(l2,c2),hc,al);
@@ -3305,16 +3311,16 @@ feature {NONE}
 	    if a_keyword(fz_variant) then
 	       if a_tag_mark and then a_expression then
 		  !LOOP_VARIANT_2!vc.make(last_tag_mark,last_expression,
-					  get_comments);
+					  get_comment);
 	       elseif a_expression then
-		  !LOOP_VARIANT_1!vc.make(last_expression,get_comments);
+		  !LOOP_VARIANT_1!vc.make(last_expression,get_comment);
 	       else
 		  wcp("Variant (INTEGER) Expression Expected.");
 	       end;
 	    end;
 	    if a_keyword(fz_until) then
 	       if a_expression then
-		  ue := last_expression.add_comment(get_comments);
+		  ue := last_expression.add_comment(get_comment);
 	       else
 		  fcp("Boolean expression expected (until).");
 		  ue := last_expression;
@@ -3324,7 +3330,7 @@ feature {NONE}
 	       ue := last_expression;
 	    end;
 	    if cc = ';' then
-	       wcp(fz_desc);
+	       wcp(em24);
 	       ok := skip1(';');
 	    end;
 	    if not a_keyword(fz_loop) then
@@ -3395,7 +3401,7 @@ feature {NONE}
 		     clients := a_clients;
 		     state := 1;
 		  elseif cc = ';' then
-		     wcp(fz_desc);
+		     wcp(em24);
 		     ok := skip1(';');
 		  else
 		     if items /= Void then
@@ -3449,18 +3455,18 @@ feature {NONE}
 	 --++ parent_list -> {parent ";" ...}
 	 --++
       local
-	 list: ARRAY[PARENT];
+	 list: FIXED_ARRAY[PARENT];
       do
 	 from
 	 until
 	    not a_parent
 	 loop
 	    if list = Void then
-	       !!list.with_capacity(4,1);
+	       !!list.with_capacity(4);
 	    end;
 	    list.add_last(last_parent);
 	    ok := skip1(';');
-	    last_parent.set_comment(get_comments);
+	    last_parent.set_comment(get_comment);
 	 end;
 	 if hc /= Void or else list /= Void then
 	    if list = Void then
@@ -3517,15 +3523,16 @@ feature {NONE}
 	       a_keyword(fz_redefine) or else
 	       a_keyword(fz_select) then
 	       eh.add_position(pos(start_line,start_column));
-	       fatal_error("Inheritance option not at a good place. %
-			   %The good order is: %"rename... export... %
-						%undefine... redefine... select...%".");
-						end;
-						ok := a_keyword(fz_end);
-					     end;
-					  end;
+	       fatal_error(
+                  "Inheritance option not at a correct place. %
+                  %The correct order is: %"rename... export... %
+                  %undefine... redefine... select...%".");
+	    end;
+	    ok := a_keyword(fz_end);
+	 end;
+      end;
 
-					  a_prefix: BOOLEAN is
+   a_prefix: BOOLEAN is
 	 --++ prefix -> "prefix" "%"" unary "%""
 	 --++           "prefix" "%"" free_operator "%""
 	 --++
@@ -3557,6 +3564,7 @@ feature {NONE}
 	 l, c: INTEGER;
 	 parent: CLASS_NAME;
 	 args: EFFECTIVE_ARG_LIST;
+	 p: POSITION;
       do
 	 if skip1('{') then
 	    Result := true;
@@ -3564,13 +3572,14 @@ feature {NONE}
 	    c := start_column;
 	    if skip1('{') then
 	       warning(pos(start_line,start_column),
-		       "One single opening '{' is correct too here.");
+	          "One single opening '{' is correct too here.");
 	    end;
 	    if a_base_class_name then
 	       parent := last_class_name;
 	    end;
 	    if not skip1('}')  then
-	       fcp("Closing '}' expected to end Precursor's parent qualification.");
+	       fcp("Closing '}' expected to end Precursor's parent %
+                   %qualification.");
 	    end;
 	    if skip1('}') then
 	       warning(pos(start_line,start_column),
@@ -3588,13 +3597,14 @@ feature {NONE}
 	    fcp("Precursor keyword expected here.");
 	 end;
 	 if Result then
+	    p := pos(l,c);
 	    if skip1('.') then
-	       !E_PRECURSOR_FUNCTION!last_expression.make(pos(l,c),parent,args);
+	       !PRECURSOR_EXPRESSION!last_expression.make(p,parent,args);
 	       a_after_a_dot(do_instruction,last_expression);
 	    elseif do_instruction then
-	       !E_PRECURSOR_PROCEDURE!last_instruction.make(pos(l,c),parent,args);
+	       !PRECURSOR_INSTRUCTION!last_instruction.make(p,parent,args);
 	    else
-	       !E_PRECURSOR_FUNCTION!last_expression.make(pos(l,c),parent,args);
+	       !PRECURSOR_EXPRESSION!last_expression.make(p,parent,args);
 	    end;
 	 end;
       end;
@@ -3699,14 +3709,14 @@ feature {NONE}
 	       fcp("Obsolete manifest string expected.");
 	    end;
 	 end;
-	 tmp_feature.set_header_comment(get_comments);
+	 tmp_feature.set_header_comment(get_comment);
 	 if a_keyword(fz_require) then
 	    sp := pos(start_line,start_column);
 	    if a_keyword(fz_else) then
-	       hc := get_comments;
+	       hc := get_comment;
 	       tmp_feature.set_require_else(sp,hc,a_assertion);
 	    else
-	       hc := get_comments;
+	       hc := get_comment;
 	       tmp_feature.set_require(sp,hc,a_assertion);
 	    end;
 	 end;
@@ -3718,7 +3728,7 @@ feature {NONE}
 	    sp := pos(start_line,start_column);
 	    in_ensure := true;
 	    if a_keyword(fz_then) then
-	       hc := get_comments;
+	       hc := get_comment;
 	       al := a_assertion;
 	       if hc /= Void or else al /= Void then
 		  !!ea.make(sp,hc,al);
@@ -3726,7 +3736,7 @@ feature {NONE}
 	       end;
 	       Result.set_ensure_assertion(ea);
 	    else
-	       hc := get_comments;
+	       hc := get_comment;
 	       al := a_assertion;
 	       if hc /= Void or else al /= Void then
 		  !!ea.make(sp,hc,al);
@@ -4023,7 +4033,8 @@ feature {NONE}
             sp := pos(start_line,start_column);
             if a_e7 then
                a_r7(last_expression);
-               !CALL_INFIX_POWER!last_expression.make(left_part,sp,last_expression);
+               !CALL_INFIX_POWER!last_expression.make(left_part,sp,
+						      last_expression);
             else
                err_exp(sp,as_pow);
             end;
@@ -4139,7 +4150,7 @@ feature {NONE}
       do
 	 if a_expression then
 	    Result := true;
-	    expression := last_expression.add_comment(get_comments);
+	    expression := last_expression.add_comment(get_comment);
 	    if not a_keyword(fz_then) then
 	       wcp("Added %"then%".");
 	    end;
@@ -4170,7 +4181,7 @@ feature {NONE}
 		  !TYPE_LIKE_ARGUMENT!last_type.make(sp,argument_name2);
 	       else
 		  !TYPE_LIKE_FEATURE!last_type.make(sp,
-						    tmp_name.to_simple_feature_name);
+				           tmp_name.to_simple_feature_name);
 	       end;
 	    else
 	       fcp("Anchor expected. An anchor could be `Current', %
@@ -4238,7 +4249,7 @@ feature {NONE}
 	 if a_keyword(fz_when) then
 	    from
 	       Result := true;
-	       !!e_when.make(pos(start_line,start_column),get_comments);
+	       !!e_when.make(pos(start_line,start_column),get_comment);
 	    until
 	       state > 3
 	    loop
@@ -4376,18 +4387,13 @@ feature {NONE}
 	 wcp("%". You should update your Eiffel code now.");
       end;
 
-   forbidden_class: ARRAY[STRING] is
-      once
-	 Result := <<as_none>>;
-      end;
-
    lcs: STRING is
 	 -- Last Comment String.
       once
 	 !!Result.make(80);
       end;
 
-   tmp_string: STRING is
+   buffer: STRING is
       once
 	 !!Result.make(80);
       end;
@@ -4397,32 +4403,33 @@ feature {NONE}
       require
 	 case_insensitive
       local
-	 state, c: INTEGER;
-	 -- state 0 : first letter read.
-	 -- state 1 : end.
+	 backward_column: INTEGER;
+	 stop: BOOLEAN;
       do
 	 if cc.is_letter then
 	    from
-	       c := column;
-	       tmp_name.reset(pos(line,c));
+	       backward_column := column;
+	       tmp_name.reset(pos(line,backward_column));
 	       tmp_name.extend(cc.to_lower);
 	    until
-	       state > 0
+	       stop
 	    loop
 	       next_char;
 	       inspect
 		  cc
-	       when 'a'..'z','0'..'9','_' then
+	       when 'a'..'z' then
+		  tmp_name.extend(cc);
+	       when '0'..'9','_' then
 		  tmp_name.extend(cc);
 	       when 'A'..'Z' then
 		  tmp_name.extend(cc.to_lower);
 	       else
-		  state := 1;
+		  stop := true;
 	       end;
 	    end;
 	    if tmp_name.isa_keyword then
 	       cc := tmp_name.buffer.first;
-	       column := c;
+	       column := backward_column;
 	    else
 	       Result := true;
 	       skip_comments;
@@ -4435,41 +4442,43 @@ feature {NONE}
       require
 	 not case_insensitive
       local
-	 state, c: INTEGER;
-	 do_warning: BOOLEAN;
-	 -- state 0 : first letter read.
-	 -- state 1 : end.
+	 backward_column: INTEGER;
+	 stop, may_be_a_keyword, style_warning: BOOLEAN;
       do
 	 if cc.is_letter then
 	    from
-	       c := column;
-	       tmp_name.reset(pos(line,c));
+	       backward_column := column;
+	       may_be_a_keyword := true;
+	       tmp_name.reset(pos(line,backward_column));
 	       tmp_name.extend(cc);
 	    until
-	       state > 0
+	       stop
 	    loop
 	       next_char;
 	       inspect
 		  cc
-	       when 'a'..'z','0'..'9','_' then
+	       when 'a'..'z' then
 		  tmp_name.extend(cc);
 	       when 'A'..'Z' then
-		  do_warning := true;
+		  style_warning := true;
+		  tmp_name.extend(cc);
+	       when '0'..'9','_' then
+		  may_be_a_keyword := false;
 		  tmp_name.extend(cc);
 	       else
-		  state := 1;
+		  stop := true;
 	       end;
 	    end;
-	    if tmp_name.isa_keyword then
+	    if may_be_a_keyword and then tmp_name.isa_keyword then
 	       cc := tmp_name.buffer.first;
-	       column := c;
+	       column := backward_column;
 	    else
 	       Result := true;
 	       skip_comments;
-	       if no_style_warning then
-	       elseif do_warning then
-		  warning(tmp_name.start_position,
-			  "Identifier should use only lowercase letters.");
+	       if style_warning then
+		  if not no_style_warning then
+		     warning(tmp_name.start_position,em25);
+		  end;
 	       end;
 	    end;
 	 end;
@@ -4593,6 +4602,9 @@ feature {NONE}
    em21: STRING is "A formal argument is not a writable variable.";
    em22: STRING is "Bad creation/create (writable expected).";
    em23: STRING is "Bad creation/create (procedure name expected).";
+   em24: STRING is "Deleted extra semi-colon.";
+   em25: STRING is "Identifier should use only lowercase letters.";
+   em26: STRING is "Same identifier appears twice (local/formal).";
 
    singleton_memory: EIFFEL_PARSER is
       once

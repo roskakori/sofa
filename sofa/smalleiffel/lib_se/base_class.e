@@ -20,7 +20,7 @@ class BASE_CLASS
 
 inherit GLOBALS;
 
-creation {EIFFEL_PARSER, TYPE_NONE} make
+creation {EIFFEL_PARSER, TYPE_NONE, TYPE_TUPLE} make
 
 feature
 
@@ -73,25 +73,21 @@ feature
 feature {NONE}
 
    feature_dictionary: DICTIONARY[E_FEATURE,STRING];
-	 -- All features really defined in the current class.
-	 -- Thus, it is the same features contained in
-	 -- `feature_clause_list' (this dictionary speed up
-	 -- feature look up).
-	 -- To avoid clash between infix and prefix names,
-	 -- access key IS NOT `to_string' but `to_key' of class
-	 -- NAME.
+	 -- All features really defined in the current class. Thus, it is 
+	 -- the same features contained in `feature_clause_list' (this dictionary 
+	 -- speed up feature look up). To avoid clash between infix and 
+	 -- prefix names, access key is not `to_string' but `to_key'.
 
    make(my_path, my_name: STRING; my_id: INTEGER) is
       require
 	 my_path = string_aliaser.item(my_path);
 	 my_name = string_aliaser.item(my_name);
-	 my_name /= as_none implies my_id > 0
+	 my_id >= 0
       do
 	 path := my_path;
 	 !!name.unknown_position(my_name);
 	 id := my_id;
 	 small_eiffel.add_base_class(Current);
-	 !!isom.with_capacity(16);
 	 !!feature_dictionary.make;
       end;
 
@@ -99,8 +95,8 @@ feature {TYPE_CLASS}
 
    smallest_ancestor(type, other: TYPE): TYPE is
 	 -- To help implementation of TYPE.smallest_ancestor while one
-	 -- have to consider parents.
-	 -- Note that `type' is directly related to `Current'.
+	 -- have to consider parents. Note that `type' is directly related 
+	 -- to `Current'.
       require
 	 type.is_run_type;
 	 other.is_run_type;
@@ -128,8 +124,7 @@ feature {SHORT,PARENT_LIST}
 
    up_to_any_in(pl: FIXED_ARRAY[BASE_CLASS]) is
       do
-	 if is_general then
-	 else
+	 if not is_general then
 	    if not pl.fast_has(Current) then
 	       pl.add_last(Current);
 	    end;
@@ -311,7 +306,9 @@ feature {RUN_FEATURE_1,PARENT,BASE_CLASS}
 	 Current = top or else Current.is_subclass_of(top)
       do
 	 if Current = top then
-	    check proper_has(bottom_fn) end;
+	    check 
+	       name.to_string /= as_tuple implies proper_has(bottom_fn)
+	    end;
 	    Result := bottom_fn;
 	 elseif parent_list /= Void then
 	    Result := parent_list.original_name(top,bottom_fn);
@@ -369,7 +366,7 @@ feature {BASE_CLASS,PARENT_LIST,PARENT}
    going_up(trace: FIXED_ARRAY[PARENT]; top: BASE_CLASS;
 	    top_fn: FEATURE_NAME;): FEATURE_NAME is
       require
-	 Current /= top;
+	 Current /= top
       do
 	 if parent_list = Void then
 	    Result := class_any.going_up(trace,top,top_fn);
@@ -470,7 +467,7 @@ feature {EIFFEL_PARSER}
 	 heading_comment2 := hc;
       end;
 
-   set_parent_list(sp: POSITION; c: COMMENT; l: ARRAY[PARENT]) is
+   set_parent_list(sp: POSITION; c: COMMENT; l: FIXED_ARRAY[PARENT]) is
       require
 	 not sp.is_unknown;
 	 c /= Void or else l /= Void;
@@ -653,7 +650,7 @@ feature {SMALL_EIFFEL}
 	    eh.append(" cannot be a root class since it is a deferred class.");
 	    eh.print_as_warning;
 	 end;
-	 rc := run_class;
+	 rc := small_eiffel.run_class_for(name.to_string);
 	 rc.set_at_run_time;
 	 f := look_up_for(rc,procedure_name);
 	 if f = Void then
@@ -663,7 +660,7 @@ feature {SMALL_EIFFEL}
 	 Result ?= f;
 	 if Result = Void then
 	    eh.add_position(f.start_position);
-	    fatal_error("Invalid Root (not a procedure).");
+	    fatal_error("Invalid Root. Only procedure are allowed (VGCC.6).");
 	 end;
       ensure
 	 Result /= Void
@@ -688,30 +685,7 @@ feature {SMALL_EIFFEL}
 	 end;
       end;
 
-feature
-
-   run_class: RUN_CLASS is
-      require
-	 not is_generic
-      local
-	 rcd: DICTIONARY[RUN_CLASS,STRING];
-	 n: STRING;
-	 type: TYPE_CLASS;
-      do
-	 n := name.to_string;
-	 rcd := small_eiffel.run_class_dictionary;
-	 if rcd.has(n) then
-	    Result := rcd.at(n);
-	 else
-	    !!type.make(name);
-	    Result := type.run_class;
-	 end;
-      end;
-
-   current_type: TYPE is
-      do
-	 Result := run_class.current_type;
-      end;
+feature 
 
    is_generic: BOOLEAN is
 	 -- When class is defined with generic arguments.
@@ -730,32 +704,18 @@ feature
       require
 	 other /= Current
       do
-	 if isom = Void then
-	    -- Yes, it is the NONE class.
+	 if other.is_any then
 	    Result := true;
-	 elseif isom.fast_has(other) then
+	 elseif other.is_platform then
 	    Result := true;
-	 elseif other.isom = Void then
-	 else
-	    if other.is_any then
-	       Result := true;
-	    else
-	       visited.clear;
-	       Result := is_subclass_of_aux(other);
-	    end;
-	    if Result then
-	       isom.add_last(other);
-	    end;
+	 elseif parent_list /= Void then
+	    Result := parent_list.has_parent(other);
+	 elseif other.is_general then
+	    Result := true;
+	 elseif other.is_none then
+	 elseif is_none then
+	    Result := true;
 	 end;
-      end;
-
-feature {NONE}
-
-   visited: FIXED_ARRAY[BASE_CLASS] is
-	 -- List of all visited classes to detects loops during
-	 -- `is_subclass_of' processing.
-      once
-	 !!Result.with_capacity(32);
       end;
 
 feature {PARENT_LIST,BASE_CLASS}
@@ -784,32 +744,30 @@ feature {PARENT_LIST,BASE_CLASS}
 	 end;
       end;
 
-   is_subclass_of_aux(c: BASE_CLASS): BOOLEAN is
-      require
-	 not c.is_any;
-	 Current /= c
-      do
-	 if visited.fast_has(Current) then
-	 else
-	    visited.add_last(Current);
-	    if parent_list /= Void then
-	       Result := parent_list.has_parent(c);
-	    elseif not visited.fast_has(class_any) then
-	       Result := class_any.is_subclass_of_aux(c);
-	    end;
-	 end;
-      end;
-
 feature
 
    is_any: BOOLEAN is
+	 -- Is it the ANY class ?
       do
-	 Result := as_any = name.to_string;
+	 Result := name.to_string = as_any;
       end;
 
    is_general: BOOLEAN is
+	 -- Is it the GENERAL class ?
       do
-	 Result := as_general = name.to_string;
+	 Result := name.to_string = as_general;
+      end;
+
+   is_platform: BOOLEAN is
+	 -- Is it the PLATFORM class ?
+      do
+	 Result := name.to_string = as_platform;
+      end;
+
+   is_none: BOOLEAN is
+	 -- Is it the NONE class ?
+      do
+	 Result := name.to_string = as_none;
       end;
 
    has_redefine(fn: FEATURE_NAME): BOOLEAN is
@@ -855,36 +813,28 @@ feature {CALL_PROC_CALL}
       local
 	 top_bc: BASE_CLASS;
 	 nfn: FEATURE_NAME;
-	 constraint: TYPE;
-	 type_formal_generic: TYPE_FORMAL_GENERIC;
 	 bcn: CLASS_NAME;
       do
 	 check  
 	    fn.to_string /= as_eq;
 	    fn.to_string /= as_neq;
 	 end;
-	 -- Check constrained genericity first :
-	 type_formal_generic ?= target.result_type;
-	 if type_formal_generic /= Void then
-	    constraint := type_formal_generic.constraint;
-	    if constraint = Void then
-	    elseif not type_formal_generic.is_a(constraint) then
-	       eh.print_as_error;
-	       eh.add_position(fn.start_position);
-	       fatal_error("Constraint genericity violation.");
-	    end;
-	 end;
-	 -- Then, compute possible rename :
-	 nfn := fn;
-	 top_bc := target.static_result_base_class;
-	 if top_bc /= Void then
-	    if Current = top_bc or else is_subclass_of(top_bc) then
-	       if top_bc.has(fn) then
-		  nfn := new_name_of(top_bc,fn);
+	 -- Compute possible rename first:
+	 if target.result_type.is_like_current then
+	    top_bc := target.start_position.base_class;
+	    nfn := ct.base_class.new_name_of(top_bc,fn);
+	 else
+	    nfn := fn;
+	    top_bc := target.static_result_base_class;
+	    if top_bc /= Void then
+	       if Current = top_bc or else is_subclass_of(top_bc) then
+		  if top_bc.has(fn) then
+		     nfn := new_name_of(top_bc,fn);
+		  end;
 	       end;
 	    end;
 	 end;
-	 -- Search for the feature :
+	 -- Search for the feature:
 	 Result := rc.get_feature(nfn);
 	 if Result = Void then
 	    eh.feature_not_found(fn);
@@ -924,7 +874,7 @@ feature {LOCAL_ARGUMENT,RUN_CLASS}
 	 Result := has(mem_fn);
       end;
 
-feature
+feature {BASE_CLASS,PARENT,RUN_CLASS}
 
    look_up_for(rc: RUN_CLASS; fn: FEATURE_NAME): E_FEATURE is
 	 -- Gives Void or the good one to compute the runnable
@@ -995,12 +945,10 @@ feature {NONE}
 	 -- base class.
       require
 	 rc /= Void;
-	 fn /= Void;
+	 fn /= Void
       do
 	 if parent_list = Void then
-	    if is_general then
-	       Result := Void;
-	    else
+	    if not is_general then
 	       Result := class_any.look_up_for(rc,fn);
 	    end;
 	 else
@@ -1071,14 +1019,15 @@ feature {BASE_CLASS,PARENT_LIST}
 	 fn /= Void
       local
 	 fn_key: STRING;
+	 ef: E_FEATURE;
       do
 	 fn_key := fn.to_key;
 	 if feature_dictionary.has(fn_key) then
-	    assertion_collector.assertion_add_last(feature_dictionary.at(fn_key));
+	    ef := feature_dictionary.at(fn_key);
+	    assertion_collector.assertion_add_last(ef);
 	 end;
 	 if parent_list = Void then
-	    if is_general then
-	    else
+	    if not is_general then
 	       class_any.collect_assertion(fn);
 	    end;
 	 else
@@ -1093,20 +1042,16 @@ feature {NONE}
       local
 	 unknown_position: POSITION;
       once
-	 !!Result.make(as_malloc,unknown_position);
+	 !!Result.make(as_storage,unknown_position);
       end;
 
 feature {BASE_CLASS}
-
-   isom: FIXED_ARRAY[BASE_CLASS];
-	 -- Memorize results to speed ud `is_subclass_of'.
 
    super_e_feature(fn: FEATURE_NAME): E_FEATURE is
 
       do
 	 if parent_list = Void then
-	    if is_general then
-	    else
+	    if not is_general then
 	       Result := class_any.e_feature(fn);
 	    end;
 	 else
@@ -1214,6 +1159,12 @@ feature {TYPE,PARENT}
       end;
 
 feature {NONE}
+
+   visited: FIXED_ARRAY[BASE_CLASS] is
+	 -- List of all visited classes for the `inherit_cycle_check'.
+      once
+	 !!Result.with_capacity(32);
+      end;
 
    vdrd6(rc: RUN_CLASS; super, redef: E_FEATURE) is
       require

@@ -16,8 +16,6 @@ class EXAMPLE1
    --            compile -o example1 -boost example1
    --
 
-inherit NUMBER_TOOLS;
-
 creation make
 
 feature
@@ -26,7 +24,7 @@ feature
       local
          max, n1, n2: NUMBER;
       do
-         max := from_integer(Maximum_integer);
+         max := Maximum_integer.to_number;
          io.put_string("The maximum integer value on this architecture is:%N%
                        %      max = ");
          io.put_number(max);
@@ -37,8 +35,8 @@ feature
          io.put_string("%NDo you like NUMBERs ?%N");
 
          io.put_string("So have a look at NUMBERs division:%N");
-         n1 := from_integer(2);
-         n2 := from_integer(6);
+         n1 := (2).to_number;
+         n2 := (6).to_number;
          io.put_string("Assume n1 = ");
          io.put_number(n1);
          io.put_string("  and n2 = ");

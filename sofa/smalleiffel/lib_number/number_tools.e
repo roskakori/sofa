@@ -127,9 +127,11 @@ feature
    from_integer(n: INTEGER): NUMBER is
 	 -- Uses value `n' to create a new NUMBER.
       do
-	 if (n = Minimum_integer)  then
-	    !LARGE_NEGATIVE_INTEGER!Result.make_smaller(0);
-         else
+	 if (n <= -Base)  then
+	    !LARGE_NEGATIVE_INTEGER!Result.make_smaller(n);
+         elseif (n >= Base) then
+	    !LARGE_POSITIVE_INTEGER!Result.make_smaller(n);
+	 else
 	    !SMALL_INTEGER!Result.make(n);
 	 end;
       ensure
@@ -144,8 +146,8 @@ feature
 	 i: INTEGER;
 	 num, den: ABSTRACT_INTEGER;
 	 nb_is_negative: BOOLEAN;
-	 length, first, last, base: INTEGER;
-	 power: ABSTRACT_INTEGER;      
+	 length, first, last: INTEGER;
+	 tmp: FIXED_ARRAY[INTEGER];
       do
 	 i := s.index_of('/');
 	 if (i = s.count + 1) then	    
@@ -158,13 +160,8 @@ feature
 	    end;
 	    from
 	       length := i.Maximum_integer.to_string.count - 1;
-	       !SMALL_INTEGER!Result.make(0);	    
 	       last := s.count;
-	       power ?= Result.one;
-	       check
-		  power /= Void;
-	       end;
-	       base := 10^length;
+	       !!tmp.with_capacity((s.count / 9).rounded);
 	    until
 	       last <= 0
 	    loop
@@ -172,12 +169,20 @@ feature
 	       if first < 0 then
 		  first := 0;
 	       end;
-	       Result := Result + ( power @* s.substring(first+1, last).to_integer );
-	       power ?= power @* base;  
-	       check
-		  power /= Void;
-	       end;
+	       tmp.add_last(s.substring(first + 1, last).to_integer);
 	       last := first;
+	    end;
+	    from
+	       i := tmp.upper
+	    until
+	       tmp.item(i) /= 0 or else i = tmp.lower
+	    loop
+	       i :=  i - 1;
+	    end;
+	    if i = tmp.lower then
+	       !SMALL_INTEGER!Result.make(tmp.item(tmp.lower));
+	    else
+	       !LARGE_POSITIVE_INTEGER!Result.make_from_fixed_array(tmp);
 	    end;
 	    if nb_is_negative then
 	       Result := -Result;
@@ -192,8 +197,8 @@ feature
 	    if (num \\ den).same_as( num.zero ) then 
 	       Result := num / den;
 	    else
-	       if num.is_integer and then den.is_integer then
-		  !SMALL_FRACTION!Result.make_from_integer(num.to_integer, den.to_integer);
+	       if num.is_integer and then num @< Base and then num @> -Base and then den.is_integer and then den @< Base and then den @> -Base then
+		  !INTEGER_FRACTION!Result.make_from_integer(num.to_integer, den.to_integer);
 	       else
 		  nb_is_negative := num.is_negative xor den.is_negative;
 		  num ?= num.abs;
@@ -202,7 +207,7 @@ feature
 		     num /= Void;
 		     den /= Void;
 		  end;
-		  !LARGE_FRACTION!Result.make(num, den, nb_is_negative);
+		  !NUMBER_FRACTION!Result.make(num, den, nb_is_negative);
 	       end;
 	    end;
 	 end;
@@ -223,13 +228,21 @@ feature
 	    Result := from_string( string );
 	 end;
       end;
-
+   
+feature {NUMBER_TOOLS}
+   
+   Base : INTEGER is
+	 -- The Base is the grater number which is like 10^x and 
+	 -- which is inferior to the Maximu_integer value.
+	 --
+	 -- So if Maximum_number is 2147483647 :
+	 -- The Base is :           1000000000.
+	 -- A number has a value between 0-9 so a number in a
+	 -- item of a FIXED_ARRAY[INTEGER] must be a succession 
+	 -- of 9 so the value of the greater item is 999999999.
+         -- And the Base is the greater value of a item + 1.
+      once
+	 Result := 10^((Maximum_integer.log10).truncated_to_integer);
+      end; -- Base
+   
 end -- NUMBER_TOOLS
-
-
-
-
-
-
-
-

@@ -22,22 +22,23 @@ inherit GLOBALS;
 
 creation make
 
-feature {PARENT}
-
-   parent_list: PARENT_LIST;
-         -- Corresponding one;
-
-feature {PARENT,TYPE}
+feature
 
    type: TYPE;
          -- Declaration type mark of the parent.
 
-feature {NONE}
+   base_class: BASE_CLASS;
+	 -- An alias for `type.base_class'.
 
-   comment: COMMENT;
-         -- Associated heading comment.
+   base_class_name: STRING;
+	 -- An alias for `base_class.name.to_string'.
 
-feature {PARENT} -- Optionnal list in syntaxical order :
+feature {PARENT}
+
+   parent_list: PARENT_LIST;
+         -- The corresponding one;
+
+feature {PARENT} -- Optionnal list in syntaxical order:
 
    rename_list: RENAME_LIST;
 
@@ -49,35 +50,11 @@ feature {PARENT} -- Optionnal list in syntaxical order :
 
    select_list: FEATURE_NAME_LIST;
 
-feature {NONE}
-
-   make(t: like type) is
-      require
-         t /= Void;
-         not t.is_anchored;
-         not t.start_position.is_unknown;
-      do
-         type := t;
-         if forbidden_parent_list.fast_has(type.written_mark) then
-            eh.add_position(type.start_position);
-            eh.append("You cannot inherit %"");
-            eh.append(type.written_mark);
-            fatal_error("%" (not yet implemented).");
-         end;
-      ensure
-         type = t
-      end;
-
 feature {PARENT_LIST}
 
    start_position: POSITION is
       do
          Result := type.start_position;
-      end;
-
-   base_class: BASE_CLASS is
-      do
-         Result := type.base_class;
       end;
 
    id_extra_information(sfw: STD_FILE_WRITE) is
@@ -132,37 +109,39 @@ feature {PARENT_LIST}
          pfn: like fn;
       do
          if rename_list = Void then
-            Result := type.look_up_for(rc,fn);
+            Result := base_class.look_up_for(rc,fn);
             Result := apply_undefine(Result,fn);
          else
             pfn := rename_list.name_in_parent(fn);
             if pfn /= Void then
-               Result := type.look_up_for(rc,pfn);
+               Result := base_class.look_up_for(rc,pfn);
                Result := apply_undefine(Result,fn);
             end;
          end;
       end;
 
-   precursor_for(p: E_PRECURSOR; wrf: RUN_FEATURE): EFFECTIVE_ROUTINE is
-         -- Look for the feature for `p' which is written inside
-         -- `wrf'.
+   precursor_for(pc: PRECURSOR_CALL; wrf: RUN_FEATURE): EFFECTIVE_ROUTINE is
+         -- Look for the feature for `pc' which is written inside `wrf'.
       local
          original_fn: FEATURE_NAME;
          cn: CLASS_NAME;
          f: E_FEATURE;
+	 er: EXTERNAL_ROUTINE;
       do
          original_fn := wrf.base_feature.first_name;
          if has_redefine(original_fn) then
-            cn := p.parent;
-            if (cn = Void
-                or else
-                cn.to_string = type.base_class_name.to_string)
-             then
+            cn := pc.parent;
+            if cn = Void or else cn.to_string = base_class_name then
                f := look_up_for(wrf.run_class,original_fn);
                Result ?= f;
                if f /= Void and then Result = Void then
-                  eh.add_position(p.start_position);
+                  eh.add_position(pc.start_position);
                   eh.add_position(f.start_position);
+		  er ?= f;
+		  if er /= Void then
+		     fatal_error("Precursor construct not implemented for %
+				 %external features (sorry).");
+		  end;
                   fatal_error("The Precursor is not an effective routine.");
                end;
             end;
@@ -170,8 +149,7 @@ feature {PARENT_LIST}
       end;
 
    multiple_check(other: like Current) is
-         -- Note : is called twice (whith swap) for each couple of
-         -- parents.
+         -- Note : is called twice in order to swap each couple of parents.
       require
          other /= Current
       local
@@ -182,8 +160,8 @@ feature {PARENT_LIST}
          check
             parent_list = other.parent_list
          end;
-         bc1 := type.base_class;
-         bc2 := other.type.base_class;
+         bc1 := base_class;
+         bc2 := other.base_class;
          if bc1 = bc2 or else
             bc1.is_subclass_of(bc2) or else
             bc2.is_subclass_of(bc1)
@@ -250,18 +228,16 @@ feature {PARENT_LIST}
          gl, gl1, gl2: ARRAY[TYPE];
          tfg: TYPE_FORMAL_GENERIC;
          rt: TYPE;
-         type_bc, t2_bc: BASE_CLASS;
-         type_bcn, t2_bcn: STRING;
+         t2_bc: BASE_CLASS;
+         t2_bcn: STRING;
       do
-         type_bc := type.base_class;
-         type_bcn := type_bc.name.to_string;
-         t2_bc := t2.base_class;
+	 t2_bc := t2.base_class;
          t2_bcn := t2_bc.name.to_string;
-         if type_bcn = t2_bcn then -- Here is a good parent :
+         if base_class_name = t2_bcn then -- Here is a good parent :
             gl := type.generic_list;
             gl2 := t2.generic_list;
             if gl = Void or else gl.count /= gl2.count then
-               eh.add_position(type.start_position);
+               eh.add_position(start_position);
                eh.add_position(t2.start_position);
                fatal_error("Bad number of generic arguments.");
             end;
@@ -275,9 +251,6 @@ feature {PARENT_LIST}
                loop
                   if gl.item(i).is_formal_generic then
                      tfg ?= gl.item(i);
-                     check
-                        tfg /= Void
-                     end;
                      rank := tfg.rank;
                      Result :=  gl1.item(rank).is_a(gl2.item(i));
                   else
@@ -286,18 +259,27 @@ feature {PARENT_LIST}
                   end;
                   i := i - 1;
                end;
-            else
+            elseif type.is_run_type then
                Result := type.is_a(t2);
+            else
+	       -- Don't know exactely what to do here :(
+	       eh.add_position(start_position);
+	       eh.append(
+                  "SmallEiffel is not yet able to handle this parent type %
+		  %mark (probably because of constrained genericity). You %
+		  %should try to inherit something else, more accurate for %
+		  %the compiler. Sorry.");
+	       eh.print_as_fatal_error;
             end;
             if not Result then
                eh.cancel;
             end;
-         elseif type_bc.is_subclass_of(t2_bc) then
+         elseif base_class.is_subclass_of(t2_bc) then
             if t1.is_generic then
                rt := type.to_runnable(t1).run_type;
-               Result := type_bc.is_a_vncg(rt,t2);
+               Result := base_class.is_a_vncg(rt,t2);
             else
-               Result := type_bc.is_a_vncg(type,t2);
+               Result := base_class.is_a_vncg(type,t2);
             end;
             if not Result then
                eh.cancel;
@@ -312,11 +294,11 @@ feature {PARENT_LIST}
          fn2: FEATURE_NAME;
       do
          if rename_list = Void then
-            Result := type.base_class.e_feature(fn);
+            Result := base_class.e_feature(fn);
          else
             fn2 := rename_list.name_in_parent(fn);
             if fn2 /= Void then
-               Result := type.base_class.e_feature(fn2);
+               Result := base_class.e_feature(fn2);
             end;
          end;
       end;
@@ -398,27 +380,28 @@ feature {PARENT_LIST}
          pl /= Void;
       local
          i: INTEGER;
-         wbc, pbc: BASE_CLASS;
+         wbc: BASE_CLASS;
          fn, old_fn, new_fn: FEATURE_NAME;
          all_check: BOOLEAN;
       do
          all_check := run_control.all_check;
          parent_list := pl;
-         pbc := type.base_class;
+         base_class := type.base_class;
+	 base_class_name := base_class.name.to_string;
          wbc := parent_list.base_class;
          if all_check then
-            if pbc.formal_generic_list /= Void then
+            if base_class.formal_generic_list /= Void then
                if type.generic_list = Void then
                   -- Nothing, because previous call triggers an error message.
                end;
             elseif type.is_generic then
-               eh.add_position(pbc.name.start_position);
-               eh.add_position(type.start_position);
+               eh.add_position(base_class.name.start_position);
+               eh.add_position(start_position);
                fatal_error("This class is not generic (VTUG.1).");
             end;
          end;
          if all_check and then rename_list /= Void then
-            rename_list.get_started(pbc);
+            rename_list.get_started(base_class);
          end;
          if all_check and then undefine_list /= Void then
             from
@@ -428,7 +411,7 @@ feature {PARENT_LIST}
             loop
                fn := undefine_list.item(i);
                old_fn := get_old_name(fn);
-               if old_fn = Void and then not pbc.has(fn) then
+               if old_fn = Void and then not base_class.has(fn) then
                   eh.add_position(fn.start_position);
                   fatal_error("Cannot undefine non-existent feature (VDUS.1).");
                end;
@@ -448,7 +431,7 @@ feature {PARENT_LIST}
                end;
                if all_check then
                   old_fn := get_old_name(fn);
-                  if old_fn = Void and then not pbc.has(fn) then
+                  if old_fn = Void and then not base_class.has(fn) then
                      eh.add_position(fn.start_position);
                      fatal_error(Vdrs1);
                   end;
@@ -470,7 +453,7 @@ feature {PARENT_LIST}
             loop
                fn := select_list.item(i);
                old_fn := get_old_name(fn);
-               if old_fn = Void and then not pbc.has(fn) then
+               if old_fn = Void and then not base_class.has(fn) then
                   eh.add_position(fn.start_position);
                   fatal_error(Vmss);
                end;
@@ -494,7 +477,7 @@ feature {PARENT_LIST}
          old_name: FEATURE_NAME;
          bc: BASE_CLASS;
       do
-         bc := type.base_class;
+         bc := base_class;
          if rename_list = Void then
             Result := bc.up_to_original(bottom,top_fn);
          else
@@ -513,7 +496,7 @@ feature {PARENT_LIST}
          old_name: FEATURE_NAME;
          bc: BASE_CLASS;
       do
-         bc := type.base_class;
+         bc := base_class;
          if bc = top or else bc.is_subclass_of(top) then
             if rename_list = Void then
                Result := bc.original_name(top,bottom_fn);
@@ -529,12 +512,12 @@ feature {PARENT_LIST}
    going_up(trace: FIXED_ARRAY[PARENT]; top: BASE_CLASS;
             top_fn: FEATURE_NAME;): FEATURE_NAME is
       local
-         bc: BASE_CLASS;
+         bc: like base_class;
       do
-         bc := type.base_class;
+         bc := base_class;
          if bc = top then
             Result := going_down(trace,top_fn);
-         elseif bc.is_general then
+         elseif base_class_name = as_general then
             Result := going_down(trace,top_fn);
          elseif bc.is_subclass_of(top) then
             trace.add_last(Current);
@@ -624,6 +607,25 @@ feature {PARENT}
 
 feature {NONE}
 
+   comment: COMMENT;
+         -- Associated heading comment.
+   
+   make(t: like type) is
+      require
+         not t.is_anchored;
+         not t.start_position.is_unknown
+      do
+         type := t;
+         if forbidden_parent_list.fast_has(type.written_mark) then
+            eh.add_position(start_position);
+            eh.append("You cannot inherit %"");
+            eh.append(type.written_mark);
+            fatal_error("%" (not yet implemented).");
+         end;
+      ensure
+         type = t
+      end;
+
    forbidden_parent_list: ARRAY[STRING] is
       once
          Result := <<as_none,as_boolean,as_integer,as_character,
@@ -711,11 +713,11 @@ feature {NONE}
          fn /= Void
       do
          if export_list = Void then
-            Result := type.base_class.clients_for(fn);
+            Result := base_class.clients_for(fn);
          else
             Result := export_list.clients_for(fn);
             if Result = Void then
-               Result := type.base_class.clients_for(fn);
+               Result := base_class.clients_for(fn);
             end;
          end;
       end;
@@ -724,7 +726,6 @@ invariant
 
    not type.is_anchored;
 
-   not type.start_position.is_unknown;
+   not start_position.is_unknown;
 
 end -- PARENT
-

@@ -63,13 +63,19 @@ feature
       end;
 
    mapping_c is
-      do
-         if is_pre_computable then
-            once_routine_pool.c_put_o_result(Current);
-         else
-            default_mapping_function;
-         end;
-      end;
+      local
+	 tmp_expanded_idx: INTEGER;
+       do
+          if is_pre_computable then
+             once_routine_pool.c_put_o_result(Current);
+          else
+	     tmp_expanded_idx := cpp.se_tmp_open(Current);
+             default_mapping_function;
+	     if tmp_expanded_idx >= 0 then
+		cpp.se_tmp_close(tmp_expanded_idx);
+	     end;
+          end;
+       end;
 
    c_define is
       do
@@ -95,9 +101,16 @@ feature
 
 feature {CALL_PROC_CALL}
 
-   collect_c_tmp is
-      do
-      end;
+    collect_c_tmp is
+       do
+         if result_type.is_user_expanded then
+            if result_type.is_dummy_expanded then
+            elseif is_pre_computable then
+            else
+               cpp.se_tmp_add(Current);
+            end;
+         end;
+       end;
 
 feature {ADDRESS_OF_POOL}
 

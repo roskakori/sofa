@@ -100,11 +100,6 @@ feature
          str.extend('6');
       end;
 
-   cast_to_ref is
-      do
-         type_boolean_ref.mapping_cast;
-      end;
-
    jvm_descriptor_in(str: STRING) is
       do
          str.extend('Z');

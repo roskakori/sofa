@@ -37,7 +37,7 @@ feature
             Result := memory.at(model);
          else
             Result := model.twin;
-            memory.put(Result,Result);
+            memory.add(Result,Result);
          end;
       ensure
          Result.is_equal(model)
@@ -77,193 +77,208 @@ feature {NONE}
    make is
       do 
          -- -------------------------------------- Class names :
-         add1(as_any);
-         add1(as_array);
-         add1(as_bit);
-         add1(as_bit_n);
-         add1(as_bit_n_ref);
-         add1(as_boolean);
-         add1(as_boolean_ref);
-         add1(as_character);
-         add1(as_character_ref);
-         add1(as_dictionary);
-         add1(as_double);
-         add1(as_double_ref);
-         add1(as_exceptions);
-         add1(as_fixed_array);
-         add1(as_general);
-         add1(as_integer);
-         add1(as_integer_ref);
-         add1(as_memory);
-         add1(as_native_array);
-         add1(as_none);
-         add1(as_platform);
-         add1(as_pointer);
-         add1(as_pointer_ref);
-         add1(as_real);
-         add1(as_real_ref);
-         add1(as_string);
-         add1(as_std_file_read);
-         add1(as_std_file_write);
+         regular_add(as_any);
+         regular_add(as_array);
+         regular_add(as_bit);
+         regular_add(as_bit_n);
+         regular_add(as_bit_n_ref);
+         regular_add(as_boolean);
+         regular_add(as_boolean_ref);
+         regular_add(as_character);
+         regular_add(as_character_ref);
+         regular_add(as_dictionary);
+         regular_add(as_double);
+         regular_add(as_double_ref);
+         regular_add(as_exceptions);
+         regular_add(as_fixed_array);
+         regular_add(as_general);
+         regular_add(as_gui_color);
+         regular_add(as_gui_event);
+         regular_add(as_gui_font);
+         regular_add(as_gui_gc);
+         regular_add(as_gui_pixmap);
+         regular_add(as_integer);
+         regular_add(as_integer_ref);
+         regular_add(as_memory);
+         regular_add(as_native_array);
+         regular_add(as_none);
+         regular_add(as_platform);
+         regular_add(as_pointer);
+         regular_add(as_pointer_ref);
+         regular_add(as_real);
+         regular_add(as_real_ref);
+         regular_add(as_string);
+         regular_add(as_std_file_read);
+         regular_add(as_std_file_write);
+         regular_add(as_tuple);
          -- ----------------------- Operator/Infix/Prefix list :
-         add1(as_and);
-         add1(as_and_then);
-         add1(as_at);
-         add1(as_backslash_backslash);
-         add1(as_eq);
-         add1(as_ge);
-         add1(as_gt);
-         add1(as_implies);
-         add1(as_le);
-         add1(as_lt);
-         add1(as_minus);
-         add1(as_muls);
-         add1(as_neq);
-         add1(as_not);
-         add1(as_or);
-         add1(as_or_else);
-         add1(as_plus);
-         add1(as_pow);
-         add1(as_shift_left);
-         add1(as_shift_right);
-         add1(as_slash);
-         add1(as_slash_slash);
-         add1(as_std_neq);
-         add1(as_xor);
+         regular_add(as_and);
+         regular_add(as_and_then);
+         regular_add(as_at);
+         regular_add(as_backslash_backslash);
+         regular_add(as_eq);
+         regular_add(as_ge);
+         regular_add(as_gt);
+         regular_add(as_implies);
+         regular_add(as_le);
+         regular_add(as_lt);
+         regular_add(as_minus);
+         regular_add(as_muls);
+         regular_add(as_neq);
+         regular_add(as_not);
+         regular_add(as_or);
+         regular_add(as_or_else);
+         regular_add(as_plus);
+         regular_add(as_pow);
+         regular_add(as_shift_left);
+         regular_add(as_shift_right);
+         regular_add(as_slash);
+         regular_add(as_slash_slash);
+         regular_add(as_std_neq);
+         regular_add(as_xor);
          -- ------------------------------------ Feature names :
-         add1(as_add_last);
-         add1(as_blank);
-         add2(as_boolean_bits);
-         add1(as_calloc);
-         add1(as_capacity);
-         add2(as_character_bits);
-         add1(as_clear_all);
-         add1(as_count);
-         add1(as_code);
-         add1(as_conforms_to);
-         add1(as_copy);
-         add1(as_c_inline_c);
-         add1(as_c_inline_h);
-         add1(as_default_rescue);
-         add1(as_deep_clone);
-         add1(as_deep_equal);
-         add1(as_deep_memcmp);
-         add1(as_deep_twin);
-         add1(as_deep_twin_from);
-         add1(as_dispose);
-         add1(as_double_bits);
-         add1(as_double_floor);
-         add1(as_die_with_code);
-         add1(as_element_sizeof);
-         add1(as_eof_code);
-         add1(as_exception);
-         add1(as_fclose);
-         add1(as_feof);
-         add1(as_first);
-         add1(as_floor);
-         add1(as_flush_stream);
-         add1(as_from_pointer);
-         add1(as_generating_type);
-         add1(as_generator);
-         add1(as_io);
-         add2(as_integer_bits);
-         add1(as_is_basic_expanded_type);
-         add1(as_is_deep_equal);
-         add1(as_is_expanded_type);
-         add1(as_is_equal);
-         add1(as_is_not_null);
-         add1(as_item);
-         add1(as_last);
-         add1(as_lower);
-         add1(as_malloc);
-         add1(as_make);
-         add2(as_minimum_character_code);
-         add2(as_minimum_double);
-         add2(as_minimum_integer);
-         add2(as_minimum_real);
-         add2(as_maximum_character_code);
-         add2(as_maximum_double);
-         add2(as_maximum_integer);
-         add2(as_maximum_real);
-         add1(as_object_size);
-         add1(as_pointer_bits);
-         add1(as_pointer_size);
-         add1(as_print);
-         add1(as_print_on);
-         add1(as_print_run_time_stack);
-         add1(as_put);
-         add1(as_put_0);
-         add1(as_put_1);
-         add1(as_raise_exception);
-         add1(as_read_byte);
-         add1(as_real_bits);
-         add1(as_realloc);
-         add1(as_se_argc);
-         add1(as_se_argv);
-         add1(as_se_getenv);
-         add1(as_se_remove);
-         add1(as_se_rename);
-         add1(as_se_string2double);
-         add1(as_se_system);
-         add1(as_sfr_open);
-         add1(as_signal_number);
-         add1(as_sfw_open);
-         add1(as_sprintf_double);
-         add1(as_sprintf_pointer);
-         add1(as_standard_copy);
-         add1(as_standard_is_equal);
-         add1(as_standard_twin);
-         add1(as_stderr);
-         add1(as_stdin);
-         add1(as_stdout);
-         add1(as_std_error);
-         add1(as_std_input);
-         add1(as_std_output);
-         add1(as_storage);
-         add1(as_to_bit);
-         add1(as_to_character);
-         add1(as_to_double);
-         add1(as_to_integer);
-         add1(as_to_pointer);
-         add1(as_to_real);
-         add1(as_trace_switch);
-         add1(as_truncated_to_integer);
-         add1(as_twin);
-         add1(as_upper);
-         add1(as_with_capacity);
-         add1(as_write_byte);
+         regular_add(as_add_last);
+         regular_add(as_blank);
+         special_add(as_boolean_bits);
+         regular_add(as_calloc);
+         regular_add(as_capacity);
+         special_add(as_character_bits);
+         regular_add(as_clear_all);
+         regular_add(as_count);
+         regular_add(as_code);
+         regular_add(as_collecting);
+         regular_add(as_collection_off);
+         regular_add(as_collection_on);
+         regular_add(as_conforms_to);
+         regular_add(as_copy);
+         regular_add(as_c_inline_c);
+         regular_add(as_c_inline_h);
+         regular_add(as_default_rescue);
+         regular_add(as_deep_clone);
+         regular_add(as_deep_equal);
+         regular_add(as_deep_memcmp);
+         regular_add(as_deep_twin);
+         regular_add(as_deep_twin_from);
+         regular_add(as_dispose);
+         regular_add(as_double_bits);
+         regular_add(as_double_floor);
+         regular_add(as_die_with_code);
+         regular_add(as_element_sizeof);
+         regular_add(as_eof_code);
+         regular_add(as_exception);
+         regular_add(as_fclose);
+         regular_add(as_feof);
+         regular_add(as_fifth);
+         regular_add(as_first);
+         regular_add(as_floor);
+         regular_add(as_flush_stream);
+         regular_add(as_fourth);
+         regular_add(as_from_pointer);
+         regular_add(as_full_collect);
+         regular_add(as_generating_type);
+         regular_add(as_generator);
+         regular_add(as_io);
+         special_add(as_integer_bits);
+         regular_add(as_is_basic_expanded_type);
+         regular_add(as_is_deep_equal);
+         regular_add(as_is_expanded_type);
+         regular_add(as_is_equal);
+         regular_add(as_is_not_null);
+         regular_add(as_item);
+         regular_add(as_last);
+         regular_add(as_lower);
+         regular_add(as_make);
+         special_add(as_minimum_character_code);
+         special_add(as_minimum_double);
+         special_add(as_minimum_integer);
+         special_add(as_minimum_real);
+         special_add(as_maximum_character_code);
+         special_add(as_maximum_double);
+         special_add(as_maximum_integer);
+         special_add(as_maximum_real);
+         regular_add(as_object_size);
+         regular_add(as_pointer_bits);
+         regular_add(as_pointer_size);
+         regular_add(as_print);
+         regular_add(as_print_on);
+         regular_add(as_print_run_time_stack);
+         regular_add(as_put);
+         regular_add(as_put_0);
+         regular_add(as_put_1);
+         regular_add(as_raise_exception);
+         regular_add(as_read_byte);
+         regular_add(as_real_bits);
+         regular_add(as_realloc);
+         regular_add(as_second);
+         regular_add(as_se_argc);
+         regular_add(as_se_argv);
+         regular_add(as_se_remove);
+         regular_add(as_se_rename);
+         regular_add(as_se_string2double);
+         regular_add(as_se_system);
+         regular_add(as_sfr_open);
+         regular_add(as_signal_number);
+         regular_add(as_sfw_open);
+         regular_add(as_sprintf_double);
+         regular_add(as_sprintf_pointer);
+         regular_add(as_standard_copy);
+         regular_add(as_standard_is_equal);
+         regular_add(as_standard_twin);
+         regular_add(as_stderr);
+         regular_add(as_stdin);
+         regular_add(as_stdout);
+         regular_add(as_std_error);
+         regular_add(as_std_input);
+         regular_add(as_std_output);
+         regular_add(as_storage);
+         regular_add(as_third);
+         regular_add(as_to_bit);
+         regular_add(as_to_character);
+         regular_add(as_to_double);
+         regular_add(as_to_integer);
+         regular_add(as_to_pointer);
+         regular_add(as_to_real);
+         regular_add(as_trace_switch);
+         regular_add(as_truncated_to_integer);
+         regular_add(as_twin);
+         regular_add(as_upper);
+         regular_add(as_with_capacity);
+         regular_add(as_write_byte);
          -- -------------------------------------- Other names :
-         add1(as_current);
-         add1(as_native_array_character);
-         add1(as_like_current);
-         add1(as_precursor);
-         add1(as_result);
-         add1(as_void);
+         regular_add(as_current);
+         regular_add(as_native_array_character);
+         regular_add(as_like_current);
+         regular_add(as_precursor);
+         regular_add(as_result);
+         regular_add(as_void);
       end;
 
-   add1(str: STRING) is
-      require
-         not memory.has(str)
+   regular_add(str: STRING) is
+	 -- Added as it is in the `memory'.
       do
-         memory.put(str,str);
+         memory.add(str,str);
       end;
 
-   add2(str: STRING) is
+   special_add(str: STRING) is
+	 -- May be added in lower case in the `memory'
       do
          if eiffel_parser.case_insensitive then
             str.to_lower;
          end;
-         add1(str);
+         regular_add(str);
       end;
 
-   tmp_string: STRING is "..............................................";
+   buffer: STRING is 
+      once
+	 !!Result.make(64);
+      end;
 
    key_for_prefix_infix(tag_prefix_or_infix, to_string: STRING): STRING is
       local
          i: INTEGER;
          c: CHARACTER;
       do
-         tmp_string.copy(tag_prefix_or_infix);
+         buffer.copy(tag_prefix_or_infix);
          from
             i := 1;
          until
@@ -271,13 +286,13 @@ feature {NONE}
          loop
             c := to_string.item(i);
             if c.is_letter then
-               tmp_string.extend(c);
+               buffer.extend(c);
             else
-               c.code.append_in(tmp_string);
+               c.code.append_in(buffer);
             end;
             i := i + 1;
          end;
-         Result := item(tmp_string);
+         Result := item(buffer);
       end;
 
    memory: DICTIONARY[STRING,STRING] is
@@ -295,4 +310,3 @@ invariant
    is_real_singleton: Current = singleton_memory
 
 end -- STRING_ALIASER
-

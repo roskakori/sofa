@@ -36,6 +36,9 @@ feature -- Creation and modification :
          new_count >= 0
       do
          if new_count = 0 then
+	    if capacity > 0 and then upper >= 0 then
+	       storage.clear(0,upper);
+	    end;
             upper := -1;
          elseif capacity = 0 then
             storage := storage.calloc(new_count);
@@ -46,8 +49,8 @@ feature -- Creation and modification :
             capacity := new_count;
             upper := new_count - 1;
          else
+	    storage.clear(0,upper);
             upper := new_count - 1;
-            clear_all;
          end;
       ensure
          count = new_count;
@@ -63,6 +66,8 @@ feature -- Creation and modification :
          if capacity < needed_capacity then
             storage := storage.calloc(needed_capacity);
             capacity := needed_capacity;
+	 elseif capacity > needed_capacity then
+	    storage.clear(0,upper);
          end;
          upper := -1;
       ensure
@@ -79,32 +84,27 @@ feature -- Modification :
       require
          new_count >= 0
       local
-         new_capacity, i: INTEGER;
-         elt_default: like item;
+         new_capacity: INTEGER;
       do
-         if new_count <= count then
-            upper := new_count - 1;
-         else
-            new_capacity := new_count;
-            if capacity < new_capacity then
-               if capacity = 0 then
-                  storage := storage.calloc(new_capacity);
-               else
-                  storage := storage.realloc(capacity,new_capacity);
-               end;
-               capacity := new_capacity;
+         if new_count > count then
+	    if capacity = 0 then
+	       storage := storage.calloc(new_count);
+	       capacity := new_count;
+	    elseif capacity < new_count then
+	       from
+		  new_capacity := capacity * 2;
+	       until
+		  new_capacity >= new_count
+	       loop
+		  new_capacity := new_capacity * 2;
+	       end;
+	       storage := storage.realloc(capacity,new_capacity);
+	       capacity := new_capacity;
             end;
-            from
-               new_capacity := upper;
-               upper := new_count - 1;
-               i := upper;
-            until
-               i = new_capacity
-            loop
-               put(elt_default,i);
-               i := i - 1;
-            end;
-         end;
+         elseif new_count /= count then
+	    storage.clear(new_count,count - 1);
+	 end;
+	 upper := new_count - 1;
       ensure
          count = new_count;
          capacity >= old capacity
@@ -135,7 +135,7 @@ feature -- Implementation of deferred :
             swap(0,1);
          else
             move(0,upper - 1,1);
-            put(element,0);
+            storage.put(element,0);
          end;
       end;
 
@@ -155,7 +155,7 @@ feature -- Implementation of deferred :
             capacity := new_capacity;
             upper := upper + 1;
          end;
-         put(element,upper);
+         storage.put(element,upper);
       end;
 
    count: INTEGER is
@@ -209,7 +209,7 @@ feature -- Implementation of deferred :
          until
             i2 > up 
          loop
-            put(model.item(i2),i1);
+            storage.put(model.item(i2),i1);
             i1 := i1 + 1;
             i2 := i2 + 1;
          end;
@@ -267,12 +267,12 @@ feature -- Implementation of deferred :
    force(element: E; index: INTEGER) is
       do
          if index <= upper then
-            put(element,index);
+            storage.put(element,index);
          elseif index = upper + 1 then
             add_last(element);
          else
             resize(index + 1);
-            put(element,index);
+            storage.put(element,index);
          end;
       end;
          

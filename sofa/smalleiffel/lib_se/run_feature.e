@@ -39,7 +39,10 @@ feature {NONE}
 feature
 
    current_type: TYPE;
-         -- The type of Current in the corresponding feature.
+         -- The type of Current in this feature.
+
+   run_class: RUN_CLASS;
+	 -- Alias the one of `current_type'.
 
    name: FEATURE_NAME;
          -- Final name (the only one really used) of the feature.
@@ -150,7 +153,7 @@ feature
       do
          check
             -- Must always be called with the same array of run classes.
-            r = current_type.run_class.running
+            r = run_class.running
          end;
          inspect
             stupid_switch_state
@@ -176,7 +179,7 @@ feature
          sub_name: FEATURE_NAME;
          rf: RUN_FEATURE;
       do
-         current_rc := current_type.run_class;
+         current_rc := run_class;
          running := current_rc.running;
          if running /= Void then
             from
@@ -213,11 +216,6 @@ feature
    frozen start_position: POSITION is
       do
          Result := base_feature.start_position;
-      end;
-
-   frozen run_class: RUN_CLASS is
-      do
-         Result := current_type.run_class;
       end;
 
    c_define is
@@ -525,19 +523,25 @@ feature {NATIVE_C_PLUS_PLUS}
       local
 	 comment: STRING;
       do
-	 comment := "....................";
-	 comment.copy(fz_open_c_comment);
-	 comment.append("C++ wrapper for ");
+	 comment := c_plus_plus_prototype_buffer;
+	 comment.copy("%N// C++ wrapper for ");
 	 comment.append(er.base_class.name.to_string);
 	 comment.extend('.');
 	 comment.append(name.to_string);
-	 comment.append(fz_close_c_comment);
-	 comment.extend('%N');
+	 comment.append("%N");
          external_prototype_for(comment,er);
+-- ????
+--	 cpp.put_string_on_h("%Nextern %"C%" {");
          cpp.put_c_heading(c_code);
+--	 cpp.put_string_on_h("}%N");
       end;
 
 feature {NONE}
+
+   c_plus_plus_prototype_buffer: STRING is
+      once
+	 !!Result.make(128);
+      end;
 
    compute_stupid_switch(r: ARRAY[RUN_CLASS]) is
       require
@@ -561,7 +565,7 @@ feature {NONE}
             t.c_type_for_external_in(c_code);
          end;
          c_code.extend(' ');
-         c_code.append(er.external_c_name);
+         c_code.append(er.external_name);
          c_code.extend('(');
          if er.use_current then
             current_type.c_type_for_external_in(c_code);
@@ -644,7 +648,7 @@ feature {NONE}
          end;
          c_code.extend(')');
          cpp.put_c_heading(c_code);
-         cecil_pool.define_body_of(Current);
+	 cecil_pool.define_body_of(Current);
       end;
 
    address_of_c_mapping_wrapper is
@@ -754,6 +758,7 @@ feature {NONE}
          t: TYPE;
          no_check, ensure_check: BOOLEAN;
 	 oresult: STRING;
+	 rf3: RUN_FEATURE_3;
       do
          no_check := run_control.no_check;
          ensure_check := run_control.ensure_check;
@@ -763,10 +768,10 @@ feature {NONE}
          end;
          -- (1) -------------------- Local variable for Result :
          if is_once_function then
+	    oresult := once_routine_pool.o_result(base_feature);
             if no_check then
                t := result_type.run_type;
                c_frame_descriptor_locals.append("(void**)&");
-	       oresult := once_routine_pool.o_result(base_feature);
                c_frame_descriptor_locals.append(oresult);
                c_frame_descriptor_locals.extend(',');
                c_frame_descriptor_local_count.increment;
@@ -823,9 +828,20 @@ feature {NONE}
          if rescue_compound /= Void then
             cpp.put_string("if(SETJMP(rc.jb)!=0){/*rescue*/%N");
             rescue_compound.compile_to_c;
-            cpp.put_string("internal_exception_handler(Routine_failure);%N}%N");
+            cpp.put_string(
+               "internal_exception_handler(Routine_failure);%N}%N");
          end;
-         -- (9) -------------------- Initialize local expanded :
+         -- (9) -------------------- Initialize Result/local expanded :
+	 if result_type /= Void then
+	    rf3 := result_type.expanded_initializer;
+	    if rf3 /= Void then
+	       if oresult /= Void then
+		  cpp.put_proc_call_0(rf3,Void,oresult);
+	       else
+		  cpp.put_proc_call_0(rf3,Void,"R");
+	       end;
+	    end;
+	 end;
          if local_vars /= Void then
             local_vars.initialize_expanded;
          end;
@@ -1151,24 +1167,25 @@ feature {NONE}
          Result := run_class.get_default_rescue(name);
       end;
    
-   frozen make(t: like current_type; n: like name; bf: like base_feature) is
+   frozen make(ct: like current_type; n: like name; bf: like base_feature) is
       require
-         t.run_type = t;
-         n /= Void;
+         ct.run_type = ct;
+	 ct.run_class.at(n) = Void;
          bf /= void;
          not small_eiffel.is_ready
       local
 	 debug_info: STRING;
       do
+	 run_class := ct.run_class;
 	 debug
-	    debug_info := t.run_time_mark.twin;
+	    debug_info := ct.run_time_mark.twin;
 	    debug_info.extend('.');
 	    debug_info.append(n.to_string.twin);
 	 end;
-         current_type := t;
+         current_type := ct;
          name := n;
          base_feature := bf;
-         run_class.add_rf(Current,n.to_key);
+         run_class.add_run_feature(Current,n);
          small_eiffel.incr_magic_count;
          use_current_state := ucs_not_computed;
          stupid_switch_state := ucs_not_computed;
@@ -1176,7 +1193,7 @@ feature {NONE}
          initialize;
          small_eiffel.pop;
       ensure
-         run_class.get_feature(name) = Current
+         run_class.at(name) = Current
       end;
 
    stupid_switch_comment: STRING is
@@ -1192,4 +1209,3 @@ invariant
    base_feature /= Void;
 
 end -- RUN_FEATURE
-

@@ -14,9 +14,11 @@
 -- Boston, MA 02111-1307, USA.
 --
 class FORMAL_GENERIC_LIST
---
--- To store the list of formal generic arguments of (a generic) class.
---
+   --
+   -- To store the list of formal generic arguments of a generic
+   -- class :
+   --              [X,Y->Z]
+   --
 
 inherit GLOBALS;
 
@@ -25,62 +27,20 @@ creation make
 feature
 
    start_position: POSITION;
-         -- Of first "[".
-
-feature {NONE}
-
-   list: ARRAY[FORMAL_GENERIC_ARG];
-
-feature
-
-   make(sp: like start_position; l: like list) is
-      require
-         not sp.is_unknown;
-         l /= Void;
-         not l.is_empty;
-         l.lower = 1;
-      local
-         rank, i: INTEGER;
-         fga: FORMAL_GENERIC_ARG;
-      do
-         start_position := sp;
-         list := l;
-         from
-            i := l.upper;
-         until
-            i = 0
-         loop
-            fga := l.item(i);
-            check
-               fga /= Void;
-            end;
-            rank := index_of(fga.name);
-            if rank /= i then
-               eh.add_position(l.item(rank).start_position);
-               eh.add_position(fga.start_position);
-               fatal_error("Formal generic name appears twice in %
-                           %formal generic list (VCFG.2).");
-            end;
-            i := i - 1;
-         end;
-      ensure
-         start_position = sp;
-         list = l;
-      end;
+         -- Of the opening square bracket.
 
    count: INTEGER is
       do
-         Result := list.upper;
+         Result := list.count;
       end;
 
    item(i: INTEGER): FORMAL_GENERIC_ARG is
       require
-         1 <= i;
-         i <= count;
+         i.in_range(1,count)
       do
          Result := list.item(i);
       ensure
-         Result /= Void;
+         Result /= Void
       end;
 
    pretty_print is
@@ -90,7 +50,7 @@ feature
          fmt.put_character('[');
          fmt.level_incr;
          from
-            i := 1;
+            i := list.lower;
          until
             i > list.upper
          loop
@@ -112,7 +72,7 @@ feature
       do
          short_print.hook_or("open_sb","[");
          from
-            i := 1;
+            i := list.lower;
          until
             i > list.upper
          loop
@@ -125,29 +85,6 @@ feature
          short_print.hook_or("close_sb","]");
       end;
 
-feature {FORMAL_GENERIC_ARG}
-
-   index_of(n: CLASS_NAME): INTEGER is
-         -- Index of `n' or 0 when not found.
-      require
-         n /= Void
-      local
-         to_string: STRING;
-      do
-         from
-            to_string := n.to_string;
-            Result := list.upper;
-         until
-            Result = 0 or else
-            to_string = list.item(Result).name.to_string
-         loop
-            Result := Result - 1;
-         end;
-      ensure
-         0 <= Result;
-         Result <= list.upper;
-      end;
-
 feature {BASE_CLASS}
 
    check_generic_formal_arguments is
@@ -157,17 +94,56 @@ feature {BASE_CLASS}
          from
             i := list.upper;
          until
-            i = 0
+            i < list.lower
          loop
             list.item(i).check_generic_formal_arguments;
             i := i - 1;
          end;
       end;
 
-invariant
+feature {EIFFEL_PARSER}
 
-   list.lower = 1;
-
-   not list.is_empty;
+   add_last(fga: FORMAL_GENERIC_ARG) is
+      require
+	 fga /= Void
+      local
+	 fga2: FORMAL_GENERIC_ARG;
+	 i: INTEGER;
+         n1, n2: STRING;
+      do
+         from
+            i := list.upper;
+	    fga.set_rank(i + 1);
+	    n1 := fga.name.to_string;
+         until
+            i < list.lower
+         loop
+	    fga2 := list.item(i);
+            n2 := fga2.name.to_string;
+            if n1 = n2 then
+               eh.add_position(fga.start_position);
+               eh.add_position(fga2.start_position);
+               fatal_error("Formal generic name appears twice in %
+                           %formal generic list (VCFG.2).");
+            end;
+	    fga2.constraint_substitution(fga,list.upper + 1);
+            i := i - 1;
+         end;
+         list.add_last(fga);
+      end;
+   
+feature {NONE}
+   
+   list: ARRAY[FORMAL_GENERIC_ARG];
+   
+   make(sp: like start_position) is
+      require
+         not sp.is_unknown
+      do
+	 !!list.with_capacity(4,1);
+         start_position := sp;
+      ensure
+         start_position = sp
+      end;
 
 end -- FORMAL_GENERIC_LIST

@@ -42,8 +42,6 @@ feature {NONE}
 
    run_type_memory: like Current;
 
-feature {NONE}
-
    make(sp: like start_position; of_what: TYPE) is
       require
          not sp.is_unknown;
@@ -62,27 +60,31 @@ feature {NONE}
          array_of = of_what
       end;
 
-   with(bcn: like base_class_name; wm: STRING; of_what: TYPE) is
+   with(bcn: like base_class_name; bcm: like base_class_memory; 
+	wm: like written_mark; of_what: TYPE) is
       require
          bcn.to_string = as_array;
          wm /= Void;
          of_what.is_run_type
       do
          base_class_name := bcn;
+	 base_class_memory := bcm;
          set_generic_list_with(of_what);
          written_mark := wm;
-         !!run_type_memory.final(bcn,of_what.run_type);
+         !!run_type_memory.final(bcn,bcm,of_what.run_type);
       ensure
          is_run_type;
          written_mark = wm
       end;
 
-   final(bcn: like base_class_name; of_what: TYPE) is
+   final(bcn: like base_class_name; bcm: like base_class_memory; 
+	 of_what: TYPE) is
       require
          bcn.to_string = as_array;
          of_what.run_type = of_what
       do
          base_class_name := bcn;
+	 base_class_memory := bcm;
          set_generic_list_with(of_what);
          tmp_written_mark.copy(as_array);
          tmp_written_mark.extend('[');
@@ -166,13 +168,6 @@ feature
    c_sizeof: INTEGER is
       do
          Result := c_sizeof_pointer;
-      end;
-
-   run_class: RUN_CLASS is
-      do
-         if is_run_type then
-            Result := small_eiffel.run_class(run_type);
-         end;
       end;
 
    c_header_pass1 is
@@ -369,9 +364,13 @@ feature
       end;
 
    is_a(other: TYPE): BOOLEAN is
+      local
+	 t1, t2: TYPE;
       do
 	 if other.is_array then
-            Result := array_of.is_a(other.generic_list.first);
+	    t1 := run_type.generic_list.first;
+	    t2 := other.run_type.generic_list.first;
+            Result := t1.is_a(t2);
             if not Result then
                eh.extend(' ');
             end;
@@ -406,12 +405,13 @@ feature
             if et2.run_type = et1 then
                run_type_memory := Current;
             else
-               !!run_type_memory.final(base_class_name,et2.run_type);
+	       et2 := et2.run_type;
+               !!run_type_memory.final(base_class_name,base_class_memory,et2);
             end;
          elseif et2 = et1 then
             Result := Current;
          else
-            !!Result.with(base_class_name,written_mark,et2);
+            !!Result.with(base_class_name,base_class_memory,written_mark,et2);
          end;
       end;
 

@@ -28,6 +28,11 @@ feature
 
    comment : COMMENT;
 
+   to_integer_or_error: INTEGER is
+      do
+	 Result := expression.to_integer_or_error;
+      end;
+
    static_result_base_class: BASE_CLASS is
       do
          Result := expression.static_result_base_class;

@@ -18,13 +18,13 @@ class E_FALSE
    -- When using explicit constant `false'.
    --
 
-inherit BOOLEAN_CONSTANT redefine to_integer end;
+inherit BOOLEAN_CONSTANT;
 
 creation make
 
 feature
 
-   to_integer: INTEGER is 0;
+   to_integer_or_error: INTEGER is 0;
 
    value: BOOLEAN is false;
 

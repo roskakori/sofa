@@ -16,9 +16,8 @@
   `run_control.no_check' is true (ie. all modes except -boost).
   This file comes after no_check.[hc] to implements the -trace flag.
 */
-#ifdef SE_TRACE
-void se_trace(se_dump_stack*ds,se_position p);
-#endif
 #ifdef SE_WEDIT
+se_position se_trace(se_position p);
+#elif SE_TRACE
 void se_trace(se_dump_stack*ds,se_position p);
 #endif

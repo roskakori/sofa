@@ -17,12 +17,14 @@ class TYPE_NATIVE_ARRAY
 
 inherit TYPE;
 
-creation make, make_runnable
+creation make
+
+creation {TYPE_NATIVE_ARRAY} set, make_runnable
 
 feature
 
    base_class_name: CLASS_NAME;
-
+   
    generic_list: ARRAY[TYPE];
 
    written_mark: STRING;
@@ -140,16 +142,20 @@ feature
                run_type := Current;
                load_basic_features;
             else
-               !!run_type.make_runnable(start_position,et2);
+               !!run_type.make_runnable(start_position,base_class_memory,et2);
                run_type.load_basic_features;
             end;
          elseif et2 = et1 then
             Result := Current;
          else
-            Result := twin;
-            !!rt.make_runnable(start_position,et2);
-            Result.set_run_type(rt);
+            !!rt.make_runnable(start_position,base_class_memory,et2);
             rt.load_basic_features;
+            !!Result.set(base_class_memory,
+			 rt.run_class,
+			 base_class_name,
+			 generic_list,
+			 written_mark,
+			 rt);
          end;
       end;
 
@@ -170,7 +176,7 @@ feature
    is_a(other: TYPE): BOOLEAN is
       do
          -- Because of VNCE :
-         Result := run_time_mark = other.run_time_mark;
+         Result := run_class = other.run_class;
          if not Result then
             eh.add_type(Current,fz_inako);
             eh.add_type(other,fz_dot);
@@ -184,13 +190,6 @@ feature
    id: INTEGER is
       do
          Result := run_class.id;
-      end;
-
-   run_class: RUN_CLASS is
-      do
-         if is_run_type then
-            Result := small_eiffel.run_class(run_type);
-         end;
       end;
 
    c_sizeof: INTEGER is
@@ -481,11 +480,6 @@ feature {RUN_CLASS,TYPE}
 
 feature {TYPE_NATIVE_ARRAY}
 
-   set_run_type(t: like run_type) is
-      do
-         run_type := t;
-      end;
-
    load_basic_features is
          -- Force some basic feature to be loaded.
       require
@@ -611,7 +605,8 @@ feature {NONE}
          start_position = sp
       end;
 
-   make_runnable(sp: like start_position; of_what: TYPE) is
+   make_runnable(sp: like start_position; bcm: like base_class_memory;
+		 of_what: TYPE) is
       require
          not sp.is_unknown;
          of_what.run_type = of_what
@@ -621,6 +616,31 @@ feature {NONE}
       ensure
          is_run_type;
          written_mark = run_time_mark
+      end;
+
+   set(bcm: like base_class_memory; rcm: like run_class_memory;
+       bcn: like base_class_name; gl: like generic_list;
+       wm: like written_mark; rt: like run_type) is
+      require
+	 rcm = rt.run_class;
+	 bcn.to_string = rt.run_class.base_class_name.to_string;
+	 gl.count = 1;
+	 wm /= Void;
+	 rt.is_run_type;
+      do
+	 base_class_memory := bcm;
+	 run_class_memory := rcm;
+	 base_class_name := bcn;
+	 generic_list := gl;
+	 written_mark := wm;
+	 run_type := rt;
+      ensure
+	 base_class_memory = bcm;
+	 run_class_memory = rcm;
+	 base_class_name = bcn;
+	 generic_list = gl;
+	 written_mark = wm;
+	 run_type = rt
       end;
 
 end -- TYPE_NATIVE_ARRAY

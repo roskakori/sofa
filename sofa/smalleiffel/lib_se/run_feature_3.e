@@ -535,7 +535,7 @@ feature {RUN_CLASS}
          -- Squeeze dummy empty `dispose' and set the appropriate
          -- `in_line_status' (no inlining).
       do
-         if not is_empty_or_null_body then
+         if (not small_eiffel.is_ready) or else (not is_empty_or_null_body) then
             Result := Current;
             in_line_status := -1;
          end;

@@ -33,8 +33,6 @@ feature
 
    c_simple: BOOLEAN is true;
 
-feature
-
    to_key: STRING is
          -- To avoid clash between different kinds of names (for
          -- example when using same infix/prefix operator).
@@ -58,7 +56,7 @@ feature
       do
          Result := start_position.base_class;
       end;
-   
+
 feature
 
    is_freeop: BOOLEAN is

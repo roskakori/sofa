@@ -8,8 +8,8 @@ indexing
 	author:     "Eric Bezault <ericb@gobosoft.com>"
 	copyright:  "Copyright (c) 1999, Eric Bezault and others"
 	license:    "Eiffel Forum Freeware License v1 (see forum.txt)"
-	date:       "$Date: 1999/10/02 14:06:37 $"
-	revision:   "$Revision: 1.6 $"
+	date:       "$Date: 2000/04/16 13:04:29 $"
+	revision:   "$Revision: 1.10 $"
 
 deferred class PR_YACC_PARSER_SKELETON
 
@@ -129,7 +129,7 @@ feature {NONE} -- Factory
 			--   %token <a_type> a_name
 		require
 			a_name_not_void: a_name /= Void
-			a_name_long_enough: not a_name.empty
+			a_name_long_enough: a_name.count > 0
 			a_type_not_void: a_type /= Void
 		do
 			if is_nonterminal (a_name) then
@@ -171,7 +171,7 @@ feature {NONE} -- Factory
 			--   %left a_name
 		require
 			a_name_not_void: a_name /= Void
-			a_name_long_enough: not a_name.empty
+			a_name_long_enough: a_name.count > 0
 		do
 			if is_nonterminal (a_name) then
 				report_token_declared_as_variable_error (a_name)
@@ -209,7 +209,7 @@ feature {NONE} -- Factory
 			--   %right a_name
 		require
 			a_name_not_void: a_name /= Void
-			a_name_long_enough: not a_name.empty
+			a_name_long_enough: a_name.count > 0
 		do
 			if is_nonterminal (a_name) then
 				report_token_declared_as_variable_error (a_name)
@@ -247,7 +247,7 @@ feature {NONE} -- Factory
 			--   %nonassoc a_name
 		require
 			a_name_not_void: a_name /= Void
-			a_name_long_enough: not a_name.empty
+			a_name_long_enough: a_name.count > 0
 		do
 			if is_nonterminal (a_name) then
 				report_token_declared_as_variable_error (a_name)
@@ -285,7 +285,7 @@ feature {NONE} -- Factory
 			-- %type <a_type> a_name
 		require
 			a_name_not_void: a_name /= Void
-			a_name_long_enough: not a_name.empty
+			a_name_long_enough: a_name.count > 0
 			a_type_not_void: a_type /= Void
 		do
 			if is_terminal (a_name) then
@@ -310,7 +310,7 @@ feature {NONE} -- Factory
 			-- `last_grammar'.
 		require
 			a_name_not_void: a_name /= Void
-			a_name_long_enough: not a_name.empty
+			a_name_long_enough: a_name.count > 0
 			is_terminal: not is_nonterminal (a_name)
 		local
 			lower_name: STRING
@@ -415,6 +415,33 @@ feature {NONE} -- Factory
 			token_not_void: Result /= Void
 		end
 
+	new_string_token (a_string: STRING): PR_TOKEN is
+			-- Terminal symbol associated with `a_string';
+			-- Report an error if there is no token associated
+			-- with this string.
+		require
+			a_string_not_void: a_string /= Void
+			-- valid_string: `a_string' recognized by
+			--		\"[^"\n]*\"
+		local
+			an_id: INTEGER
+		do
+			if terminal_symbols.has (a_string) then
+				Result := terminal_symbols.item (a_string)
+			else
+				report_undefined_string_token_error (a_string)
+					-- Tokens are indexed from 0, but token
+					-- of id 0 is reserved for EOF.
+				an_id := last_grammar.tokens.count + 1
+				!! Result.make (an_id, a_string, Unknown_type)
+				Result.set_literal_string (a_string)
+				terminal_symbols.force (Result, a_string)
+				last_grammar.put_token (Result)
+			end
+		ensure
+			token_not_void: Result /= Void
+		end
+
 	new_variable (a_name: STRING): PR_VARIABLE is
 			-- Nonterminal symbol named `a_name';
 			-- Create a new symbol if it does not exist
@@ -422,7 +449,7 @@ feature {NONE} -- Factory
 			-- of `last_grammar'.
 		require
 			a_name_not_void: a_name /= Void
-			a_name_long_enough: not a_name.empty
+			a_name_long_enough: a_name.count > 0
 			is_nonterminal: not is_terminal (a_name)
 		local
 			lower_name: STRING
@@ -467,7 +494,7 @@ feature {NONE} -- Factory
 			-- the list of variables of `last_grammar'.
 		require
 			a_name_not_void: a_name /= Void
-			a_name_long_enough: not a_name.empty
+			a_name_long_enough: a_name.count > 0
 		local
 			lower_name: STRING
 			a_variable: PR_VARIABLE
@@ -495,7 +522,7 @@ feature {NONE} -- Factory
 			-- it does not exist yet.
 		require
 			a_name_not_void: a_name /= Void
-			a_name_long_enough: not a_name.empty
+			a_name_long_enough: a_name.count > 0
 		local
 			upper_name: STRING
 			an_id: INTEGER
@@ -520,7 +547,7 @@ feature {NONE} -- Factory
 			-- it does not exist yet.
 		require
 			a_name_not_void: a_name /= Void
-			a_name_long_enough: not a_name.empty
+			a_name_long_enough: a_name.count > 0
 		local
 			upper_name: STRING
 			an_id: INTEGER
@@ -545,7 +572,7 @@ feature {NONE} -- Factory
 			-- Create a new type if it does not exist yet.
 		require
 			a_name_not_void: a_name /= Void
-			a_name_long_enough: not a_name.empty
+			a_name_long_enough: a_name.count > 0
 			valid_generics: generics /= Void implies not generics.has (Void)
 		local
 			upper_name: STRING
@@ -565,6 +592,31 @@ feature {NONE} -- Factory
 				end
 			else
 				Result := new_type (a_name)
+			end
+		ensure
+			type_not_void: Result /= Void
+		end
+
+	new_anchored_type (a_name: STRING): PR_TYPE is
+			-- Anchored type of  the form "like `a_name'";
+			-- Create a new type if it does not exist yet.
+		require
+			a_name_not_void: a_name /= Void
+			a_name_long_enough: a_name.count > 0
+		local
+			lower_name: STRING
+			an_id: INTEGER
+		do
+			lower_name := STRING_.to_lower (a_name)
+			if types.has (lower_name) then
+				Result := types.item (lower_name)
+			else
+					-- Types are indexed from 1.
+					-- (0 is reserved for no-type)
+				an_id := last_grammar.types.count + 1
+				!! Result.make_anchored (an_id, a_name)
+				types.force (Result, lower_name)
+				last_grammar.put_type (Result)
 			end
 		ensure
 			type_not_void: Result /= Void
@@ -688,6 +740,45 @@ feature {NONE} -- Implementation
 			a_token.set_precedence (a_precedence)
 		ensure
 			precedence_set: a_token.precedence = a_precedence
+		end
+
+	set_token_id (a_token: PR_TOKEN; an_id: INTEGER) is
+			-- Set `token_id' of `a_token' to `an_id'.
+		require
+			a_token_not_void: a_token /= Void
+			an_id_positive: an_id > 0
+		do
+			if a_token.has_token_id and then a_token.token_id /= an_id then
+				report_two_token_ids_token_error (a_token.name, a_token.token_id, an_id)
+			end
+			a_token.set_token_id (an_id)
+		ensure
+			token_id_set: a_token.token_id = an_id
+		end
+
+	set_literal_string (a_token: PR_TOKEN; a_string: STRING) is
+			-- Set `literal_string' of `a_token' to `a_string'.
+		require
+			a_token_not_void: a_token /= Void
+			a_string_not_void: a_string /= Void
+			-- valid_string: `a_string' recognized by
+			--		\"[^"\n]*\"
+		do
+			if
+				a_token.literal_string /= Void and then
+				not a_token.literal_string.is_equal (a_string)
+			then
+				report_two_strings_token_error (a_token.name, a_token.literal_string, a_string)
+			elseif
+				terminal_symbols.has (a_string) and then
+				terminal_symbols.item (a_string) /= a_token
+			then
+				report_string_token_defined_twice_error (a_string, terminal_symbols.item (a_string).name, a_token.name)
+			end
+			a_token.set_literal_string (a_string)
+			terminal_symbols.force (a_token, a_string)
+		ensure
+			literal_string_set: a_token.literal_string = a_string
 		end
 
 	process_rule (a_rule: PR_RULE) is
@@ -848,11 +939,11 @@ feature {NONE} -- Error handling
 		local
 			an_error: PR_START_SYMBOL_TOKEN_ERROR
 			a_name: STRING
-			line: INTEGER
+			a_line: INTEGER
 		do
 			a_name := start_symbol.first
-			line := start_symbol.second
-			!! an_error.make (filename, line, a_name)
+			a_line := start_symbol.second
+			!! an_error.make (filename, a_line, a_name)
 			error_handler.report_error (an_error)
 			successful := False
 		ensure
@@ -866,11 +957,11 @@ feature {NONE} -- Error handling
 		local
 			an_error: PR_UNKNOWN_START_SYMBOL_ERROR
 			a_name: STRING
-			line: INTEGER
+			a_line: INTEGER
 		do
 			a_name := start_symbol.first
-			line := start_symbol.second
-			!! an_error.make (filename, line, a_name)
+			a_line := start_symbol.second
+			!! an_error.make (filename, a_line, a_name)
 			error_handler.report_error (an_error)
 			successful := False
 		ensure
@@ -1029,6 +1120,70 @@ feature {NONE} -- Error handling
 			an_error: PR_UNDEFINED_SYMBOL_ERROR
 		do
 			!! an_error.make (filename, a_name)
+			error_handler.report_error (an_error)
+			successful := False
+		ensure
+			not_successful: not successful
+		end
+
+	report_undefined_string_token_error (a_string: STRING) is
+			-- Report that the literal `a_string' has not
+			-- been defined as a token.
+		require
+			a_string_not_void: a_string /= Void
+		local
+			an_error: PR_UNDEFINED_STRING_TOKEN_ERROR
+		do
+			!! an_error.make (filename, line_nb, a_string)
+			error_handler.report_error (an_error)
+			successful := False
+		ensure
+			not_successful: not successful
+		end
+
+	report_string_token_defined_twice_error (a_string: STRING; token1, token2: STRING) is
+			-- Report that the literal `a_string' has 
+			-- been defined twice.
+		require
+			a_string_not_void: a_string /= Void
+			token1_not_void: token1 /= Void
+			token2_not_void: token2 /= Void
+		local
+			an_error: PR_STRING_TOKEN_DEFINED_TWICE_ERROR
+		do
+			!! an_error.make (filename, line_nb, a_string, token1, token2)
+			error_handler.report_error (an_error)
+			successful := False
+		ensure
+			not_successful: not successful
+		end
+
+	report_two_strings_token_error (a_token: STRING; string1, string2: STRING) is
+			-- Report that the token `a_token' has been
+			-- associated with two different literal strings.
+		require
+			a_token_not_void: a_token /= Void
+			string1_not_void: string1 /= Void
+			string2_not_void: string2 /= Void
+		local
+			an_error: PR_TWO_STRINGS_TOKEN_ERROR
+		do
+			!! an_error.make (filename, line_nb, a_token, string1, string2)
+			error_handler.report_error (an_error)
+			successful := False
+		ensure
+			not_successful: not successful
+		end
+
+	report_two_token_ids_token_error (a_token: STRING; id1, id2: INTEGER) is
+			-- Report that the token `a_token' has been
+			-- given two different token ids.
+		require
+			a_token_not_void: a_token /= Void
+		local
+			an_error: PR_TWO_TOKEN_IDS_TOKEN_ERROR
+		do
+			!! an_error.make (filename, line_nb, a_token, id1, id2)
 			error_handler.report_error (an_error)
 			successful := False
 		ensure

@@ -17,9 +17,9 @@ expanded class BOOLEAN
 inherit
    BOOLEAN_REF
       redefine
-         infix "and", infix "and then", infix "or",
-         infix "or else", infix "implies", infix "xor",
-         prefix "not", out_in_tagged_out_memory, fill_tagged_out_memory
+         infix "and", infix "and then", infix "or", infix "or else", 
+	 infix "implies", infix "xor", prefix "not", out_in_tagged_out_memory,
+	 fill_tagged_out_memory
       end;
 
 feature 

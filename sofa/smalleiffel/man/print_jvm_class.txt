@@ -24,17 +24,17 @@
 
    First, you have to produce some class files using command
    compile_to_jvm:
-   compile_to_jvm -boost hello_world
+          compile_to_jvm -boost hello_world
 
    Then, using command print_to_jvm_class you can print on standard
    output a readable view of any produced class file. The following
    command prints the main class :
-   print_jvm_class hello_world.class
+          print_jvm_class hello_world.class
 
    You can also print any class file of the hello_world directory. For
    example, under Unix, you can print the byte code produced for class
    INTEGER using command :
-   print_jvm_class hello_world/integer.class
+          print_jvm_class hello_world/integer.class
 
                                    [Line]
    Copyright © Dominique COLNET and Suzanne COLLIN - [2]<colnet@loria.fr>

@@ -10,8 +10,8 @@ indexing
 	author:     "Eric Bezault <ericb@gobosoft.com>"
 	copyright:  "Copyright (c) 1999, Eric Bezault and others"
 	license:    "Eiffel Forum Freeware License v1 (see forum.txt)"
-	date:       "$Date: 1999/10/02 13:45:50 $"
-	revision:   "$Revision: 1.2 $"
+	date:       "$Date: 2000/02/02 10:25:59 $"
+	revision:   "$Revision: 1.3 $"
 
 class KL_IMPORTED_FIXED_ARRAY_TYPE [G]
 

@@ -15,9 +15,10 @@
 --
 class INSTALL
    --
-   -- The portable `install' command to install SmallEiffel. The installation is 
-   -- done from scratch. Unless "-no_compile" is specified,  all commands are
-   -- recompiled from scratch (the compiler itself is bootstrapped).
+   -- The portable `install' command to install SmallEiffel. 
+   -- The installation is done from scratch. Unless "-skip_c_compilation" is 
+   -- specified, all commands are recompiled from scratch (the compiler 
+   -- itself is bootstrapped !).
    --
 
 inherit COMMAND_FLAGS rename system_tools as dev_null end;
@@ -31,12 +32,9 @@ feature {NONE}
    interactive: BOOLEAN;
 	 -- No automatic compiler selection or system name selection.
 
-   no_compile: BOOLEAN;
-         -- Compile binaries ? (Useful, if precompile binaries are already
-         -- included with a distribution)
-
-   compiler: STRING;
-         -- Name of C compiler
+   skip_c_compilation: BOOLEAN;
+	 -- Useful, if precompile binaries are already included with a 
+	 -- distribution.
 
    system_se_path: STRING;
 	 -- The "system.se" file path is the very first information this 
@@ -378,22 +376,21 @@ feature {NONE}
    set_c_compiler_name is
       do
 	 echo.put_string("C compiler selection:%N");
-	 if not interactive and compiler = Void then
+	 if not interactive and c_compiler_name = Void then
 	    if system_name.is_equal("UNIX") then
-	       compiler := "gcc";
+	       c_compiler_name := "gcc";
 	       if ("linux.c").is_equal(garbage_collector) then
 		  c_compiler_linker_options.copy("-pipe");
 	       end;
 	    end;
 	 end;
-	 if compiler = Void then
-	    compiler := choice_in("C compiler selection",
-				  system_tools.compiler_list);
+	 if c_compiler_name = Void then
+	    c_compiler_name := choice_in("C compiler selection",
+					 system_tools.compiler_list);
 	 end;
 	 echo.put_string("Selected C compiler is %"");
-	 echo.put_string(compiler);
+	 echo.put_string(c_compiler_name);
 	 echo.put_string("%".%N");
-	 c_compiler_name := compiler;
 	 echo.put_string("Try to update %"");
 	 echo.put_string(compiler_se_path);
 	 echo.put_string("%".%N");
@@ -679,7 +676,7 @@ feature {NONE}
 	 -- prepare all C source files.
       local
 	 i: INTEGER;
-	 item: STRING;
+	 args, item: STRING;
       do
 	 from
 	    i := 1;
@@ -688,13 +685,11 @@ feature {NONE}
 	 loop
 	    item := no_split_command_list.item(i);
 	    if ("lcc-win32").is_equal(c_compiler_name) then
-	       echo.put_string(
-               "Because of the very slow malloc of %"lcc-win32%",%N%
-               %the -no_gc flag is not used.%N");
-	       call_compile_to_c("-boost -no_split",item);
+	       args := "-boost -no_split"; -- See (*).
 	    else
-	       call_compile_to_c("-boost -no_gc -no_split",item);
+	       args := "-boost -no_split -no_gc";
 	    end;
+	    call_compile_to_c(args,item);
 	    i := i + 1;
 	 end;
 	 from
@@ -704,14 +699,16 @@ feature {NONE}
 	 loop
 	    item := splitted_command_list.item(i);
 	    if ("lcc-win32").is_equal(c_compiler_name) then
-	       echo.put_string(
-	       "Because of the very slow malloc of %"lcc-win32%" -no_gc flag is not used.%N");
-	       call_compile_to_c("-boost",item);
+	       args := "-boost"; -- See (*).
 	    else
-	       call_compile_to_c("-boost -no_gc",item);
+	       args := "-boost -no_gc";
 	    end;
+	    call_compile_to_c(args,item);
 	    i := i + 1;
 	 end;
+	 -- (*): because the bad/slow Microsoft malloc is used, we 
+	 -- get better results when the GC is on (thus the -no_gc 
+	 -- flag is not used).
       end;
 
    no_split_mode_c_compile(name: STRING) is
@@ -882,7 +879,8 @@ feature {NONE}
 	 echo.set_verbose;
 	 echo.put_string("usage : ");
 	 echo.put_string(command_name);
-         echo.put_string(" [-interactive] [-no_compile] [-compiler <name>] [-debug]%N");
+         echo.put_string(
+            " [-interactive] [-skip_c_compilation] [-cc <name>] [-debug]%N");
 	 restore_current_working_directory;
 	 die_with_code(exit_failure_code);
       end;
@@ -1011,15 +1009,15 @@ feature {NONE}
 	       echo.set_verbose;
 	    elseif ("-interactive").is_equal(arg) then
 	       interactive := true;
-	    elseif ("-no_compile").is_equal(arg) then
-	       no_compile := true;
-	    elseif ("-compiler").is_equal(arg) then
+	    elseif ("-skip_c_compilation").is_equal(arg) then
+	       skip_c_compilation := true;
+	    elseif ("-cc").is_equal(arg) then
 	       if i < argument_count then
 		  i := i + 1;
-		  compiler := argument(i);
+		  c_compiler_name := argument(i);
 	       else
 		  std_output.put_string("compiler name must be specified %
-					%after %"-compiler%"%N");
+					%after %"-cc%"%N");
 		  echo_usage_exit;
                end;
             else
@@ -1058,16 +1056,17 @@ feature {NONE}
 	 end;
 	 compute_bin_path_in_system_env_path;
 	 gathered_information_summary;
-         if not no_compile then
-   	    std_output.put_string("C Compiling in %"");
-   	    std_output.put_string(basic_directory.last_entry);
-   	    std_output.put_string("%".%N");
-   	    split_mode_c_compile("compile_to_c");
-   	    prepare_bin_c_directory;
-   	    c_compile_no_split_command_list;
-   	    c_compile_splitted_command_list;
-   	    clean_bin_c_path;
-         end
+         if skip_c_compilation then
+	 else
+	    std_output.put_string("C Compiling in %"");
+	    std_output.put_string(basic_directory.last_entry);
+	    std_output.put_string("%".%N");
+	    split_mode_c_compile("compile_to_c");
+	    prepare_bin_c_directory;
+	    c_compile_no_split_command_list;
+	    c_compile_splitted_command_list;
+	    clean_bin_c_path;
+	 end;
 	 restore_current_working_directory;
 	 if not bin_path_in_system_env_path then
 	    std_output.put_string("Do not forget to add %"");

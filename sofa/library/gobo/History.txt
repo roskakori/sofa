@@ -1,3 +1,74 @@
+Version 1.6 - 20 August 2000
+
+	geyacc:
+
+	* One can now use manifest strings (e.g. "<=" or "..")
+	  in place of identifiers (e.g. LE or DOTDOT) in grammar
+	  rules (suggested by Berend de Boer).
+	* Anchored types are now accepted in %type declarations.
+	* Improved format of tokens in verbose file (suggested
+	  by Roger Browne).
+	* Added ISE's language extensions to the Eiffel parser
+	  example (suggested by Patrick Flaherty).
+	* The Eiffel parser example now accepts empty Eiffel
+	  source files (suggested by Alexander Kogtenkov).
+	* Added a few words in the documentation about the Eiffel
+	  debug instructions spread out in the parser skeleton
+	  class (suggested by Francis Drai).
+
+	gelex:
+
+	* Added redefinable routine `default_action' to YY_SCANNER
+	  when default rule is matched (suggested by David Massart).
+	* Added `pre_action' and `post_action', called when
+	  %option pre-action and %option post-action are specified
+	  (suggested by Alexander Kogtenkov).
+	* Added `pre_eof_action' and `post_eof_action', called when
+	  %option pre-eof-action and %option post-eof-action are
+	  specified.
+	* Added '%option line' to generate code for line and column
+	  counting (suggested by Alexander Kogtenkov).
+	* Added '%option position' to generate code for character
+	  counting since the beginning of the input source.
+	* Fixed bug when the input buffer contains a null character
+	  (reported by Emmanuel Stapf).
+	* Fixed bug when scanning a token larger than the size of
+	  the input buffer (reported by Emmanuel Stapf).
+
+	Gobo Eiffel Structure Library:
+
+	* DS_TRAVERSABLE: removed postcondition from routine
+	  `valid_cursor' and made `internal_cursor' deferred
+	  (suggested by Andreas Leitner).
+	* DS_SEARCHABLE: added features `same_items' and
+	  `same_equality_tester'.
+	* DS_ARRAYED_LIST, DS_ARRAYED_STACK: got rid of garbage
+	  (i.e. old items at indexes count+1..capacity) in
+	  removal features.
+	* DS_TABLE, DS_SPARSE_TABLE, DS_HASH_TABLE: added
+	  fetaure `put_new'.
+	* DS_SPARSE_TABLE, DS_HASH_TABLE: added fetaure
+	  `replace_found_item'.
+	* DS_SPARSE_TABLE, DS_HASH_TABLE: new optimized
+	  implementation (requested by Jacques Bouchard).
+	* DS_SPARSE_TABLE: added feature `key'; optimization
+	  of feature `force' (avoid unnecessary resizing).
+	* HASH_TABLE: optimization of features `put' and
+	  `force' (avoid unnecessary resizing).
+	* DS_SORTER: Added features `reverse_sort' and
+	  `reverse_sorted'.
+
+	Gobo Eiffel Kernel Library:
+
+	* Added class KL_DIRECTORY to allow Eiffel compiler
+	  portable directory access.
+
+	Gobo Eiffel Utility Library:
+
+	* Fixed bug in feature `append_decimal_integer' from
+	  class UT_INTEGER_FORMATTER when dealing with negative
+	  values.
+
 Version 1.5 - 2 October 1999
 
 	geyacc:

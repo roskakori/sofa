@@ -125,26 +125,26 @@ feature
       local
          l, r: EXPRESSION;
       do
-         l := left_side.to_runnable(ct);
-         if l = Void then
-            eh.add_position(left_side.start_position);
-            fatal_error(fz_blhsoa);
-         end;
-         r := right_side.to_runnable(ct);
-         if r = Void then
-            eh.add_position(right_side.start_position);
-            fatal_error(fz_brhsoa);
-         end;
-         if not r.result_type.is_a(l.result_type) then
-            eh.add_position(l.start_position);
-            fatal_error(" Bad assignment (VJAR).");
-         end;
-         if l = left_side and then r = right_side then
-            Result := implicit_conversion;
-         else
-            !!Result.make(l,r);
-            Result := Result.implicit_conversion;
-         end;
+	 l := left_side.to_runnable(ct);
+	 if l = Void then
+	    eh.add_position(left_side.start_position);
+	    fatal_error(fz_blhsoa);
+	 end;
+	 r := right_side.to_runnable(ct);
+	 if r = Void then
+	    eh.add_position(right_side.start_position);
+	    fatal_error(fz_brhsoa);
+	 end;
+	 if not r.result_type.is_a(l.result_type) then
+	    eh.add_position(l.start_position);
+	    fatal_error(" Bad assignment (VJAR).");
+	 end;
+	 if l = left_side and then r = right_side then
+	    Result := implicit_conversion;
+	 else
+	    !!Result.make(l,r);
+	    Result := Result.implicit_conversion;
+	 end;
       end;
 
    pretty_print is
@@ -158,6 +158,7 @@ feature {ASSIGNMENT}
       local
          left_run_type, right_run_type: TYPE;
          rhs: EXPRESSION;
+	 T1: TYPE;
       do
          left_run_type := left_type.run_type;
          right_run_type := right_type.run_type;
@@ -168,6 +169,7 @@ feature {ASSIGNMENT}
             eh.add_type(left_type,".");
             eh.print_as_error;
          end;
+	 T1 := right_side.result_type;
          rhs := conversion_handler.implicit_cast(right_side,left_run_type);
          if rhs = right_side then
             Result := Current;
@@ -177,8 +179,6 @@ feature {ASSIGNMENT}
       end;
 
 feature {NONE}
-
-   current_type: TYPE;
 
    make(ls: like left_side; rs: like right_side) is
       require

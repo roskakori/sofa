@@ -19,55 +19,6 @@ inherit GLOBALS;
 
 creation make_1, merge
 
-feature {NONE}
-
-   first: CLASS_NAME;
-
-   remainder: FIXED_ARRAY[CLASS_NAME];
-
-feature {NONE}
-
-   make_1(cn: CLASS_NAME) is
-      require
-         cn /= Void
-      do
-         first := cn;
-      ensure
-         count = 1;
-         item(1) = cn
-      end;
-
-   merge(l1, l2: like Current) is
-      require
-         l1 /= Void;
-         l2 /= Void
-      local
-         i: INTEGER;
-         cn: CLASS_NAME;
-      do
-         first := l1.item(1);
-         !!remainder.with_capacity(l1.count + l2.count - 1);
-         from
-            i := l1.count;
-         until
-            i = 1
-         loop
-            remainder.add_last(l1.item(i));
-            i := i - 1;
-         end;
-         from
-            i := l2.count;
-         until
-            i = 0
-         loop
-            cn := l2.item(i);
-            if index_of(cn) = 0 then
-               remainder.add_last(cn);
-            end;
-            i := i - 1;
-         end;
-      end;
-
 feature
 
    count: INTEGER is
@@ -168,7 +119,52 @@ feature {CLIENT_LIST}
          end;
       end;
 
-feature {}
+feature {NONE}
+
+   first: CLASS_NAME;
+
+   remainder: FIXED_ARRAY[CLASS_NAME];
+
+   make_1(cn: CLASS_NAME) is
+      require
+         cn /= Void
+      do
+         first := cn;
+      ensure
+         count = 1;
+         item(1) = cn
+      end;
+
+   merge(l1, l2: like Current) is
+      require
+         l1 /= Void;
+         l2 /= Void
+      local
+         i: INTEGER;
+         cn: CLASS_NAME;
+      do
+         first := l1.item(1);
+         !!remainder.with_capacity(l1.count + l2.count - 1);
+         from
+            i := l1.count;
+         until
+            i = 1
+         loop
+            remainder.add_last(l1.item(i));
+            i := i - 1;
+         end;
+         from
+            i := l2.count;
+         until
+            i = 0
+         loop
+            cn := l2.item(i);
+            if index_of(cn) = 0 then
+               remainder.add_last(cn);
+            end;
+            i := i - 1;
+         end;
+      end;
 
    index_of(n: CLASS_NAME): INTEGER is
       -- Use `to_string' for comparison.

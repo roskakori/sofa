@@ -2,6 +2,8 @@ AUTHOR
 
   The Sofa Team
 
+  Contact: Thomas Aglassinger <agi@sbox.tu-graz.ac.at>
+
 DESCRIPTION
 
   Sofa is the Amiga distribution of SmallEiffel, the GNU Eiffel
@@ -9,37 +11,41 @@ DESCRIPTION
   structures library, parser generator tools and Amiga-related
   libraries for ARexx, argument parsing and pattern matching.
 
-  Eiffel is an advanced object-oriented programming language that
-  emphasizes the design and construction of high-quality and reusable
-  software. It supports the concept of "Design by Contract" to improve
-  software correctness, allowing a program to validate its consistency
-  during run time. Interfaces to other languages such as ARexx, C and
-  C++ are supported.
-
-  Eiffel's design addresses many practical concerns that software
-  engineers face when creating complex software. It has an elegant
-  design and programming style, and is easy to learn.
+  Eiffel is an advanced, yet simple and easy to learn, object-oriented
+  programming language that emphasizes the design and construction of
+  high-quality and reusable software. Interfaces to other languages
+  such as ARexx, C and C++ are supported.
 
 FEATURES
 
   - supports incremental compilation
-  - compiles to native C code or Java byte code
+  - compiles to C code or Java byte code
+  - generated executables run about as fast as their C/C++ equivalents
+  - interfaces to ARexx, C and C++
+  - includes Sofa Library to access Amiga features
   - does *not* require ixemul.library
 
 NEW FEATURES
 
-  - more documentation and some examples
-  - C compiler support for Dice and Vbcc
-  - sofa.lib, for accessing some AmigaOS releted features such as
-    ARexx, argument parsing and pattern matching
+  - includes current version of SmallEiffel and Gobo
+  - some minor fixes and improvements
 
 SPECIAL REQUIREMENTS
 
   - a C compiler (SAS/c, Dice or Vbcc) or Java byte code interpreter
-  - AmigaOS 3.x,
+  - AmigaOS 3.x
   - 68020
   - 4MB free RAM
   - 30MB free harddisk space
+
+INSTALLATION
+
+  Use the included Amiga Installer script. Sofa does not require any
+  manual fiddling with environment variables or the user-startup.
+
+  The archive extracts to a directory called "sofa". If you already
+  extract it to the location where you want Sofa to reside, the
+  installation will be much faster because the copying can be skipped.
 
 AVAILABILITY
 

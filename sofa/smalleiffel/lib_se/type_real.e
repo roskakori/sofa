@@ -99,11 +99,6 @@ feature
          str.extend('4');
       end;
 
-   cast_to_ref is
-      do
-         type_real_ref.mapping_cast;
-      end;
-
    jvm_descriptor_in(str: STRING) is
       do
          str.extend('F');

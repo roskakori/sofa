@@ -19,22 +19,19 @@ feature -- Status Report :
 
    frozen collecting: BOOLEAN is
          -- Is garbage collection enabled ?
-      do
-         c_inline_c("R=!gc_is_off;%N");
+      external "SmallEiffel"
       end;
-   
+
 feature -- Status setting :
 
    frozen collection_off is
          -- Disable garbage collection.
-      do
-         c_inline_c("gc_is_off=1;%N");
+      external "SmallEiffel"
       end;
    
    frozen collection_on is
          -- Enable garbage collection.
-      do
-         c_inline_c("gc_is_off=0;%N");
+      external "SmallEiffel"
       end;
 
 feature -- Removal :
@@ -48,13 +45,10 @@ feature -- Removal :
    frozen full_collect is
          -- Force a full collection cycle if garbage collection is
          -- enabled; do nothing otherwise.
-      do
-         if collecting then
-            c_inline_c("gc_start();%N");
-         end;
+      external "SmallEiffel"
       end;
 
-feature -- The Guru section (low level memory management) :
+feature -- Low level memory management :
 
    pointer_size: INTEGER is
          -- The size in number of bytes for a pointer.

@@ -18,13 +18,11 @@ deferred class TYPE_BASIC_EIFFEL_EXPANDED
 -- Root of TYPE_BOOLEAN, TYPE_CHARACTER, TYPE_INTEGER,
 -- TYPE_REAL, TYPE_DOUBLE, and TYPE_POINTER.
 --
-inherit TYPE undefine cast_to_ref end;
+inherit TYPE;
 
 feature
 
    base_class_name: CLASS_NAME;
-
-feature
 
    is_basic_eiffel_expanded: BOOLEAN is true;
 
@@ -55,8 +53,6 @@ feature
    need_c_struct: BOOLEAN is false;
 
    jvm_method_flags: INTEGER is 9;
-
-feature
 
    frozen pretty_print is
       do
@@ -91,8 +87,6 @@ feature
          ca.resolve_u2_branch(point2);
       end;
 
-feature
-
    frozen start_position: POSITION is
       do
          Result := base_class_name.start_position;
@@ -122,11 +116,6 @@ feature
    frozen run_type: TYPE is
       do
          Result := Current;
-      end;
-
-   run_class: RUN_CLASS is
-      do
-         Result := small_eiffel.run_class(Current);
       end;
 
    frozen c_header_pass1 is
@@ -193,24 +182,23 @@ feature {RUN_CLASS,TYPE}
       do
       end;
 
-feature {NONE}
-
-   load_ref(n: STRING) is
-      local
-         cn: CLASS_NAME;
-         rc: RUN_CLASS;
-         rf: RUN_FEATURE;
-      do
-         !!cn.unknown_position(n);
-         rc := cn.base_class.run_class;
-         rf := rc.get_feature_with(as_item);
-      end;
-
 feature {TYPE}
 
    frozen short_hook is
       do
          short_print.a_class_name(base_class_name);
+      end;
+
+feature {NONE}
+
+   load_ref(n: STRING) is
+	 -- Make the `item' feature live.
+      local
+         rc: RUN_CLASS;
+         rf: RUN_FEATURE;
+      do
+	 rc := small_eiffel.run_class_for(n);
+         rf := rc.get_feature_with(as_item);
       end;
 
 end -- TYPE_BASIC_EIFFEL_EXPANDED

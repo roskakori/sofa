@@ -15,8 +15,7 @@
 --
 class FEATURE_NAME_LIST
    --
-   -- A list of FEATURE_NAME (FEATURE_NAME, INFIX_NAME and
-   -- PREFIX_NAME mixed).
+   -- A list of FEATURE_NAME (FEATURE_NAME, INFIX_NAME and PREFIX_NAME mixed).
    --
 
 inherit GLOBALS;

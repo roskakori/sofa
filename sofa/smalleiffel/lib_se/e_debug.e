@@ -26,10 +26,6 @@ feature
 
    start_position: POSITION;
 
-   list: ARRAY[MANIFEST_STRING];
-
-   compound: COMPOUND;
-
    is_pre_computable: BOOLEAN is false;
 
    end_mark_comment: BOOLEAN is true;
@@ -130,6 +126,10 @@ feature
 feature {NONE}
 
    current_type: TYPE;
+
+   list: FIXED_ARRAY[MANIFEST_STRING];
+
+   compound: COMPOUND;
 
    make(sp: like start_position; l: like list; c: like compound) is
       require

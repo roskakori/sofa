@@ -1,15 +1,16 @@
-#!/local/bin/bash
+#!/bin/sh
 
 # system:     "Gobo Eiffel Libraries precompilation"
-# compiler:   "SmallEiffel -0.78"
+# compiler:   "SmallEiffel -0.76"
 # author:     "Eric Bezault <ericb@gobosoft.com>"
-# copyright:  "Copyright (c) 1999, Eric Bezault and others"
+# copyright:  "Copyright (c) 1999-2000, Eric Bezault and others"
 # license:    "Eiffel Forum Freeware License v1 (see forum.txt)"
-# date:       "$Date: 1999/10/02 20:10:12 $"
-# revision:   "$Revision: 1.3 $"
+# date:       "$Date: 2000/08/20 18:03:24 $"
+# revision:   "$Revision: 1.6 $"
 
-echo ${GOBO}/library/loadpath.se>		loadpath.se
-echo ${GOBO}/library/structure/base/>>	loadpath.se
+echo ${GOBO}/library/loadpath.se>			loadpath.se
+echo ${GOBO}/library/structure/base/>>		loadpath.se
+echo ${GOBO}/library/other/EiffelTime/>>	loadpath.se
 
 export geoptions="-no_style_warning"
 export geformat="-html2"

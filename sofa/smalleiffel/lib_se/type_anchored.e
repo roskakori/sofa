@@ -48,11 +48,6 @@ feature
          Result := run_type.base_class_name;
       end;
 
-   frozen run_class: RUN_CLASS is
-      do
-         Result := small_eiffel.run_class(run_type);
-      end;
-
    frozen actual_reference(destination: TYPE): TYPE is
       do
          Result := run_type.actual_reference(destination);
@@ -351,9 +346,10 @@ feature {RUN_CLASS,TYPE}
 
 feature {NONE}
 
-   tmp_written_mark: STRING is ".........................................";
-
-feature {NONE}
+   written_mark_buffer: STRING is
+      once
+	 !!Result.make(128);
+      end;
 
    anchor_cycle_start is
       local

@@ -58,6 +58,11 @@ feature
 
    is_manifest_string: BOOLEAN is false;
 
+   to_integer_or_error: INTEGER is
+      do
+	 to_integer_error;
+      end;
+
    result_type: TYPE is
       do
          Result := destination_type;

@@ -18,8 +18,7 @@ file system violently cut-off the name.
 - Also removed "bin/ge2e.sh" and "bin/make_spec.bat" because they
 won't work without the #?.ge files anyway.
 
-- If you want to recompile the "ge#?" tools, check the files
-"SCOPTIONS" and "make.amiga" in the respective directories in
-gobo/src.
+- If you want to recompile the "ge#?" tools, check the file
+"make.amiga" in the respective directories in gobo/src.
 
 Thomas.

@@ -45,16 +45,16 @@ feature {SMALL_EIFFEL,EIFFEL_PARSER}
          if tmp_file_read.is_connected then
             path := string_aliaser.item(a_path);
             from
-               if get_line(0) /= Void then
+               if empty_line_at(0) /= Void then
                   -- unused line.
                end;
                i := 1;
-               tmp_file_read.read_line_in(get_line(i));
+               tmp_file_read.read_line_in(empty_line_at(i));
             until
                tmp_file_read.end_of_input
             loop
                i := i + 1;
-               tmp_file_read.read_line_in(get_line(i));
+               tmp_file_read.read_line_in(empty_line_at(i));
             end;
             if text.item(i).is_empty then
                count := i - 1;
@@ -101,10 +101,10 @@ feature {NONE}
          -- To store the complete file to parse. Each line
          -- is one STRING without the '%N' end-of-line mark.
       once
-         !!Result.with_capacity(4096);
+         !!Result.with_capacity(6000);
       end;
 
-   get_line(i: INTEGER): STRING is
+   empty_line_at(i: INTEGER): STRING is
       require
          i >= 0
       do
@@ -121,7 +121,7 @@ feature {NONE}
          text.item(i) = Result
       end;
 
-   medium_line_size: INTEGER is 80;
+   medium_line_size: INTEGER is 128;
 
 end -- PARSER_BUFFER
 

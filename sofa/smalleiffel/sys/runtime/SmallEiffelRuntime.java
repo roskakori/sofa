@@ -26,11 +26,18 @@ import java.util.*;
 public final class SmallEiffelRuntime {
 
     /**
-     * To implement Eiffel GENERAL.se_getenv
+     * To implement Eiffel GENERAL.basic_getenv
      */
-    public static String se_getenv (Object bytes) {
+    public static Object basic_getenv (Object bytes) {
 	String name = NullTerminatedBytesToString(bytes);
-	return System.getProperty(name);
+	String value = System.getProperty(name);
+
+	if (value == null) {
+	    return null;
+	}
+	else {
+	    return StringToNullTerminatedBytes(value);
+	}
     }
 
     /**

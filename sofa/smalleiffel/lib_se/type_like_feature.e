@@ -42,10 +42,10 @@ feature {NONE}
       do
          start_position := sp;
          like_what := lw;
-         tmp_written_mark.copy(fz_like);
-         tmp_written_mark.extend(' ');
-         like_what.declaration_in(tmp_written_mark);
-         written_mark := string_aliaser.item(tmp_written_mark);
+         written_mark_buffer.copy(fz_like);
+         written_mark_buffer.extend(' ');
+         like_what.declaration_in(written_mark_buffer);
+         written_mark := string_aliaser.item(written_mark_buffer);
       ensure
          start_position = sp
       end;

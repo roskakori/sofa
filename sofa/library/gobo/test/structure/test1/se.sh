@@ -1,13 +1,13 @@
-#!/local/bin/bash
+#!/bin/sh
 
 # system:     "List tester"
 # library:    "Gobo Eiffel Structure Library"
-# compiler:   "SmallEiffel -0.78"
+# compiler:   "SmallEiffel -0.76"
 # author:     "Eric Bezault <ericb@gobosoft.com>"
-# copyright:  "Copyright (c) 1999, Eric Bezault and others"
+# copyright:  "Copyright (c) 1999-2000, Eric Bezault and others"
 # license:    "Eiffel Forum Freeware License v1 (see forum.txt)"
-# date:       "$Date: 1999/10/02 20:11:00 $"
-# revision:   "$Revision: 1.2 $"
+# date:       "$Date: 2000/08/20 18:03:48 $"
+# revision:   "$Revision: 1.4 $"
 
 
 echo ${GOBO}/test/structure/test1/>				loadpath.se

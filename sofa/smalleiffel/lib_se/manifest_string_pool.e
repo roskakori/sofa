@@ -293,6 +293,11 @@ feature {NONE}
          !!Result.with_capacity(4096);
       end;
 
+   header: STRING is
+      once
+         !!Result.make(64);
+      end;
+
    body: STRING is
       once
          !!Result.make(2048);
@@ -301,22 +306,32 @@ feature {NONE}
    define_se_ms(string_at_run_time: BOOLEAN) is
       do
          header.copy("T7*se_ms(int c,char*e)");
-         body.copy("T7*s=");
+         body.copy("/* Allocation of a Manifest STRING.*/%NT7*s=");
          gc_handler.new_manifest_string_in(body,string_at_run_time);
-         body.append(
-            "s->_count=c;%N%
-            %s->_capacity=c+1;%N%
-            %s->_storage=((T9)");
-         gc_handler.new_native9_in(body,string_at_run_time);
-         body.append(
-            "(c+1));%N%
-            %memcpy(s->_storage,e,c);%N%
-            %return s;");
-         cpp.put_c_function(header,body);
+	 common_body_for_se_string_and_se_ms(string_at_run_time);
          --
-         cpp.put_c_function("T7*se_string_from_external_copy(char*e)",
-            "/* Creation of an Eiffel STRING by copying C string e. */%N%
-            %return se_ms(strlen(e),e);");
+         header.copy("T7*se_string(char*e)");
+         body.copy("/* Creation of an Eiffel STRING by copying C char*e */%N%
+		   %int c=strlen(e);%N%
+		   %T7*s;");
+	 if string_at_run_time then
+	    gc_handler.basic_allocation("s",body,type_string.run_class);
+	 else
+	    gc_handler.new_manifest_string_in(body,string_at_run_time);
+	 end;
+	 common_body_for_se_string_and_se_ms(string_at_run_time);
+      end;
+
+   common_body_for_se_string_and_se_ms(string_at_run_time: BOOLEAN) is
+      do
+         body.append("s->_count=c;%N%
+		     %s->_capacity=c+1;%N%
+		     %s->_storage=((T9)");
+         gc_handler.new_native9_in(body,string_at_run_time);
+         body.append("(c+1));%N%
+		     %memcpy(s->_storage,e,c+1);%N%
+		     %return s;");
+         cpp.put_c_function(header,body);
       end;
 
    define_manifest_string_mark_header(number: INTEGER) is
@@ -330,8 +345,6 @@ feature {NONE}
       end;
 
    fz_manifest_string_mark: STRING is "manifest_string_mark";
-
-   header: STRING is "................................";
 
    fz_se_msi: STRING is "se_msi";
 

@@ -73,8 +73,8 @@ feature
          mem: INTEGER;
       do
          read_character;
-         if last_character /= '%N' then
-            from  
+         if last_character /= '%N' and then memory /= eof_code then
+            from
                str.extend(memory.to_character);
                mem := read_byte(stdin);
             until

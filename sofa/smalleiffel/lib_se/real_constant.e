@@ -24,12 +24,17 @@ creation make
 
 feature
 
-   to_string: STRING;
-         -- Cleanly written view of the constant (ANSI C compatible).
-
    c_simple: BOOLEAN is true;
 
    is_static: BOOLEAN is false;
+
+   to_string: STRING;
+         -- Cleanly written view of the constant (ANSI C compatible).
+
+   to_integer_or_error: INTEGER is
+      do
+	 to_integer_error;
+      end;
 
    static_result_base_class: BASE_CLASS is
       do

@@ -25,7 +25,7 @@ feature
 
 feature {NONE}
 
-   output_stream: POINTER;
+   input_stream: POINTER;
 
    eof_code: INTEGER is
       external "SmallEiffel"
@@ -38,8 +38,8 @@ feature
          not is_connected;
          not new_path.is_empty
       do
-         output_stream := bfr_open(new_path.count,new_path.to_external);
-         if output_stream.is_not_null then
+         input_stream := bfr_open(new_path.count,new_path.to_external);
+         if input_stream.is_not_null then
             path := new_path;
          end;
       end;
@@ -63,14 +63,14 @@ feature
          is_connected;
          not end_of_input
       do
-         last_byte := fgetc(output_stream);
+         last_byte := fgetc(input_stream);
       end;
 
    disconnect is
       require
          is_connected
       do
-         c_inline_c("fclose(C->_output_stream);");
+         c_inline_c("fclose(C->_input_stream);");
          path := Void;
       end;
 

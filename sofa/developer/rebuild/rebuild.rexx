@@ -12,12 +12,13 @@
  * Furthermore, small programs are compiled using the SE's "-no_split",
  * making things a it a lot easier for the C optimizer.
  *
- * $VER: rebuild.rexx 1.0 (3.3.2000)
+ * $VER: rebuild.rexx 1.1 (12.10.2000)
  */
 
 NoClean = 0
 NoCompile = 0
 NoCompile_to_c = 0
+NoCompile_to_jvm = 0
 NoFinder = 0
 NoPretty = 0
 NoShort = 0
@@ -33,6 +34,7 @@ Address Command
 call compile_small('clean', NoClean)
 call compile_small('compile', NoCompile)
 call compile_big('compile_to_c', NoCompile_to_c)
+call compile_big('compile_to_jvm', NoCompile_to_jvm)
 call compile_small('finder', NoFinder)
 call compile_big('pretty', NoPretty)
 call compile_big('short', NoShort)

@@ -14,7 +14,7 @@
 </TR>
 </TABLE>
 <P>
-<TT>install [-interactive] [-debug]</TT>
+<TT>install [-interactive] [-debug] [-cc &lt;c_compiler&gt;] [-skip_c_compilation]</TT>
 </P><P>
 Command <TT>install</TT> is the installation program for SmallEiffel
 The GNU Eiffel Compiler.
@@ -28,9 +28,12 @@ The <TT>install.e</TT> source code as well as the generated C code
 </P><P>
 If you are under some <B>UNIX</B> (including GNU Linux) system and if you want
 to use the <TT>gcc</TT> compiler like we do, simply type <TT>make</TT>
-in the SmallEiffel directory (the <TT>Makefile</TT> which is in the
+in the SmallEiffel directory. The <TT>Makefile</TT> which is in the
 SmallEiffel directory C-compile and launch automatically the
-<TT>install</TT> command).
+<TT>install</TT> command.
+Furthermore, if you want to select manually the C compiler to be used,
+you should consider to type <TT>make interactive</TT> (this will
+add the <I>-interactive</I> flag described below).
 
 </P><P>
 If you are using a <B>Windows</B> system, a precompiled <TT>install.exe</TT>
@@ -48,36 +51,43 @@ the <TT>install.c</TT> file in order to run it.
 </TABLE>
 <P>
 <DL COMPACT>
-<DT>
-<I>-interactive</I>:<BR>
-<DD> By default, the <TT>install</TT> command tries to determinate
-	automatically the system name as well as the C compiler name.
-	When the flag <I>-interactive</I> is used, the user is interactively
-	prompted for the system name and the C compiler to select.
-<BR><BR>
-<DT>
 
-<I>-debug</I>:<BR>
-<DD>
+<DT><I>-interactive</I>:<BR>
+<DD> By default, the <TT>install</TT> command tries to determinate
+automatically the system name as well as the C compiler name.
+When the flag <I>-interactive</I> is used, the user is interactively
+prompted for the system name and the C compiler to select as well
+as some other crucial informations.
+When all the information has been interactively gathered, the command
+prompts for confirmation before starting the remainder of the
+installation process automatically.
+Using first the <I>-interactive</I> flag is a good idea to know more
+about supported system list as well as supported C compiler list.
+<BR><BR>
+
+<DT><I>-debug</I>:<BR><DD>
 Displays a lot of information useful to debug the installation
 process.
 It is also interresting if you are curious to see what the
 <TT>install</TT> command is really doing (or trying to do ;) ).
+<BR><BR>
 
-<dt><i>-no_compile</i>:
-<dd>Assumes that all commands are already compiled and their executables
-	 exist. This is useful only for binary distributions.
+<DT><I>-cc &lt;c_compiler&gt;</I>:<BR><DD>
+By default, <TT>install</TT> interactively asks for the C compiler
+to use. With this option specified, is skips this query and uses
+the <I>c_compiler</I> name. This <I>c_compiler</I> name must be one of
+the supported C compilers (e.g. <TT>gcc</TT>).
+This is mostly useful for system-specific installation scripts that
+execute <TT>install</TT> as part of it.
+<BR><BR>
 
-<dt><i>-compiler name</i>:
-<dd>By default, <tt>install</tt> interactively asks for the C compiler to use.
-	 With this option specified, is skips this query and uses the C compiler <i>name</i>.
-	 <i>Name</i> must be one of the available compilers (e.g. <tt>gcc</tt>).
-	 This is mostly useful for system-specific installation scripts that
-	 execute <tt>install</tt> as part of it.
+<DT><I>-skip_c_compilation</I>:<BR><DD>
+Assumes that all commands are already compiled and their
+executables exist. This is useful only for binary distributions.
+<BR><BR>
 
 </DL>
 </P>
-
 
 <!-- BL START -->
 <!-- BL1 START -->
@@ -88,7 +98,7 @@ It is also interresting if you are curious to see what the
 Copyright &copy; Dominique COLNET and Suzanne COLLIN -
 <A HREF="mailto:colnet@loria.fr">&lt;colnet@loria.fr&gt;</A>
 <BR>
-Last update: 13 Feb. 2000, by OZ.
+Last update: 13 April 2000, by DC.
 </I></FONT>
 <BR>
 </CENTER>

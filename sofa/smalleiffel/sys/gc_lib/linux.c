@@ -20,7 +20,7 @@
 */
 
 void mark_stack_and_registers (void) {
-  void** max = stack_bottom + 8; /* stack_bottom correction here. */
+  void** max = stack_bottom + 10; /* stack_bottom correction here. */
   void** stack_pointer;
   jmp_buf registers;
 

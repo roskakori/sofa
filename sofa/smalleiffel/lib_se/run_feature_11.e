@@ -19,7 +19,7 @@ class RUN_FEATURE_11
    --
 inherit RUN_FEATURE redefine fall_down end;
 
-creation {E_PRECURSOR_FUNCTION} make
+creation {PRECURSOR_EXPRESSION} make
 
 feature
 

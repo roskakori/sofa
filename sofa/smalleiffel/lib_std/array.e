@@ -96,23 +96,23 @@ feature -- Modification :
             intersize := max_index.min(upper) - min_index.max(lower) + 1;
             if intersize > 0 then
                if offset = 0 then
-                  if intersize < needed then
-                     storage.clear(intersize, needed - 1);
+                  if intersize < capacity then
+                     storage.clear(intersize, capacity - 1);
                   end;
                elseif offset < 0 then
                   storage.move(-offset, intersize - offset - 1, offset);
-                  if intersize < needed then
-                     storage.clear(intersize, needed - 1);
+                  if intersize < capacity then
+                     storage.clear(intersize, capacity - 1);
                   end;
                else
                   storage.move(0, intersize - 1, offset);
                   storage.clear(0, offset - 1);
-                  if intersize + offset < needed then
-                     storage.clear(intersize + offset, needed - 1);
+                  if intersize + offset < capacity then
+                     storage.clear(intersize + offset, capacity - 1);
                   end;
                end;
             else
-               storage.clear(0, needed - 1);
+	       storage.clear(0, capacity - 1);
             end;
          end;
          lower := min_index;

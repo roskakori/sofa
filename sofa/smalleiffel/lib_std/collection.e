@@ -11,19 +11,18 @@
 --
 deferred class COLLECTION[E]
 -- 
--- Common abstract definition of a sequentiable collection of 
--- objects. Such a collection is traversable using a simple 
--- INTEGER index from `lower' to `upper'. Items can be added,
--- changed or removed.
+-- Common abstract definition of a sequenceable collection of objects. 
+-- Such a collection is traversable using a simple INTEGER index from `lower' 
+-- to `upper'. Items can be added, changed or removed.
 -- 
--- The SmallEiffel standard library (lib_std) provides four
--- implementations : ARRAY[E], FIXED_ARRAY[E], LINK_LIST[E] 
--- and LINK2_LIST[E]. All implementations have exactly the 
--- same behavior. Switching from one implementation to another 
--- only change the memory used and the execution time.
+-- The SmallEiffel standard library (lib_std) provides four implementations: 
+-- ARRAY[E], FIXED_ARRAY[E], LINKED_LIST[E] and TWO_WAY_LINKED_LIST[E].
+-- All implementations have exactly the same behavior. Switching from one 
+-- implementation to another only change the memory used and the execution 
+-- time.
 --
 
-inherit ANY redefine copy, is_equal, fill_tagged_out_memory end;
+inherit SAFE_EQUAL[E] redefine copy, is_equal, fill_tagged_out_memory end;
 
 feature -- Indexing :
 
@@ -521,23 +520,23 @@ feature -- Other Features :
          Result.lower = lower
       end;
 
-feature {NONE}
-
-   frozen equal_like(e1, e2: like item): BOOLEAN is
-         -- Note: this feature is called to avoid calling `equal'
-         -- on expanded types (no automatic conversion to 
-         -- corresponding reference type).
+   reverse is
+	 -- Reverse the order of the elements.
+      local
+	 i, j: INTEGER;
       do
-         if e1.is_basic_expanded_type then
-            Result := e1 = e2;
-         elseif e1.is_expanded_type then
-            Result := e1.is_equal(e2);
-         elseif e1 = e2 then
-            Result := true;
-         elseif e1 = Void or else e2 = Void then
-         else
-            Result := e1.is_equal(e2);
-         end;
+	 from
+	    i := lower;
+	    j := upper;
+	 until
+	    i >= j
+	 loop
+	    swap(i,j);
+	    i := i + 1;
+	    j := j - 1;
+	 end;
+      ensure 
+	 count = old count
       end;
 
 invariant

@@ -37,6 +37,11 @@ feature {NONE}
    as_exceptions:       STRING is "EXCEPTIONS";
    as_fixed_array:      STRING is "FIXED_ARRAY";
    as_general:          STRING is "GENERAL";
+   as_gui_color:        STRING is "GUI_COLOR";
+   as_gui_event:        STRING is "GUI_EVENT";
+   as_gui_font:         STRING is "GUI_FONT";
+   as_gui_gc:           STRING is "GUI_GC";
+   as_gui_pixmap:       STRING is "GUI_PIXMAP";
    as_integer:          STRING is "INTEGER";
    as_integer_ref:      STRING is "INTEGER_REF";
    as_memory:           STRING is "MEMORY";
@@ -50,8 +55,7 @@ feature {NONE}
    as_string:           STRING is "STRING";
    as_std_file_read:    STRING is "STD_FILE_READ";
    as_std_file_write:   STRING is "STD_FILE_WRITE";
-
-
+   as_tuple:            STRING is "TUPLE";
 
    -- Operator/Infix/Prefix list :
 
@@ -93,6 +97,9 @@ feature {NONE}
    as_clear_all:                STRING is "clear_all";
    as_count:                    STRING is "count";
    as_code:                     STRING is "code";
+   as_collecting:               STRING is "collecting";
+   as_collection_off:           STRING is "collection_off";
+   as_collection_on:            STRING is "collection_on";
    as_conforms_to:              STRING is "conforms_to";
    as_copy:                     STRING is "copy";
    as_c_inline_c:               STRING is "c_inline_c";
@@ -112,10 +119,13 @@ feature {NONE}
    as_exception:                STRING is "exception";
    as_fclose:                   STRING is "fclose";
    as_feof:                     STRING is "feof";
+   as_fifth:                    STRING is "fifth";
    as_first:                    STRING is "first";
    as_floor:                    STRING is "floor";
    as_flush_stream:             STRING is "flush_stream";
+   as_fourth:                   STRING is "fourth";
    as_from_pointer:             STRING is "from_pointer";
+   as_full_collect:             STRING is "full_collect";
    as_generating_type:          STRING is "generating_type";
    as_generator:                STRING is "generator";
    as_io:                       STRING is "io";
@@ -128,7 +138,6 @@ feature {NONE}
    as_item:                     STRING is "item";
    as_last:                     STRING is "last";
    as_lower:                    STRING is "lower";
-   as_malloc:                   STRING is "malloc";
    as_make:                     STRING is "make";
    as_minimum_character_code:   STRING is "Minimum_character_code";
    as_minimum_double:           STRING is "Minimum_double";
@@ -151,9 +160,9 @@ feature {NONE}
    as_read_byte:                STRING is "read_byte";
    as_real_bits:                STRING is "Real_bits";
    as_realloc:                  STRING is "realloc";
+   as_second:                   STRING is "second";
    as_se_argc:                  STRING is "se_argc";
    as_se_argv:                  STRING is "se_argv";
-   as_se_getenv:                STRING is "se_getenv";
    as_se_remove:                STRING is "se_remove";
    as_se_rename:                STRING is "se_rename";
    as_se_string2double:         STRING is "se_string2double";
@@ -173,6 +182,7 @@ feature {NONE}
    as_std_input:                STRING is "std_input";
    as_std_output:               STRING is "std_output";
    as_storage:                  STRING is "storage";
+   as_third:                    STRING is "third";
    as_to_bit:                   STRING is "to_bit";
    as_to_character:             STRING is "to_character";
    as_to_double:                STRING is "to_double";

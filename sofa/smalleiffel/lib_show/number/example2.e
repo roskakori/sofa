@@ -16,8 +16,6 @@ class EXAMPLE2
    --            compile -o example2 -boost example2
    --
 
-inherit NUMBER_TOOLS;
-
 creation make
 
 feature
@@ -26,8 +24,8 @@ feature
       local
          n1, n2, n3: NUMBER;
       do
-         n1 := from_string("1/3");
-         n2 := from_integer(1) / from_integer(3);
+         n1 := ("1/3").to_number;
+         n2 := (1).to_number / (3).to_number;
          n3 := n1 + n2;
          io.put_number(n1);
          io.put_string(" + ");

@@ -17,19 +17,17 @@ class CST_ATT_INTEGER
 
 inherit CST_ATT;
 
-creation make
+creation make, implicit
 
 feature {NONE}
 
    value_mem: INTEGER_CONSTANT;
 
-feature {NONE}
-
    make(n: like names; t: like result_type; v: like value) is
       require
          n /= Void;
-         v /= Void;
-         t /= Void
+         t.is_integer;
+         v /= Void
       do
          make_e_feature(n);
          result_type := t;
@@ -37,7 +35,29 @@ feature {NONE}
       ensure
          names = n;
          result_type = t;
-         value_mem = v;
+         value_mem = v
+      end;
+
+   implicit(bc: like base_class; sfn: SIMPLE_FEATURE_NAME; v: INTEGER) is
+	 -- Allow the creation of some implicit constant attribute of 
+	 -- value `v' written in class `bc'. As an example, this routine is 
+	 -- used to create the implicit `count' attribute of type TUPLE.
+      require
+	 bc /= Void;
+	 sfn /= Void
+      local
+	 fnl: like names;
+	 sp: POSITION;
+	 type_integer: TYPE_INTEGER;
+	 ic: INTEGER_CONSTANT;
+      do
+	 base_class := bc;
+	 !!fnl.make_1(sfn);
+	 sp.set_in(bc);
+	 !!type_integer.make(sp);
+	 !!ic.make(v,sp);
+	 make(fnl,type_integer,ic);
+	 !!clients.omitted;
       end;
 
 feature

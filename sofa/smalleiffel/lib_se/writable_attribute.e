@@ -20,7 +20,7 @@ class WRITABLE_ATTRIBUTE
 
 inherit ATTRIBUTE;
 
-creation make
+creation make, implicit
 
 feature
 
@@ -41,6 +41,21 @@ feature {NONE}
       ensure
          names = n;
          result_type = t
+      end;
+
+   implicit(bc: like base_class; 
+	    attribute_name: SIMPLE_FEATURE_NAME; 
+	    attribute_type: TYPE) is
+	 -- Allow the creation of an implicit writable attribute 
+	 -- written in class `bc'. As an example, this routine is 
+	 -- used to create `first', `second', ... TUPLE implicit attributes.
+      local
+	 fnl: like names;
+      do
+	 base_class := bc;
+	 !!fnl.make_1(attribute_name);
+	 make(fnl,attribute_type);
+	 !!clients.omitted;
       end;
 
    pretty_tail is

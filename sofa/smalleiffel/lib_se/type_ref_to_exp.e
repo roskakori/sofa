@@ -25,8 +25,6 @@ feature
 
    start_position: POSITION;
 
-   run_class: RUN_CLASS;
-
    written_mark: STRING;
 
 feature {NONE}
@@ -44,7 +42,6 @@ feature {NONE}
          tmp_string.copy(fz_reference);
          tmp_string.append(model.run_time_mark);
          written_mark := string_aliaser.item(tmp_string);
-         run_class := small_eiffel.run_class(Current)
          run_class.set_at_run_time;
       ensure
          run_class.at_run_time
@@ -60,7 +57,6 @@ feature {NONE}
          tmp_string.copy(fz_reference);
          tmp_string.append(model.run_time_mark);
          written_mark := string_aliaser.item(tmp_string);
-         run_class := small_eiffel.run_class(Current)
       end;
 
 feature

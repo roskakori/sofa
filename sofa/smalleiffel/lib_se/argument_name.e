@@ -53,9 +53,8 @@ feature
          if rt.is_reference then
             if target_type.is_reference then
                -- Reference into Reference :
-               cpp.put_string(fz_b7);
-               cpp.put_integer(target_type.id);
-               cpp.put_string(fz_b8);
+               cpp.put_character('(');
+	       target_type.mapping_cast;
                cpp.print_argument(rank);
                cpp.put_character(')');
             else

@@ -13,7 +13,7 @@ class EXAMPLE
    --
    -- Is is also possible to do :
    --
-   --         gcc -c c_prog.o
+   --         gcc -c c_prog.c
    --         compile -cecil cecil.se example c_prog.o
    --
 

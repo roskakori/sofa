@@ -8,8 +8,8 @@ indexing
 	author:     "Eric Bezault <ericb@gobosoft.com>"
 	copyright:  "Copyright (c) 1999, Eric Bezault and others"
 	license:    "Eiffel Forum Freeware License v1 (see forum.txt)"
-	date:       "$Date: 1999/10/02 12:50:12 $"
-	revision:   "$Revision: 1.9 $"
+	date:       "$Date: 2000/02/02 10:21:24 $"
+	revision:   "$Revision: 1.10 $"
 
 class EIFFEL_SCANNER
 
@@ -75,6 +75,7 @@ creation
 "["					last_token := Left_bracket_code
 "]"					last_token := Right_bracket_code
 "$"					last_token := Dollar_code
+"?"					last_token := Question_mark_code
 "//"				last_token := E_DIV
 "\\\\"				last_token := E_MOD
 "/="				last_token := E_NE
@@ -98,6 +99,14 @@ creation
 [bB][iI][tT]							last_token := E_BITTYPE
 [cC][hH][eE][cC][kK]					last_token := E_CHECK
 [cC][lL][aA][sS][sS]					last_token := E_CLASS
+[cC][rR][eE][aA][tT][eE]			{
+										if create_keyword then
+											last_token := E_CREATE
+										else
+											last_token := E_IDENTIFIER
+											last_value := text
+										end
+									}
 [cC][rR][eE][aA][tT][iI][oO][nN]		last_token := E_CREATION
 [cC][uU][rR][rR][eE][nN][tT]			last_token := E_CURRENT
 [dD][eE][bB][uU][gG]					last_token := E_DEBUG
@@ -399,6 +408,7 @@ feature {NONE} -- Initialization
 			make_with_buffer (Empty_buffer)
 			eif_buffer := STRING_.make (Init_buffer_size)
 			eif_lineno := 1
+			create_keyword := True
 		end
 
 feature -- Initialization
@@ -424,6 +434,12 @@ feature -- Access
 
 	is_operator: BOOLEAN
 			-- Parsing an operator declaration?
+
+feature -- Status report
+
+	create_keyword: BOOLEAN
+			-- Should `create' be considered as
+			-- a keyword (otherwise identifier)?
 
 feature {NONE} -- Processing
 

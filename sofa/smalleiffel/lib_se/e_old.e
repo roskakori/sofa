@@ -48,6 +48,11 @@ feature
 
    isa_dca_inline_argument: INTEGER is 0;
 
+   to_integer_or_error: INTEGER is
+      do
+	 to_integer_error;
+      end;
+
    static_result_base_class: BASE_CLASS is
       do
          Result := expression.static_result_base_class;

@@ -8,8 +8,8 @@ indexing
 	author:     "Eric Bezault <ericb@gobosoft.com>"
 	copyright:  "Copyright (c) 1999, Eric Bezault and others"
 	license:    "Eiffel Forum Freeware License v1 (see forum.txt)"
-	date:       "$Date: 1999/09/01 12:29:50 $"
-	revision:   "$Revision: 1.4 $"
+	date:       "$Date: 2000/02/02 10:42:19 $"
+	revision:   "$Revision: 1.5 $"
 
 deferred class DS_SEARCHABLE [G]
 
@@ -26,6 +26,27 @@ feature -- Status report
 		deferred
 		ensure
 			not_empty: Result implies not is_empty
+		end
+
+	same_items (v, u: G): BOOLEAN is
+			-- Are `v' and `u' considered equal?
+			-- (Use `equality_tester''s comparison criterion
+			-- if not void, use `=' criterion otherwise.)
+		do
+			if equality_tester /= Void then
+				Result := equality_tester.test (v, u)
+			else
+				Result := (v = u)
+			end
+		end
+
+	same_equality_tester (other: DS_SEARCHABLE [G]): BOOLEAN is
+			-- Does container use the same comparison
+			-- criterion as `other'?
+		require
+			other_not_void: other /= Void
+		do
+			Result := equal (equality_tester, other.equality_tester)
 		end
 
 feature -- Measurement

@@ -93,7 +93,7 @@ feature
                            %ds.caller=caller;%N");
          end;
          cpp.put_string("{Tid id=");
-         running.copy(up_rf.current_type.run_class.running);
+         running.copy(up_rf.run_class.running);
          sort_running(running);
          if boost then
             cpp.put_string("((T0*)C)->id;%N");
@@ -146,31 +146,35 @@ feature {C_PRETTY_PRINTER}
          cpp.on_c
       end;
 
-   put_ith_argument(up_rf: RUN_FEATURE; fal: FORMAL_ARG_LIST; index: INTEGER) is
-         -- Produce C code for argument `index' of `fal' used
+   put_ith_argument(up_rf: RUN_FEATURE; fal: FORMAL_ARG_LIST; i: INTEGER) is
+         -- Produce C code for argument at index `i' of `fal' used
          -- inside the switching C function.
       require
          cpp.on_c;
          fal.count = up_rf.arguments.count;
-         1 <= index;
-         index <= fal.count
+         1 <= i;
+         i <= fal.count
       local
          eal: like fal;
          at, ft: TYPE;
+	 conversion: BOOLEAN;
       do
          eal := up_rf.arguments;
-         at := eal.type(index).run_type;
-         ft := fal.type(index).run_type;
-         if at.is_reference and then ft.is_basic_eiffel_expanded then
-            cpp.put_character('(');
-            ft.cast_to_ref;
-            cpp.put_character('a');
-            cpp.put_integer(index);
-            cpp.put_string(")->_item");
-         else
-            cpp.put_character('a');
-            cpp.put_integer(index);
-         end;
+         at := eal.type(i).run_type;
+         ft := fal.type(i).run_type;
+	 if at.is_reference then
+	    conversion := ft.is_expanded;
+	 else
+	    conversion := ft.is_reference;
+	 end;
+	 if conversion then
+	    conversion_handler.c_function_call(at,ft);
+	 end;
+	 cpp.put_character('a');
+	 cpp.put_integer(i);
+	 if conversion then
+	    cpp.put_character(')');
+	 end;
       ensure
          cpp.on_c
       end;
@@ -237,7 +241,7 @@ feature {C_PRETTY_PRINTER,SWITCH}
       do
          c_code.clear;
          c_code.extend('X');
-         up_rf.current_type.id.append_in(c_code);
+         up_rf.run_class.id.append_in(c_code);
          c_code.append(up_rf.name.to_key);
          Result := c_code;
       end;
@@ -333,7 +337,7 @@ feature {SWITCH_COLLECTION}
          x_result_type := up_rf.result_type;
          x_arguments := up_rf.arguments;
          from
-            r := up_rf.current_type.run_class.running;
+            r := up_rf.run_class.running;
             i := r.upper;
          until
             i = 0
@@ -359,7 +363,7 @@ feature {SWITCH_COLLECTION}
       do
          -- Define the Java switching static method for `up_rf'.
          method_info.start(9,name(up_rf),jvm_descriptor(up_rf));
-         running.copy(up_rf.current_type.run_class.running);
+         running.copy(up_rf.run_class.running);
          rt := up_rf.result_type;
          if rt /= Void then
             rt := rt.run_type;

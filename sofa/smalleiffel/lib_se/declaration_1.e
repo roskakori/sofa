@@ -21,7 +21,7 @@ class DECLARATION_1
 
 inherit DECLARATION;
 
-creation {EIFFEL_PARSER} make
+creation make
 
 feature {NONE}
 
@@ -73,4 +73,3 @@ feature {DECLARATION_LIST}
       end;
 
 end -- DECLARATION_1
-

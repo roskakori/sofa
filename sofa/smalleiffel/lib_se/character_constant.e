@@ -18,7 +18,7 @@ class CHARACTER_CONSTANT
 -- For Manifest Constant CHARACTER.
 --
 
-inherit BASE_TYPE_CONSTANT redefine to_integer end;
+inherit BASE_TYPE_CONSTANT;
 
 creation make
 
@@ -63,7 +63,7 @@ feature
          Result := small_eiffel.get_class(as_character);
       end;
 
-   static_value, to_integer: INTEGER is
+   static_value, to_integer_or_error: INTEGER is
       do
          Result := value.code;
       end;

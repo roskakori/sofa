@@ -27,43 +27,6 @@ feature
    start_position: POSITION;
          -- Of the the opening bracket when list is really written.
 
-feature {CLIENT_LIST}
-
-   list: CLASS_NAME_LIST;
-
-feature {NONE}
-
-   make(sp: like start_position; l: like list) is
-         -- When the client list is really written.
-         --
-         -- Note : {NONE} has the same meaning as {}.
-      require
-         not sp.is_unknown
-      do
-         start_position := sp;
-         list := l;
-      ensure
-         start_position = sp;
-         list = l
-      end;
-
-   omitted is
-         -- When the client list is omitted.
-         --
-         -- Note : it has the same meaning as {ANY}.
-      do
-      end;
-
-   merge(sp: like start_position; l1, l2: like list) is
-      require
-         not sp.is_unknown
-      do
-         start_position := sp;
-         !!list.merge(l1,l2);
-      end;
-
-feature
-
    is_omitted: BOOLEAN is
       do
          Result := start_position.is_unknown;
@@ -111,6 +74,19 @@ feature
          gives_permission_error(Result,cn.to_string);
       end;
 
+   gives_permission_to_any: BOOLEAN is
+      do
+         if is_omitted then
+            Result := true;
+            -- Because it is as : {ANY}.
+         elseif list = Void then
+            -- Because it is as : {NONE}.
+         else
+            Result := list.gives_permission_to_any;
+         end;
+         gives_permission_error(Result,as_any);
+      end;
+
 feature {EXPORT_LIST}
 
    merge_with(other: like Current): like current is
@@ -155,21 +131,6 @@ feature {PARENT_LIST}
                end;
             end;
          end;
-      end;
-
-feature
-
-   gives_permission_to_any: BOOLEAN is
-      do
-         if is_omitted then
-            Result := true;
-            -- Because it is as : {ANY}.
-         elseif list = Void then
-            -- Because it is as : {NONE}.
-         else
-            Result := list.gives_permission_to_any;
-         end;
-         gives_permission_error(Result,as_any);
       end;
 
 feature {RUN_FEATURE}
@@ -234,7 +195,40 @@ feature {RUN_FEATURE}
          end;
       end;
 
+feature {CLIENT_LIST}
+
+   list: CLASS_NAME_LIST;
+
 feature {NONE}
+
+   make(sp: like start_position; l: like list) is
+         -- When the client list is really written.
+         --
+         -- Note : {NONE} has the same meaning as {}.
+      require
+         not sp.is_unknown
+      do
+         start_position := sp;
+         list := l;
+      ensure
+         start_position = sp;
+         list = l
+      end;
+
+   omitted is
+         -- When the client list is omitted.
+         --
+         -- Note : it has the same meaning as {ANY}.
+      do
+      end;
+
+   merge(sp: like start_position; l1, l2: like list) is
+      require
+         not sp.is_unknown
+      do
+         start_position := sp;
+         !!list.merge(l1,l2);
+      end;
 
    gives_permission_error(no_error: BOOLEAN; cn: STRING) is
       do

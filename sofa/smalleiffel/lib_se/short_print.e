@@ -69,7 +69,7 @@ feature {SHORT}
          hc2 := bc.heading_comment2;
          if hc2 /= Void then
             hook("hook015");
-            hc2.short("hook016","   -- ","hook017","%N");
+            hc2.short("hook016","   --","hook017","%N");
             hook("hook018");
          else
             hook("hook019");
@@ -239,7 +239,7 @@ feature
          hc := rf.base_feature.header_comment;
          if hc /= Void then
             hook("hook310");
-            hc.short("hook311","      -- ","hook312","%N");
+            hc.short("hook311","      --","hook312","%N");
             hook("hook313");
          else
             hook("hook314");

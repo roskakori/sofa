@@ -9,8 +9,8 @@ indexing
 	author:     "Eric Bezault <ericb@gobosoft.com>"
 	copyright:  "Copyright (c) 1999, Eric Bezault and others"
 	license:    "Eiffel Forum Freeware License v1 (see forum.txt)"
-	date:       "$Date: 1999/10/02 14:06:33 $"
-	revision:   "$Revision: 1.3 $"
+	date:       "$Date: 2000/02/02 17:44:18 $"
+	revision:   "$Revision: 1.7 $"
 
 class PR_YACC_PARSER
 
@@ -33,16 +33,17 @@ creation
 %token T_TOKEN T_LEFT T_RIGHT T_NONASSOC T_EXPECT T_PREC T_START T_TYPE
 %token T_2PERCENTS T_UNKNOWN
 
-%token <STRING>		T_EIFFEL T_IDENTIFIER T_ACTION T_USER_CODE T_CHAR
+%token <STRING>		T_EIFFEL T_IDENTIFIER T_ACTION T_USER_CODE T_CHAR T_STR
 %token <STRING>		T_INTEGER T_BOOLEAN T_CHARACTER T_REAL T_DOUBLE T_POINTER
+%token <STRING>		T_LIKE
 %token <INTEGER>	T_NUMBER '|' ':'
 
 %type <STRING>		Identifier
-%type <PR_TOKEN>	Terminal Token Left_token Right_token Nonassoc_token
+%type <PR_TOKEN>	Terminal Token_declaration Left_declaration Right_declaration Nonassoc_declaration
 %type <PR_TYPE>		Eiffel_type
 %type <DS_ARRAYED_LIST [PR_TYPE]>	Eiffel_type_list Eiffel_generics
 
-%expect 7
+%expect 8
 
 %start Grammar
 
@@ -148,6 +149,10 @@ Eiffel_type: T_IDENTIFIER
 		{
 			$$ := new_generic_type ($1, $2)
 		}
+	| T_LIKE T_IDENTIFIER
+		{
+			$$ := new_anchored_type ($2)
+		}
 	;
 
 Eiffel_generics: '[' Eiffel_type_list ']'
@@ -177,16 +182,25 @@ Token_declaration_list: -- Empty
 	| Token_declaration_list ',' Token_declaration
 	;
 
-Token_declaration: Token
-	| Token T_NUMBER
-		{
-			($1).set_token_id ($2)
-		}
-	;
-
-Token: Identifier
+Token_declaration: Identifier
 		{
 			$$ := new_terminal ($1, type)
+		}
+	| Identifier T_NUMBER
+		{
+			$$ := new_terminal ($1, type)
+			set_token_id ($$, $2)
+		}
+	| Identifier T_STR
+		{
+			$$ := new_terminal ($1, type)
+			set_literal_string ($$, $2)
+		}
+	| Identifier T_NUMBER T_STR
+		{
+			$$ := new_terminal ($1, type)
+			set_token_id ($$, $2)
+			set_literal_string ($$, $3)
 		}
 	| T_CHAR
 		{
@@ -199,16 +213,25 @@ Left_declaration_list: -- Empty
 	| Left_declaration_list ',' Left_declaration
 	;
 
-Left_declaration: Left_token
-	| Left_token T_NUMBER
-		{
-			($1).set_token_id ($2)
-		}
-	;
-
-Left_token: Identifier
+Left_declaration: Identifier
 		{
 			$$ := new_left_terminal ($1, precedence)
+		}
+	| Identifier T_NUMBER
+		{
+			$$ := new_left_terminal ($1, precedence)
+			set_token_id ($$, $2)
+		}
+	| Identifier T_STR
+		{
+			$$ := new_left_terminal ($1, precedence)
+			set_literal_string ($$, $2)
+		}
+	| Identifier T_NUMBER T_STR
+		{
+			$$ := new_left_terminal ($1, precedence)
+			set_token_id ($$, $2)
+			set_literal_string ($$, $3)
 		}
 	| T_CHAR
 		{
@@ -221,16 +244,25 @@ Right_declaration_list: -- Empty
 	| Right_declaration_list ',' Right_declaration
 	;
 
-Right_declaration: Right_token
-	| Right_token T_NUMBER
-		{
-			($1).set_token_id ($2)
-		}
-	;
-
-Right_token: Identifier
+Right_declaration: Identifier
 		{
 			$$ := new_right_terminal ($1, precedence)
+		}
+	| Identifier T_NUMBER
+		{
+			$$ := new_right_terminal ($1, precedence)
+			set_token_id ($$, $2)
+		}
+	| Identifier T_STR
+		{
+			$$ := new_right_terminal ($1, precedence)
+			set_literal_string ($$, $2)
+		}
+	| Identifier T_NUMBER T_STR
+		{
+			$$ := new_right_terminal ($1, precedence)
+			set_token_id ($$, $2)
+			set_literal_string ($$, $3)
 		}
 	| T_CHAR
 		{
@@ -243,16 +275,25 @@ Nonassoc_declaration_list: -- Empty
 	| Nonassoc_declaration_list ',' Nonassoc_declaration
 	;
 
-Nonassoc_declaration: Nonassoc_token
-	| Nonassoc_token T_NUMBER
-		{
-			($1).set_token_id ($2)
-		}
-	;
-
-Nonassoc_token: Identifier
+Nonassoc_declaration: Identifier
 		{
 			$$ := new_nonassoc_terminal ($1, precedence)
+		}
+	| Identifier T_NUMBER
+		{
+			$$ := new_nonassoc_terminal ($1, precedence)
+			set_token_id ($$, $2)
+		}
+	| Identifier T_STR
+		{
+			$$ := new_nonassoc_terminal ($1, precedence)
+			set_literal_string ($$, $2)
+		}
+	| Identifier T_NUMBER T_STR
+		{
+			$$ := new_nonassoc_terminal ($1, precedence)
+			set_token_id ($$, $2)
+			set_literal_string ($$, $3)
 		}
 	| T_CHAR
 		{
@@ -322,6 +363,10 @@ Rhs: -- Empty
 		{
 			put_symbol (new_char_token ($2), rule)
 		}
+	| Rhs T_STR
+		{
+			put_symbol (new_string_token ($2), rule)
+		}
 	| Rhs T_ACTION
 		{
 			put_action (new_action ($2), rule)
@@ -382,6 +427,8 @@ Identifier: T_IDENTIFIER
 	| T_DOUBLE
 		{ $$ := $1 }
 	| T_POINTER
+		{ $$ := $1 }
+	| T_LIKE
 		{ $$ := $1 }
 	;
 

@@ -118,7 +118,7 @@ feature
          elseif as_sprintf_pointer = name then
             cpp.put_string("{void*p=");
             cpp.put_target_as_value;
-            cpp.put_string(";%Nsprintf((");
+            cpp.put_string(";%Nsprintf(((char*)");
             cpp.put_ith_argument(1);
             cpp.put_string("),%"%%p%",p);}%N");
          elseif as_sprintf_double = name then
@@ -148,6 +148,18 @@ feature
             cpp.put_string("internal_exception_handler(");
             cpp.put_ith_argument(1);
             cpp.put_string(fz_14);
+	 elseif as_full_collect = name then
+	    if not gc_handler.is_off then
+	       cpp.put_string("gc_start();%N");
+	    end;
+	 elseif as_collection_off = name then
+	    if not gc_handler.is_off then
+	       cpp.put_string("gc_is_off=1;%N");
+	    end;
+	 elseif as_collection_on = name then
+	    if not gc_handler.is_off then
+	       cpp.put_string("gc_is_off=0;%N");
+	    end;
          end;
       end;
 
@@ -164,7 +176,7 @@ feature
          elseif as_general = bcn then
             if as_is_equal = name or else as_standard_is_equal = name then
                ct := rf8.current_type;
-               rc := ct.run_class;
+               rc := rf8.run_class;
                if ct.is_basic_eiffel_expanded then
                elseif ct.is_native_array then
                elseif ct.is_bit then
@@ -184,7 +196,7 @@ feature
                c_define_standard_twin(rf8,rf8.current_type);
             elseif as_twin = name then
                ct := rf8.current_type;
-               rc := ct.run_class;
+               rc := rf8.run_class;
                rf := rc.get_copy;
                rf7 ?= rf;
                if rf7 /= Void then
@@ -194,26 +206,40 @@ feature
                end;
             elseif as_deep_twin = name then
                ct := rf8.current_type;
-	       if ct.is_basic_eiffel_expanded then
+	       if ct.is_basic_eiffel_expanded 
+		  or else ct.is_dummy_expanded
+		then
 		  rf8.c_define_with_body("R=C;%N");
 	       elseif ct.is_native_array then
 		  eh.add_type(ct,fz_dtideena);
-		  eh.print_as_fatal_error;
+		  eh.print_as_warning;
+		  if run_control.boost then
+		     rf8.c_define_with_body("R=NULL");
+		  else
+		     rf8.c_define_with_body("error0(%"Invalid deep_twin.%",NULL);");
+		  end;
 	       else
 		  body.clear;
-		  ct.run_class.deep_twin_in(body);
+		  rf8.run_class.deep_twin_in(body);
 		  rf8.c_define_with_body(body);
 	       end;
             elseif as_is_deep_equal = name then
                ct := rf8.current_type;
 	       if ct.is_basic_eiffel_expanded then
 		  rf8.c_define_with_body("R=(C==a1);%N");
+	       elseif ct.is_dummy_expanded then
+		  rf8.c_define_with_body("R=1;%N");
 	       elseif ct.is_native_array then
 		  eh.add_type(ct,fz_dtideena);
-		  eh.print_as_fatal_error;
+		  eh.print_as_warning;
+		  if run_control.boost then
+		     rf8.c_define_with_body("R=0");
+		  else
+		     rf8.c_define_with_body("error0(%"Invalid is_deep_equal.%",NULL);");
+		  end;
 	       else
 		  body.clear;
-		  ct.run_class.is_deep_equal_in(body);
+		  rf8.run_class.is_deep_equal_in(body);
 		  rf8.c_define_with_body(body);
 	       end;
             end;
@@ -225,7 +251,7 @@ feature
                   body.clear;
                   body.append("R=");
                   if gc_handler.is_off then
-                     body.append("malloc(sizeof(T");
+                     body.append("se_malloc(sizeof(T");
                      elt_type.id.append_in(body);
                      body.append(")*");
                   else
@@ -262,6 +288,13 @@ feature
             cpp.put_string(as_stdin);
          elseif as_stdout = name then
             cpp.put_string(as_stdout);
+         elseif name.has_prefix(fz_basic_) then
+            cpp.put_string(name);
+            cpp.put_character('(');
+            if rf8.arguments /= Void then
+               cpp.put_arguments;
+            end;
+            cpp.put_character(')');
          elseif as_general = bcn then
             if as_generating_type = name then
                cpp.put_generating_type(rf8.current_type);
@@ -273,7 +306,7 @@ feature
                cpp.put_object_size(rf8.current_type);
             elseif as_is_equal = name or else as_standard_is_equal = name then
                ct := rf8.current_type;
-               rc := ct.run_class;
+               rc := rf8.run_class;
                if ct.is_basic_eiffel_expanded then
                   basic_eq := true;
                elseif ct.is_native_array then
@@ -324,7 +357,7 @@ feature
                c_mapping_standard_twin(rf8,rf8.current_type);
             elseif as_twin = name then
                ct := rf8.current_type;
-               rc := ct.run_class;
+               rc := rf8.run_class;
                rf := rc.get_copy;
                rf7 ?= rf;
                if rf7 /= Void then
@@ -375,11 +408,7 @@ feature
             elseif as_se_argc = name then
                cpp.put_string(as_se_argc);
             elseif as_se_argv = name then
-               cpp.put_string("((T0*)se_string_from_external_copy(se_argv[_i]))");
-            elseif as_se_getenv = name then
-               cpp.put_string(
-               "(NULL==(_p=getenv((char*)_p)))?NULL:%
-               %((T0*)se_string_from_external_copy((char*)_p))");
+               cpp.put_string("((T0*)se_string(se_argv[_i]))");
             end;
          elseif as_native_array = bcn then
             c_mapping_native_array_function(rf8,name);
@@ -463,12 +492,6 @@ feature
             cpp.put_string("(sscanf(_p,%"%%lf%",&R),R)");
          elseif as_bit_n = bcn then
             c_mapping_bit_function(rf8,name);
--- *** ???
---         elseif as_item = name then
---            cpp.put_character('(');
---            cpp.put_target_as_value;
---            cpp.put_string(")->_item");
--- *** ???
          elseif as_pointer_size = name then
             cpp.put_string(fz_sizeof);
             cpp.put_character('(');
@@ -482,13 +505,12 @@ feature
             cpp.put_string("internal_exception_number");
          elseif as_signal_number = name then
             cpp.put_string("signal_exception_number");
-         elseif name.has_prefix(fz_basic_) then
-            cpp.put_string(name);
-            cpp.put_character('(');
-            if rf8.arguments /= Void then
-               cpp.put_arguments;
-            end;
-            cpp.put_character(')');
+	 elseif as_collecting = name then
+	    if gc_handler.is_off then
+	       cpp.put_character('0');
+	    else
+	       cpp.put_string("!gc_is_off");
+	    end;
          end;
       end;
 
@@ -502,7 +524,7 @@ feature
          if as_general = bcn then
             if as_twin = name then
                ct := rf8.current_type;
-               rc := ct.run_class;
+               rc := rf8.run_class;
                rf := rc.get_copy;
                rf7 ?= rf;
                if rf7 /= Void then
@@ -532,7 +554,7 @@ feature
          if as_general = bcn then
             if as_twin = name then
                ct := rf8.current_type;
-               rc := ct.run_class;
+               rc := rf8.run_class;
                rf := rc.get_copy;
                rf7 ?= rf;
                if rf7 /= Void then
@@ -542,7 +564,7 @@ feature
             elseif as_generating_type = name then
                rf8.jvm_opening;
                ct := rf8.current_type;
-               rc := ct.run_class;
+               rc := rf8.run_class;
                rc_idx := rc.jvm_constant_pool_index;
                field_idx := cp.idx_fieldref_generating_type(rc_idx);
                ca.opcode_getstatic(field_idx,1);
@@ -557,7 +579,7 @@ feature
             elseif as_generator = name then
                rf8.jvm_opening;
                ct := rf8.current_type;
-               rc := ct.run_class;
+               rc := rf8.run_class;
                rc_idx := rc.jvm_constant_pool_index;
                field_idx := cp.idx_fieldref_generator(rc_idx);
                ca.opcode_getstatic(field_idx,1);
@@ -593,6 +615,8 @@ feature
             ca.opcode_system_out;
          elseif as_stderr = name then
             ca.opcode_system_err;
+         elseif name.has_prefix(fz_basic_) then
+            jvm_small_eiffel_runtime(name,rf8);
          elseif as_integer = bcn then
             jvm_mapping_integer_function(rf8,name);
          elseif as_real = bcn then
@@ -654,7 +678,7 @@ feature
                jvm_standard_twin(rf8.current_type);
             elseif as_twin = name then
                ct := rf8.current_type;
-               rc := ct.run_class;
+               rc := rf8.run_class;
                rf := rc.get_copy;
                rf7 ?= rf;
                if rf7 /= Void then
@@ -680,9 +704,6 @@ feature
                jvm.push_se_argc;
             elseif as_se_argv = name then
                jvm.push_se_argv;
-            elseif as_se_getenv = name then
-               space := jvm.push_ith_argument(1);
-               ca.runtime_se_getenv;
             else
                fe_nyi(rf8);
             end;
@@ -745,7 +766,7 @@ feature
          elseif as_item = name then
             jvm.push_target;
             ct := rf8.current_type;
-            rc := ct.run_class;
+            rc := rf8.run_class;
             idx := rc.jvm_constant_pool_index;
             idx := cp.idx_fieldref4(idx,as_item,fz_a9);
             ca.opcode_getfield(idx,0);
@@ -755,8 +776,6 @@ feature
          elseif as_exception = name then
             ca.runtime_internal_exception_number;
          elseif as_signal_number = name then
-         elseif name.has_prefix(fz_basic_) then
-            jvm_small_eiffel_runtime(name,rf8);
          else
             fe_nyi(rf8);
          end;
@@ -946,7 +965,7 @@ feature {NONE}
             end;
          else
             if gc_handler.is_off then
-               body.copy("R=malloc(sizeof(*C));%N");
+               body.copy("R=se_malloc(sizeof(*C));%N");
             else
                body.copy("R=(");
                body.append(fz_cast_void_star);
@@ -974,7 +993,7 @@ feature {NONE}
          if ct.is_reference then
             if gc_handler.is_off then
                id := rc.id;
-               cpp.put_string("R=malloc(sizeof(*C));%N");
+               cpp.put_string("R=se_malloc(sizeof(*C));%N");
                cpp.put_string("*((T");
                cpp.put_integer(id);
                cpp.put_string("*)R)=M");
@@ -1035,7 +1054,7 @@ feature {NONE}
          elseif name = as_from_pointer then
             jvm.drop_target;
             space := jvm.push_ith_argument(1);
-            rf8.current_type.run_class.opcode_checkcast;
+            rf8.run_class.opcode_checkcast;
          else
             fe_nyi(rf8);
          end;
@@ -1085,7 +1104,7 @@ feature {NONE}
                if gc_handler.is_off then
                   cpp.put_string("((T");
 		  cpp.put_integer(ct.id);
-                  cpp.put_string(")(calloc(");
+                  cpp.put_string(")(se_calloc(");
                   cpp.put_ith_argument(1);
                   tmp_string.copy(",sizeof(");
                   elt_type.c_type_for_result_in(tmp_string);
@@ -1178,7 +1197,7 @@ feature {NONE}
 
    jvm_define_twin(rf8: RUN_FEATURE_8; rc: RUN_CLASS; cpy: RUN_FEATURE) is
       require
-         rc = rf8.current_type.run_class;
+         rc = rf8.run_class;
          cpy /= Void
       local
          idx, space, i: INTEGER;
@@ -1382,7 +1401,8 @@ feature {NONE}
                ca.opcode_ddiv;
             elseif as_pow = name then
                ca.opcode_i2d;
-               idx := constant_pool.idx_methodref3(fz_java_lang_math,"pow",fz_99);
+               idx := constant_pool.idx_methodref3(fz_java_lang_math,
+						   "pow",fz_99);
                ca.opcode_invokestatic(idx,-2);
             else
                ca.opcode_dcmpg;
@@ -1520,6 +1540,10 @@ feature {NONE}
             cpp.put_string(name);
             cpp.put_character('(');
             cpp.put_target_as_value;
+	    if rf8.arguments /= Void then
+	       cpp.put_character(',');
+	       cpp.put_arguments;
+	    end;
             cpp.put_character(')');
          end;
       end;

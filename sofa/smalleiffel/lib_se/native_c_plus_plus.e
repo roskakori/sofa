@@ -153,7 +153,7 @@ feature {NONE}
 		  i := i + 7;
 		  i := parse_cpp_class(i,tag);
 		  body.append("::");
-		  body.append(er.external_c_name);
+		  body.append(er.c_plus_plus_name);
 		  state := 2;
                elseif i = tag.substring_index("new ",i) then 
                   i := i + 4;
@@ -177,7 +177,7 @@ feature {NONE}
 		  body.append("((");
 		  i := parse_cpp_class(i,tag);
 		  body.append("*)a1)->");
-                  body.append(er.external_c_name);
+                  body.append(er.c_plus_plus_name);
                   state := 5;
                end;
             when 2 then 
@@ -398,11 +398,10 @@ feature {NONE}
       require
 	 ("%"<").has(tag.item(s))
       local
-         buffer, include: STRING;
+         include: STRING;
 	 i: INTEGER; c: CHARACTER;
       do
 	 from
-	    buffer := ".....................";
 	    buffer.clear;
 	    buffer.extend(tag.item(s));
 	    i := s + 1;

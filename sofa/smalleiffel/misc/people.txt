@@ -31,15 +31,17 @@
    working in the field of image processing and augmented reality.
    [o]
    Olivier ZENDRA
-          Working on a PhD about the compilation of OO languages
+          Got his PhD "Translation and global optimization in class
+          languages" working on the SmallEiffel project.
 
    He started working during most of his spare time with Dominique on
-   SmallEiffel in late 1994 - early 1995. He had many conceptual and
-   technical discussions with Dominique about languages, anchored types,
-   ANSI C, garbage collection, etc. and participated to the first
-   bootstrap. He also maintains the SmallEiffel Web site. He was able to
-   join the ECOO research team in late 1997 and thus is now working
-   almost full-time on SmallEiffel.
+   SmallEiffel in late 1994 - early 1995. He had many important
+   conceptual and technical discussions with Dominique about languages,
+   typing, ANSI C, Java bytecode, garbage collection, etc. and worked on
+   the first bootstrap. He also used to maintain the SmallEiffel Web
+   site. He joined the ECOO research team in late 1997 for his PhD to
+   work almost full-time on SmallEiffel. Got his PhD with highest honors
+   in late 2000.
 
    Former but still active team members
 
@@ -75,7 +77,7 @@
 
                                    [Line]
    Copyright © Dominique COLNET and Suzanne COLLIN - [5]<colnet@loria.fr>
-                      Last update: 14 Feb.2000 by OZ.
+                      Last update: 07 Nov.2000 by OZ.
 
 References
 

@@ -11,10 +11,6 @@
 --
 deferred class TIME_IN_SOME_LANGUAGE
 --
--- NOTE: THIS IS AN ALPHA VERSION. THIS CLASS IS NOT STABLE AT ALL AND 
--- MIGHT EVEN CHANGE COMPLETELY IN THE NEXT RELEASE !
--- 
---
 -- The polymophic format class for BASIC_TIME.
 --
 
@@ -42,8 +38,6 @@ feature
          short_mode = value
       end;
 
-feature
-   
    day_in(buffer: STRING) is
          -- According to the current `short_mode', append in the `buffer' 
          -- the name of the day.
@@ -56,16 +50,11 @@ feature
       deferred
       end;
 
-feature
-   
    frozen to_string: STRING is
-      local
-         buffer: STRING;
       do
-         buffer := "...........................";
-         buffer.clear;
-         append_in(buffer);
-         Result := buffer.twin;
+         to_string_buffer.clear;
+         append_in(to_string_buffer);
+         Result := to_string_buffer.twin;
       end;
    
    append_in(buffer: STRING) is
@@ -75,6 +64,13 @@ feature
    frozen out_in_tagged_out_memory is
       do
          append_in(tagged_out_memory);
+      end;
+
+feature {NONE}
+
+   to_string_buffer: STRING is
+      once
+	 !!Result.make(128);
       end;
 
 end

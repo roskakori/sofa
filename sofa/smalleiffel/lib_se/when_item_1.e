@@ -24,27 +24,13 @@ class WHEN_ITEM_1
 
 inherit WHEN_ITEM;
 
-creation {E_WHEN,WHEN_ITEM_1}
-   make
+creation {E_WHEN,WHEN_ITEM_1} make
 
-feature {ANY}
+feature
 
    expression: EXPRESSION;
 
    expression_value: INTEGER;
-
-feature {NONE}
-
-   make(v: like expression) is
-      require
-         v /= Void
-      do
-         expression := v;
-      ensure
-         expression = v
-      end;
-
-feature {ANY}
 
    start_position: POSITION is
       do
@@ -64,7 +50,7 @@ feature {E_WHEN, WHEN_ITEM_1}
             e := expression.to_runnable(ct);
             if e /= Void and then e.result_type.is_integer then
                expression := e;
-               expression_value := expression.to_integer;
+               expression_value := expression.to_integer_or_error;
                e_when.add_when_item_1(Current);
             else
                error(expression.start_position,fz_biv);
@@ -87,7 +73,7 @@ feature {E_WHEN, WHEN_ITEM_1}
             e := expression.to_runnable(ct);
             if e /= Void and then e.result_type.is_character then
                expression := e;
-               expression_value := expression.to_integer;
+               expression_value := expression.to_integer_or_error;
                e_when.add_when_item_1(Current);
             else
                error(expression.start_position,fz_bcv);
@@ -104,11 +90,15 @@ feature {E_WHEN, WHEN_ITEM_1}
          expression.pretty_print;
       end;
 
-feature {E_WHEN}
+feature {NONE}
 
-   eval(exp: INTEGER): BOOLEAN is
+   make(v: like expression) is
+      require
+         v /= Void
       do
-         Result := expression_value = exp;
+         expression := v;
+      ensure
+         expression = v
       end;
 
 end -- WHEN_ITEM_1

@@ -13,6 +13,7 @@
 -- write to the  Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 -- Boston, MA 02111-1307, USA.
 --
+
 class E_INSPECT
    --
    -- The Eiffel inspect instruction.
@@ -39,31 +40,9 @@ feature
    else_compound: COMPOUND;
          -- Else compound if any.
 
-feature {NONE}
-
-   current_type: TYPE;
-
-feature {NONE}
-
-   make(sp: like start_position; exp: like expression) is
-      require
-         not sp.is_unknown;
-         exp /= Void;
-      do
-         start_position := sp;
-         expression := exp;
-      ensure
-         start_position = sp;
-         expression = exp;
-      end;
-
-feature
-
    is_pre_computable: BOOLEAN is false;
 
    end_mark_comment: BOOLEAN is true;
-
-feature
 
    afd_check is
       do
@@ -77,9 +56,16 @@ feature
       end;
 
    includes(v: INTEGER): BOOLEAN is
-      -- True if a when clause includes `v'.
+	 -- True if a when clause includes `v'.
       do
          Result := when_list.includes_integer(v);
+      end;
+
+   includes_between(low, up: INTEGER): BOOLEAN is
+	 -- True if a when clause includes an integer between `low' and 
+	 -- `up' (inclusive).
+      do
+         Result := when_list.includes_integer_between(low,up);
       end;
 
    collect_c_tmp is
@@ -94,7 +80,7 @@ feature
          no_check := run_control.no_check;
          debug_check := run_control.debug_check;
          cpp.inspect_incr;
-         cpp.put_string("{int ");
+         cpp.put_string("/*[INSPECT*/%N{int ");
          cpp.put_inspect;
          cpp.put_character('=');
          if debug_check then
@@ -110,30 +96,45 @@ feature
          if when_list = Void then
             if else_position.is_unknown then
                if no_check then
-                  exceptions_handler.incorrect_inspect_value(start_position);
+                  exceptions_handler.bad_inspect_value(start_position);
                end;
             elseif else_compound /= Void then
                else_compound.compile_to_c;
             end;
-         else
-            when_list.compile_to_c(else_position);
-            if else_position.is_unknown then
-               if no_check then
-                  cpp.put_character(' ');
-                  cpp.put_string(fz_else);
-                  cpp.put_character('{');
-                  exceptions_handler.incorrect_inspect_value(start_position);
-                  cpp.put_character('}');
-               end;
-            elseif else_compound /= Void then
-               cpp.put_character(' ');
-               cpp.put_string(fz_else);
-               cpp.put_character('{');
-               else_compound.compile_to_c;
-               cpp.put_character('}');
-            end;
+         elseif use_c_switch_statement then
+	    cpp.put_string("switch(");
+	    cpp.put_inspect;
+	    cpp.put_string("){%N");
+	    when_list.compile_to_c_switch(else_position);
+	    if else_position.is_unknown then
+	       if no_check then
+		  cpp.put_string("default:;%N");
+		  exceptions_handler.bad_inspect_value(start_position);
+	       end;
+	    elseif else_compound /= Void then
+	       cpp.put_string("default:;%N");
+	       else_compound.compile_to_c;
+	    end;
+	    cpp.put_string("}%N");
+	 else
+	    when_list.compile_to_c(else_position);
+	    if else_position.is_unknown then
+	       if no_check then
+		  cpp.put_character(' ');
+		  cpp.put_string(fz_else);
+		  cpp.put_character('{');
+		  exceptions_handler.bad_inspect_value(start_position);
+		  cpp.put_character('}');
+	       end;
+	    elseif else_compound /= Void then
+	       cpp.put_character(' ');
+	       cpp.put_string(fz_else);
+	       cpp.put_character('{');
+	       else_compound.compile_to_c;
+	       cpp.put_character('}');
+            end
          end;
-         cpp.put_string(fz_12);
+         cpp.put_string("}/*INSPECT]*/%N");
          cpp.inspect_decr;
       end;
 
@@ -169,26 +170,16 @@ feature
 
    stupid_switch(r: ARRAY[RUN_CLASS]): BOOLEAN is
       do
-         Result := expression.stupid_switch(r) and then
-                   (when_list = Void or else when_list.stupid_switch(r)) and then
-                   (else_compound = Void or else else_compound.stupid_switch(r));
-      end;
-
-   add_when(e_when: E_WHEN) is
-      require
-         e_when /= Void
-      do
-         if when_list = Void then
-            !!when_list.make(e_when);
-         else
-            when_list.add_last(e_when);
-         end;
-      end;
-
-   set_else_compound(sp: like else_position; ec: like else_compound) is
-      do
-         else_position := sp;
-         else_compound := ec;
+         if expression.stupid_switch(r) then
+	    if when_list = Void or else when_list.stupid_switch(r) then
+	       if (else_compound = Void 
+		   or else 
+		   else_compound.stupid_switch(r)) 
+		then
+		  Result := true;
+	       end;
+	    end;
+	 end;
       end;
 
    to_runnable(ct: TYPE): like Current is
@@ -202,9 +193,7 @@ feature
             e := expression.to_runnable(ct);
             if nb_errors = 0 then
                expression := e;
-               te := e.result_type.run_type;
-               --                  ********
-               --                  VIRABLE
+               te := e.result_type;
             end;
             if nb_errors = 0 then
                if te.is_character then
@@ -241,8 +230,6 @@ feature
          end;
       end;
 
-feature
-
    pretty_print is
       do
          fmt.keyword(fz_inspect);
@@ -276,6 +263,25 @@ feature
          end;
       end;
 
+feature {EIFFEL_PARSER}
+
+   add_when(e_when: E_WHEN) is
+      require
+         e_when /= Void
+      do
+         if when_list = Void then
+            !!when_list.make(e_when);
+         else
+            when_list.add_last(e_when);
+         end;
+      end;
+
+   set_else_compound(sp: like else_position; ec: like else_compound) is
+      do
+         else_position := sp;
+         else_compound := ec;
+      end;
+
 feature {E_INSPECT}
 
    set_when_list(wl: like when_list) is
@@ -285,12 +291,6 @@ feature {E_INSPECT}
          when_list = wl;
       end;
 
-feature {NONE}
-
-   em1: STRING is "Bad inspect.";
-
-feature {E_INSPECT}
-
    clear_current_type is
       do
          current_type := Void;
@@ -298,9 +298,41 @@ feature {E_INSPECT}
          current_type = Void
       end;
 
+feature {NONE}
+
+   current_type: TYPE;
+	 -- The one when runnable.
+
+   make(sp: like start_position; exp: like expression) is
+      require
+         not sp.is_unknown;
+         exp /= Void;
+      do
+         start_position := sp;
+         expression := exp;
+      ensure
+         start_position = sp;
+         expression = exp;
+      end;
+
+   use_c_switch_statement: BOOLEAN is
+	 -- To decide if the generated C code is a true C "switch" or 
+	 -- a sequence of "if... else if ... else ..."). 
+      do
+	 -- For the time being, this a naive implementation, because 
+	 -- we may also  consider wich C compiler is used (see in 
+	 -- `system_tools'). If someone want to do this, I think we should add a 
+	 -- new function named `use_c_switch_statement' in system_tools.
+	 -- Just post the fix in the mailing list. 
+	 if when_list.largest_range_of_values <= 32 then
+	    Result := true;
+	 end;
+      end;
+
+   em1: STRING is "Bad inspect.";
+
 invariant
 
    expression /= Void;
 
 end -- E_INSPECT
-

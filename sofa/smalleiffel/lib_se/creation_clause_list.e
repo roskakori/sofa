@@ -19,22 +19,6 @@ inherit GLOBALS;
 
 creation {BASE_CLASS} make
 
-feature {CREATION_CLAUSE_LIST}
-
-   list: ARRAY[CREATION_CLAUSE];
-
-feature {NONE}
-
-   make(first: CREATION_CLAUSE) is
-      require
-         first /= Void
-      do
-         !!list.with_capacity(4,1);
-	 list.add_last(first);
-      ensure
-         list.first = first
-      end;
-
 feature
 
    start_position: POSITION is
@@ -47,7 +31,7 @@ feature
          i: INTEGER;
       do
          from
-            i := 1;
+            i := list.lower;
          until
             i > list.upper
          loop
@@ -66,7 +50,7 @@ feature
          i: INTEGER;
       do
          from
-            i := 1;
+            i := list.lower;
          until
             i > list.upper
          loop
@@ -80,7 +64,7 @@ feature
          i: INTEGER;
       do
          from
-            i := 1;
+            i := list.lower;
          until
             i > list.upper or else list.item(i).has(fn)
          loop
@@ -100,7 +84,7 @@ feature {BASE_CLASS}
          from
             i := list.upper;
          until
-            i = 0 or else Result /= Void
+            i < list.lower or else Result /= Void
          loop
             Result := list.item(i).root_procedure_name(procedure_name);
             i := i - 1;
@@ -109,7 +93,7 @@ feature {BASE_CLASS}
 
    add_last(cc: CREATION_CLAUSE) is
       require
-         cc /= Void;
+         cc /= Void
       do
          list.add_last(cc);
       end;
@@ -117,14 +101,18 @@ feature {BASE_CLASS}
    check_expanded_with(t: TYPE) is
       require
          t.is_expanded;
+      local
+	 lower: INTEGER;
       do
-         if list.upper > 1 then
+         if list.count > 1 then
             eh.add_type(t,fz_cbe);
-            eh.add_position(list.item(1).start_position);
-            eh.add_position(list.item(2).start_position);
+	    lower := list.lower;
+            eh.add_position(list.item(lower).start_position);
+	    lower := lower + 1;
+            eh.add_position(list.item(lower).start_position);
             fatal_error_vtec_2;
          end;
-         list.item(1).check_expanded_with(t);
+         list.first.check_expanded_with(t);
       end;
 
    expanded_initializer(t: TYPE): RUN_FEATURE_3 is
@@ -135,12 +123,24 @@ feature {BASE_CLASS}
          check
             list.count = 1
          end;
-         Result := list.item(1).expanded_initializer(t);
+         Result := list.first.expanded_initializer(t);
+      end;
+
+feature {NONE}
+
+   list: FIXED_ARRAY[CREATION_CLAUSE];
+
+   make(first: CREATION_CLAUSE) is
+      require
+         first /= Void
+      do
+         !!list.with_capacity(4);
+	 list.add_last(first);
+      ensure
+         list.first = first
       end;
 
 invariant
-
-   list.lower = 1;
 
    not list.is_empty;
 

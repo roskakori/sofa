@@ -9,8 +9,8 @@ indexing
 	author:     "Eric Bezault <ericb@gobosoft.com>"
 	copyright:  "Copyright (c) 1999, Eric Bezault and others"
 	license:    "Eiffel Forum Freeware License v1 (see forum.txt)"
-	date:       "$Date: 1999/10/02 14:05:43 $"
-	revision:   "$Revision: 1.4 $"
+	date:       "$Date: 2000/04/16 13:04:12 $"
+	revision:   "$Revision: 1.5 $"
 
 deferred class PR_SYMBOL
 
@@ -25,7 +25,7 @@ feature {NONE} -- Initialization
 		require
 			valid_id: id >= 0
 			a_name_not_void: a_name /= Void
-			a_name_long_enough: not a_name.empty
+			a_name_long_enough: a_name.count > 0
 			a_type_not_void: a_type /= Void
 		do
 			id := an_id
@@ -108,7 +108,7 @@ invariant
 
 	valid_id: id >= 0
 	name_not_void: name /= Void
-	name_long_enough: not name.empty
+	name_long_enough: name.count > 0
 	type_not_void: type /= Void
 
 end -- class PR_SYMBOL

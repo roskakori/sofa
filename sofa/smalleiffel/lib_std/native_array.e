@@ -20,6 +20,8 @@ expanded class NATIVE_ARRAY[E]
 -- interoperability between Java and C low level arrays.
 --
 
+inherit SAFE_EQUAL[E];
+
 feature -- Basic features :
 
    element_sizeof: INTEGER is
@@ -81,7 +83,7 @@ feature -- Comparison :
          from
             i := capacity - 1;
          until
-            i < 0 or else not equal_like(item(i),other.item(i))
+            i < 0 or else not safe_equal(item(i),other.item(i))
          loop
             i := i - 1;
          end;
@@ -123,11 +125,14 @@ feature -- Comparison :
 	    elseif e1 /= Void then
 	       if e2 /= Void then
 		  Result := e1.is_deep_equal(e2);
+	       else
+		  Result := false;
 	       end;
+	    else
+	       Result := false;
 	    end;
             i := i - 1;
          end;
-         Result := i < 0;
       end;
 
 feature -- Searching :
@@ -141,7 +146,7 @@ feature -- Searching :
       do
          from  
          until
-            Result > upper or else equal_like(element,item(Result))
+            Result > upper or else safe_equal(element,item(Result))
          loop
             Result := Result + 1;
          end;
@@ -173,7 +178,7 @@ feature -- Searching :
          until
             Result or else i < 0
          loop
-            Result := equal_like(element,item(i));
+            Result := safe_equal(element,item(i));
             i := i - 1;
          end;
       end;
@@ -251,7 +256,7 @@ feature -- Replacing :
          until
             i < 0
          loop
-            if equal_like(old_value,item(i)) then
+            if safe_equal(old_value,item(i)) then
                put(new_value,i);
             end;
             i := i - 1;
@@ -466,7 +471,7 @@ feature -- Other :
          until
             i < 0
          loop
-            if equal_like(element,item(i)) then
+            if safe_equal(element,item(i)) then
                Result := Result + 1;
             end;
             i := i - 1;
@@ -551,25 +556,6 @@ feature -- For C only :
                %Please, update your code."
       external "C_InlineWithoutCurrent"
       alias "malloc"
-      end;
-
-feature {NONE}
-
-   frozen equal_like(e1, e2: like item): BOOLEAN is
-         -- Note: this feature is called to avoid calling `equal'
-         -- on expanded types (no automatic conversion to 
-         -- corresponding reference type).
-      do
-         if e1.is_basic_expanded_type then
-            Result := e1 = e2;
-         elseif e1.is_expanded_type then
-            Result := e1.is_equal(e2);
-         elseif e1 = e2 then
-            Result := true;
-         elseif e1 = Void or else e2 = Void then
-         else
-            Result := e1.is_equal(e2);
-         end;
       end;
 
 end -- NATIVE_ARRAY[E]

@@ -69,7 +69,7 @@ feature {RUN_FEATURE_3,RUN_FEATURE_4}
          rf: RUN_FEATURE;
       do
          rf := run_feature;
-         rc := rf.current_type.run_class;
+         rc := rf.run_class;
          run_feature := rc.running.first.dynamic(rf);
       end;
 

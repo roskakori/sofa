@@ -9,8 +9,8 @@ indexing
 	author:     "Eric Bezault <ericb@gobosoft.com>"
 	copyright:  "Copyright (c) 1999, Eric Bezault and others"
 	license:    "Eiffel Forum Freeware License v1 (see forum.txt)"
-	date:       "$Date: 1999/10/02 14:06:46 $"
-	revision:   "$Revision: 1.4 $"
+	date:       "$Date: 2000/02/02 15:39:44 $"
+	revision:   "$Revision: 1.7 $"
 
 class PR_YACC_SCANNER
 
@@ -90,6 +90,10 @@ ESC					\\(.|[0-7]{1,3}|x[0-9a-f]{1,2})
 						last_token := T_POINTER
 						last_value := text
 					}
+	[lL][iI][kK][eE]	{
+						last_token := T_LIKE
+						last_value := text
+					}
 	[a-z][a-z0-9_]*	{
 						last_token := T_IDENTIFIER
 						last_value := text
@@ -104,6 +108,13 @@ ESC					\\(.|[0-7]{1,3}|x[0-9a-f]{1,2})
 	\'([^'\\\n]|{ESC})\'	{
 						last_token := T_CHAR
 						last_value := text
+					}
+	\"[^"\n]*\"		{
+						last_token := T_STR
+						last_value := text
+						if text_count < 4 then
+							report_invalid_string_token_error (text)
+						end
 					}
 }
 

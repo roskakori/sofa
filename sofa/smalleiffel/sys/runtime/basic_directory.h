@@ -16,14 +16,12 @@
   included when some external "SmallEiffel" feature of class BASIC_DIRECTORY
   is live.
 */
-#ifndef AMIGA
 #ifndef WIN32
 #include <dirent.h>
 #endif
 #ifndef WIN32
 #include <unistd.h>
 #endif
-#endif /* AMIGA */
 
 EIF_POINTER basic_directory_open(EIF_POINTER path);
 EIF_POINTER basic_directory_read_entry(EIF_POINTER dirstream);

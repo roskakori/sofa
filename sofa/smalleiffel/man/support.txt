@@ -42,18 +42,29 @@
    Donations of money are also accepted. If you use SmallEiffel at work
    to do your job or for teaching, perhaps you would consider it
    appropriate for your company (or for your university) to make a
-   donation.
-   Donations Status :
-     * Total number of donations: 1
-     * Total amount of donations: US $100
+   donation. Contact colnet@loria.fr or use traditional mail with:
+          Dominique Colnet
+          LORIA B.P. 239
+          54506 Vandoeuvre Les Nancy
+          FRANCE
+
+   Money Donations Status :
+     * Total number of donations: 2
+     * Total amount of donations: US $200
      * Maximum amount in a single donation: US $100
      * Minimum amount in a single donation: US $100
      * Date of the first donation: Tuesday September 1st, 1998
-     * Date of the last donation: Tuesday September 1st, 1998
+     * Date of the last donation: Friday June 2th, 2000
+
+   Miscellaneous Donations Status:
+     * Mug counter: 0
+     * T-shirt counter: 0
+     * Post-card counter: 0
+     * Unidentified object counter: 0
 
                                    [Line]
    Copyright © Dominique COLNET and Suzanne COLLIN - [5]<colnet@loria.fr>
-                     Last update: 22 June 1999, by OZ.
+                     Last update: 2 June 2000, by DC.
 
 References
 

@@ -3,7 +3,8 @@
 
    Usage
 
-   install [-interactive] [-debug]
+   install [-interactive] [-debug] [-cc <c_compiler>]
+   [-skip_c_compilation]
 
    Command install is the installation program for SmallEiffel The GNU
    Eiffel Compiler.
@@ -15,8 +16,11 @@
 
    If you are under some UNIX (including GNU Linux) system and if you
    want to use the gcc compiler like we do, simply type make in the
-   SmallEiffel directory (the Makefile which is in the SmallEiffel
-   directory C-compile and launch automatically the install command).
+   SmallEiffel directory. The Makefile which is in the SmallEiffel
+   directory C-compile and launch automatically the install command.
+   Furthermore, if you want to select manually the C compiler to be used,
+   you should consider to type make interactive (this will add the
+   -interactive flag described below).
 
    If you are using a Windows system, a precompiled install.exe is
    available too in the SmallEiffel directory, you just have to run it.
@@ -30,15 +34,32 @@
           By default, the install command tries to determinate
           automatically the system name as well as the C compiler name.
           When the flag -interactive is used, the user is interactively
-          prompted for the system name and the C compiler to select.
+          prompted for the system name and the C compiler to select as
+          well as some other crucial informations. When all the
+          information has been interactively gathered, the command
+          prompts for confirmation before starting the remainder of the
+          installation process automatically. Using first the
+          -interactive flag is a good idea to know more about supported
+          system list as well as supported C compiler list.
    -debug:
           Displays a lot of information useful to debug the installation
           process. It is also interresting if you are curious to see what
           the install command is really doing (or trying to do ;) ).
+   -cc <c_compiler>:
+          By default, install interactively asks for the C compiler to
+          use. With this option specified, is skips this query and uses
+          the c_compiler name. This c_compiler name must be one of the
+          supported C compilers (e.g. gcc). This is mostly useful for
+          system-specific installation scripts that execute install as
+          part of it.
+   -skip_c_compilation:
+          Assumes that all commands are already compiled and their
+          executables exist. This is useful only for binary
+          distributions.
 
                                    [Line]
    Copyright © Dominique COLNET and Suzanne COLLIN - [1]<colnet@loria.fr>
-                     Last update: 13 Feb. 2000, by OZ.
+                    Last update: 13 April 2000, by DC.
 
 References
 

@@ -8,8 +8,8 @@ indexing
 	author:     "Eric Bezault <ericb@gobosoft.com>"
 	copyright:  "Copyright (c) 1999, Eric Bezault and others"
 	license:    "Eiffel Forum Freeware License v1 (see forum.txt)"
-	date:       "$Date: 1999/09/01 12:46:21 $"
-	revision:   "$Revision: 1.5 $"
+	date:       "$Date: 2000/02/02 10:45:32 $"
+	revision:   "$Revision: 1.6 $"
 
 class DS_LINKED_LIST [G]
 
@@ -1123,6 +1123,11 @@ feature {NONE} -- Implementation
 		ensure
 			last_cell_set: last_cell = a_cell
 		end
+
+feature {NONE} -- Implementation
+
+	internal_cursor: like new_cursor
+			-- Internal cursor
 
 feature {NONE} -- Cursor movement
 

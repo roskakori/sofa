@@ -9,8 +9,8 @@ indexing
 	author:     "Eric Bezault <ericb@gobosoft.com>"
 	copyright:  "Copyright (c) 1999, Eric Bezault and others"
 	license:    "Eiffel Forum Freeware License v1 (see forum.txt)"
-	date:       "$Date: 1999/10/02 14:05:47 $"
-	revision:   "$Revision: 1.3 $"
+	date:       "$Date: 2000/02/04 22:09:07 $"
+	revision:   "$Revision: 1.6 $"
 
 class PR_TOKEN
 
@@ -29,6 +29,15 @@ feature -- Status report
 
 	is_terminal: BOOLEAN is True
 			-- Is current symbol terminal?
+
+	has_identifier: BOOLEAN is
+			-- Is current token associated with an identifier?
+		local
+			c: CHARACTER
+		do
+			c := name.item (1)
+			Result := c /= '%'' and c /= '%"'
+		end
 
 	is_left_associative: BOOLEAN is
 			-- Is current token left associative?
@@ -82,6 +91,11 @@ feature -- Access
 			-- Precedence level
 			-- (0 means that no `precedence' has been assigned.)
 
+	literal_string: STRING
+			-- Literal string that can be used instead
+			-- of curren token's name in rules
+			-- (Void if no sucg string.)
+
 feature -- Setting
 
 	set_token_id (i: INTEGER) is
@@ -100,6 +114,14 @@ feature -- Setting
 			precedence := p
 		ensure
 			precedence_set: precedence = p
+		end
+
+	set_literal_string (a_string: STRING) is
+			-- Set `literal_string' to `a_string'.
+		do
+			literal_string := a_string
+		ensure
+			literal_string_set: literal_string = a_string
 		end
 
 feature -- Status setting
@@ -140,7 +162,7 @@ feature -- Output
 			a_rule: PR_RULE
 		do
 			a_file.put_string (name)
-			a_file.put_string (" (")
+			a_file.put_string (" (token ")
 			a_file.put_integer (token_id)
 			a_file.put_character (')')
 			rules := a_grammar.rules

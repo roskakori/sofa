@@ -25,6 +25,10 @@ creation make
 
 feature
 
+   is_pre_computable: BOOLEAN is false;
+
+   end_mark_comment: BOOLEAN is true;
+
    start_position: POSITION;
 	 -- Of keyword "if".
 
@@ -32,25 +36,6 @@ feature
 
    else_compound: COMPOUND;
 	 -- Not Void if any.
-
-feature {NONE}
-
-   current_type: TYPE;
-
-feature {NONE}
-
-   make(sp: like start_position) is
-      do
-	 start_position := sp;
-      end;
-
-feature
-
-   is_pre_computable: BOOLEAN is false;
-
-   end_mark_comment: BOOLEAN is true;
-
-feature
 
    use_current: BOOLEAN is
       do
@@ -227,5 +212,13 @@ feature {EIFFEL_PARSER}
 	 else_compound = ec;
       end;
 
-end -- IFTHENELSE
+feature {NONE}
 
+   current_type: TYPE;
+
+   make(sp: like start_position) is
+      do
+	 start_position := sp;
+      end;
+
+end -- IFTHENELSE

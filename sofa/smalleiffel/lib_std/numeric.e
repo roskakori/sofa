@@ -10,14 +10,11 @@
 --                       http://SmallEiffel.loria.fr
 --
 deferred class  NUMERIC
---
--- This class describes a ring.
---
+   --
+   -- This class describes a ring.
+   --
    
-inherit
-   HASHABLE 
-      undefine is_equal
-      end;
+inherit HASHABLE undefine is_equal end;
    
 feature  
 
@@ -106,22 +103,9 @@ feature
    
    sign: INTEGER is
          -- Sign of Current (0 -1 or 1).
-      do
-         if Current > zero then
-            Result := 1;
-         elseif Current < zero then
-            Result := -1;
-         end;
+      deferred
       ensure
          -1 <= Result; Result <= 1
-      end;
-
-   infix "<" (other: like Current): BOOLEAN is
-      deferred
-      end;
-
-   infix ">" (other: like Current): BOOLEAN is
-      deferred
       end;
 
 end --  NUMERIC

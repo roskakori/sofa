@@ -140,6 +140,12 @@ Why don't you <B>change this and add that</B>?! It would be much
 better/cooler/whatever !</TD>
 </TR>
 
+<TR>
+<TD><B>Q21:</B></TD>
+<TD><A HREF="SmallEiffelFAQ.html#Q21">
+How to customize the <B>Garbage Collector</B> for a new architecture ?</TD>
+</TR>
+
 
 </TABLE>
  </P>
@@ -356,7 +362,7 @@ with SmallEiffel?&nbsp;</TD>
 <BR>You just have to disable the generation of the GC by SmallEiffel
 (option <IT>-no_gc</IT>) and replace it by the BDW library.
 Note that the BDW GC
-can be easily added because SmallEiffel only uses malloc/realloc/calloc/free.
+can be easily added because SmallEiffel only uses malloc/realloc/calloc.
 <BR>You can download the BDW library from :&nbsp;
 <DL COMPACT>
 <DD>
@@ -697,6 +703,59 @@ selling sofware and making a bit of money with it... ;)))
 </TD>
 </TR>
 
+<TR>
+<TD>&nbsp;</TD>
+</TR>
+
+<TR>
+<TD><A NAME="Q21"></A><B>Q21:</B></TD>
+
+<TD>
+How to customize the <B>Garbage Collector</B> for a new architecture ?
+</TD>
+</TR>
+
+<TR>
+<TD VALIGN=TOP><B>A21:</B></TD>
+<TD>
+The <A HREF="install.html"><TT>install</TT></A>
+command is supposed to tune the GC automatically for you.
+Unfortunately, on some systems, this is not yet automatic.
+Here the way to fix your installation manually (hence to provide
+a patch for the install command itself).
+<BR>
+
+The content of file <TT>SmallEiffel/sys/gc</TT> indicates the
+appropriate `mark_stack_and_registers' C function for your system.
+As an example, if the file <TT>SmallEiffel/sys/gc</TT> contains on the
+very first line the name <B>linux.c</B>, the file
+<TT>SmallEiffel/sys/gc_lib/linux.c</TT>
+is used to get the appropriate definition of the
+`mark_stack_and_registers' C function.
+This definition is automatically included in the generated C files
+(use the -verbose flag to check for the path of the selected
+<TT>gc_lib</TT> file).
+<BR>
+
+If the very first line of the file <TT>SmallEiffel/sys/gc</TT> is
+<B>NONE</B>, the compiler will continue to emit a warning about GC
+configuration and will use the default
+<TT>SmallEiffel/sys/gc_lib/generic.c</TT> definition.
+To fix this, you have to select the appropriate file of the
+<TT>SmallEiffel/sys/gc_lib</TT> directory and update
+<TT>SmallEiffel/sys/gc</TT> accordingly.
+<BR>
+
+In order to check the GC, you should be able to run all files of
+the <TT>SmallEiffel/misc/benchmarks/gc directory</TT>.
+If you don't find an appropriate file for your system in the
+<TT>SmallEiffel/sys/gc_lib</TT> directory, you should first check that
+the <TT>generic.c</TT> definition works.
+The <TT>generic.c</TT> file contains some more information to allow
+you to write your own new configuration.
+</TD>
+</TR>
+
 <!-------------------------------------------------------------------------->
 
 
@@ -709,5 +768,5 @@ selling sofware and making a bit of money with it... ;)))
 
 <CENTER><I><FONT SIZE=-1>Copyright &copy; Dominique COLNET and Suzanne
 COLLIN - <A HREF="mailto:colnet@loria.fr">&lt;colnet@loria.fr></A><BR>
-Last update: 30 June 1999, by OZ.
+Last update: 26 November 2000, by DC.
 </FONT></I></CENTER>

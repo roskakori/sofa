@@ -16,8 +16,8 @@ indexing
 	author:     "Eric Bezault <ericb@gobosoft.com>"
 	copyright:  "Copyright (c) 1999, Eric Bezault and others"
 	license:    "Eiffel Forum Freeware License v1 (see forum.txt)"
-	date:       "$Date: 1999/10/02 14:13:41 $"
-	revision:   "$Revision: 1.5 $"
+	date:       "$Date: 2000/02/02 10:57:50 $"
+	revision:   "$Revision: 1.6 $"
 
 class UT_CHARACTER_CODES
 
@@ -104,6 +104,7 @@ feature -- Access
 	Dot_code: INTEGER is 46						-- '.'
 	Dollar_code: INTEGER is 36					-- '$'
 	Exclamation_code: INTEGER is 33				-- '!'
+	Question_mark_code: INTEGER is 63			-- '?'
 	Single_quote_code: INTEGER is 39			-- '%''
 	Double_quote_code: INTEGER is 34			-- '%"'
 	Left_parenthesis_code: INTEGER is 40		-- '('

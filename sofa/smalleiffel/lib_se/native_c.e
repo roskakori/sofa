@@ -16,7 +16,7 @@
 deferred class NATIVE_C
    --
    -- Common root for NATIVE_WITHOUT_CURRENT, NATIVE_INLINE_WITHOUT_CURRENT,
-   -- NATIVE_WITH_CURRENT, NATIVE_INLINE_WITH_CURRENT and NATIVE_C_PLUS_PLUS..
+   -- NATIVE_WITH_CURRENT, NATIVE_INLINE_WITH_CURRENT and NATIVE_C_PLUS_PLUS.
    --
 
 inherit NATIVE;
@@ -95,7 +95,7 @@ feature {NONE}
                cpp.put_character(',');
             end;
          end;
-         cpp.put_string(er.external_c_name);
+         cpp.put_string(er.external_name);
          cpp.put_character('(');
          if eruc then
             cpp.put_target_as_value;
@@ -116,7 +116,7 @@ feature {NONE}
       local
          i: INTEGER;
       do
-         body.append(er.external_c_name);
+         body.append(er.external_name);
          body.extend('(');
          if use_current(er) then
             body.extend('C');
@@ -138,6 +138,10 @@ feature {NONE}
          end;
          body.append(fz_14);
       end;
+   
+   buffer: STRING is 
+      once
+	 !!Result.make(32);
+      end;
 
 end -- NATIVE_C
-

@@ -8,8 +8,8 @@ indexing
 	author:     "Eric Bezault <ericb@gobosoft.com>"
 	copyright:  "Copyright (c) 1999, Eric Bezault and others"
 	license:    "Eiffel Forum Freeware License v1 (see forum.txt)"
-	date:       "$Date: 1999/09/01 12:25:47 $"
-	revision:   "$Revision: 1.1 $"
+	date:       "$Date: 1999/10/15 09:20:54 $"
+	revision:   "$Revision: 1.3 $"
 
 deferred class LINEAR [G]
 
@@ -130,11 +130,16 @@ feature -- Measurement
 	ds_count: INTEGER is
 			-- Number of items
 		do
+				-- Give a dummy value.
+				-- (Needs to be greater than 0 in order to 
+				-- preserve "empty_definition" invariant in
+				-- ISE's COUNTABLE_SEQUENCE class.)
+			Result := 1
 		end
 
 feature -- Status report
 
-	has (v: like item): BOOLEAN is
+	has (v: G): BOOLEAN is
 			-- Does structure include an occurrence of `v'?
 			-- (Reference or object equality,
 			-- based on `object_comparison'.)

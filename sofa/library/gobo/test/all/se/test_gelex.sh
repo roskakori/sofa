@@ -1,11 +1,11 @@
-#!/local/bin/bash
+#!/bin/sh
 
 mkdir gelex
 cd gelex
 if [ "$1" = "-boost" ]; then
 	cp $GOBO/src/gelex/se.sh .
 else
-	sed "s/-boost/-ensure_check/g" $GOBO/src/gelex/se.sh > se.sh
+	sed "s/-boost/-all_check/g" $GOBO/src/gelex/se.sh > se.sh
 fi
 ./se.sh | grep -v "warning \(C4049\|C4761\)"
 

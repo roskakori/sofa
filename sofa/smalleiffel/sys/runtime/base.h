@@ -31,8 +31,6 @@
 #include <limits.h>
 #include <float.h>
 #include <setjmp.h>
-
-#if 0
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -46,13 +44,19 @@
 #define O_RDONLY 0000
 #endif
 #endif
+
+/*
+  Because ANSI C EXIT_FAILURE is not always defined :
+ */
+#ifndef EXIT_FAILURE
+#define EXIT_FAILURE 1
 #endif
 
 /*
-	On Linux glibc systems, we need to use sig.* versions of jmp_buf,
-	setjmp and longjmp to preserve the signal handling context.
-	Currently, the way I figured to detect this is if _SIGSET_H_types has
-	been defined in /usr/include/setjmp.h.
+   On Linux glibc systems, we need to use sig.* versions of jmp_buf,
+   setjmp and longjmp to preserve the signal handling context.
+   Currently, the way I figured to detect this is if _SIGSET_H_types has
+   been defined in /usr/include/setjmp.h.
 */
 #ifdef _SIGSET_H_types
 #define JMP_BUF    sigjmp_buf
@@ -65,7 +69,7 @@
 #endif
 
 /*
-	Type to store reference objects Id :
+   Type to store reference objects Id :
  */
 typedef int Tid;
 
@@ -76,12 +80,12 @@ struct S0{
 };
 
 /*
-	The default channel used to print runtime error messages :
+   The default channel used to print runtime error messages :
 */
 #define SE_ERR stderr
 
 /*
-	Eiffel type INTEGER is #2 :
+   Eiffel type INTEGER is #2 :
 */
 typedef int T2;
 #define EIF_INTEGER T2
@@ -135,7 +139,7 @@ typedef char T6;
 #define EIF_BOOLEAN_BITS (CHAR_BIT)
 
 /*
-	Eiffel type POINTER is #8 :
+   Eiffel type POINTER is #8 :
 */
 typedef void* T8;
 #define EIF_POINTER T8
@@ -154,3 +158,10 @@ typedef void* T8;
 #define EIF_REFERENCE T0*
 #define EIF_OBJ T0*
 #define EIF_OBJECT EIF_OBJ
+
+/*
+   Wrappers for `malloc', `calloc' and `realloc' :
+*/
+void* se_malloc(size_t size);
+void* se_calloc(size_t nmemb, size_t size);
+void* se_realloc(void *ptr, size_t size);

@@ -10,8 +10,8 @@ indexing
 	author:     "Eric Bezault <ericb@gobosoft.com>"
 	copyright:  "Copyright (c) 1999, Eric Bezault and others"
 	license:    "Eiffel Forum Freeware License v1 (see forum.txt)"
-	date:       "$Date: 1999/10/02 13:47:41 $"
-	revision:   "$Revision: 1.5 $"
+	date:       "$Date: 2000/02/02 10:27:48 $"
+	revision:   "$Revision: 1.7 $"
 
 class KL_STRING_BUFFER_ROUTINES
 
@@ -28,10 +28,10 @@ feature -- Initialization
 		require
 			non_negative_n: n >= 0
 		local
-			a_string: STRING
+			to_special: TO_SPECIAL [CHARACTER]
 		do
-			!! a_string.make (n)
-			Result := a_string.area
+			!! to_special.make_area (n)
+			Result := to_special.area
 		ensure
 			string_buffer_not_void: Result /= Void
 			count_set: Result.count = n
@@ -246,8 +246,6 @@ feature -- Resizing
 		require
 			a_buffer_not_void: a_buffer /= Void
 			n_large_enough: n >= a_buffer.count
-		local
-			i: INTEGER
 		do
 			Result := c_str_resize ($a_buffer, n)
 		ensure

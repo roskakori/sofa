@@ -12,7 +12,7 @@
    *** Xavier CREGUT: has been using SmallEiffel for a long time. Many
    bug reports. Reported in a very small program a tricky bug dealing
    with inheritance/genericity and VNCG rule.
-   *** Geoff Eldridge: since many years, Geoff is one of the best
+   *** Geoff ELDRIDGE: since many years, Geoff is one of the best
    SmallEiffel's supporter thanks to the excellent elj-win32
    distribution. Keep up the good work Geoff ! As a sidenote, Geoff is
    also the initial designer of the BASIC_TIME class.
@@ -56,6 +56,8 @@
    ** Andre DOHERTY: used to maintain the SmallEiffel ready for OS2
    version.
    ** Antoine GUARRIGUES: worked with Philippe RIBET (see above).
+   ** Wai-Ming HO: many well-isolated bug reports, plus one tricky
+   Garbage Collector bug with fix.
    ** Jean-Marc JEZEQUEL: reported some bugs on ARRAY inheritance.
    Isolated a bug on VNCG. Beta testing.
    ** Alexander KJELDAAS: fixed a bug in INSTALL.CSH. Reported a problem
@@ -76,7 +78,7 @@
    leaks.
    ** Dan WILDER: uploads new versions of SmallEiffel to sunsite (for
    Linux).
-   ** Alan Zimmerman: clear bug report with an excellent fix for the
+   ** Alan ZIMMERMAN: clear bug report with an excellent fix for the
    exception trace. For one aspect, the problem was specific to the
    CYGWIN compiler and its implementation of longjmp. The second bug was
    related to the unwinding of exception trace immediately before a
@@ -87,23 +89,31 @@
    BASIC_DIRECTORY available on Amiga.
    * Christophe ALEXANDRE: found a bug in REAL.put_real_format.
    * Wilfried BERGER: done some tuning of the GC for Windows platforms.
-   * Oscar N. BRIA: reported a bug for mixed rename/redefine.
+   * Vincent BERNAT: first implementation of class SET (together with
+   Philippe GEOFFROY).
    * Emmanuel BOUYER: was the first one to use SmallEiffel for his PhD
    Thesis. He is also a good bug reporter.
-   * Robert W. Brewer: a good bug report about inlining of $ operator.
+   * Robert W. BREWER: a good bug report about inlining of $ operator.
+   * Oscar N. BRIA: reported a bug for mixed rename/redefine.
    * Lars BRUECKNER: wrote some code for STD_FILE_READ.
    * Romaric CHARTON: find two bugs in ifthenelse expression, and
    argument checking of external feature.
    * Grant CHESTON: reported a bug with attribute renaming.
+   * Rudi CHIARITO: for the Amiga/Elate support as well as various C
+   compiler for this system.
    * Frank CHIRON: fixed a bug in class BIT_N.
    * Vincent CROIZIER: good work to fix the priority of operator infix
    "^" and for Precursor implementation.
    * Stephane D'ALU: added some features in STRING (split, ...). Reported
    some bugs for class BIT.
+   * James Scott EDWARDS: fixed a bug in the inspect statement. The new
+   generated C code may also use the C switch statement.
    * Oliver ELPHICK: fixed a bug in misc/INSTALL.SH and help us to make
    our decision about Eiffel source distribution.
    * Joel FAEDI: (not yet) solved some problems using gcc.
-   * Wai-Ming HO: many well-isolated bug reports.
+   * Pierre-Marie FORT: made a great work in order to optimize NUMBERs.
+   * Philippe GEOFFROY: first implementation of class SET (together with
+   Vincent BERNAT).
    * Brigitte JARAY: one of the first beta testing girls.
    * Zahi Al JAMOUS: found a syntaxical bug, and some others. First
    Lebanese user of SmallEiffel.
@@ -114,7 +124,7 @@
    platforms.
    * Nicole LEVY: found some syntactical bugs producing a core dump.
    * Masato MOGAKI: reported a bug with $ operator.
-   * Jean-Louis NeBUT: reported bug about renaming.
+   * Jean-Louis NÉBUT: reported bug about renaming.
    * Steve NORMAN: fixed a bug in floating-point constants.
    * Francois PENNANEACH: a good bug report.
    * Todd PLESSEL: a good bug report.
@@ -136,7 +146,7 @@
 
                                    [Line]
    Copyright © Dominique COLNET and Suzanne COLLIN - [1]<colnet@loria.fr>
-                  Last update: 24 september 1999, by DC.
+                  Last update: 4th november 2000, by DC.
 
 References
 

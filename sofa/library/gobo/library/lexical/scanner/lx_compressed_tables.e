@@ -8,8 +8,8 @@ indexing
 	author:     "Eric Bezault <ericb@gobosoft.com>"
 	copyright:  "Copyright (c) 1999, Eric Bezault and others"
 	license:    "Eiffel Forum Freeware License v1 (see forum.txt)"
-	date:       "$Date: 1999/10/02 13:56:15 $"
-	revision:   "$Revision: 1.5 $"
+	date:       "$Date: 2000/02/09 18:36:19 $"
+	revision:   "$Revision: 1.6 $"
 
 class LX_COMPRESSED_TABLES
 
@@ -88,6 +88,8 @@ feature -- Conversion
 			yyVariable_trail_context := other.yyVariable_trail_context
 			yyNb_rules := other.yyNb_rules
 			yyEnd_of_buffer := other.yyEnd_of_buffer
+			yyLine_used := other.yyLine_used
+			yyPosition_used := other.yyPosition_used
 		end
 
 	to_tables: LX_COMPRESSED_TABLES is

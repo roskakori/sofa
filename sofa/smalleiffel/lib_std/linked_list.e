@@ -215,7 +215,7 @@ feature
             until
                lnk1 = Void or not Result
             loop
-               Result := equal_like(lnk1.item,lnk2.item);
+               Result := safe_equal(lnk1.item,lnk2.item);
                lnk1 := lnk1.next;
                lnk2 := lnk2.next;
             end;
@@ -227,7 +227,7 @@ feature
          from  
             Result := lower;
          until
-            (Result > upper) or else equal_like(x,item(Result))
+            (Result > upper) or else safe_equal(x,item(Result))
          loop
             Result := Result + 1;
          end;
@@ -341,7 +341,7 @@ feature
          until
             lnk = Void
          loop
-            if equal_like(element,lnk.item) then
+            if safe_equal(element,lnk.item) then
                Result := Result + 1;
             end;
             lnk := lnk.next;
@@ -416,7 +416,7 @@ feature
          until 
             i > upper
          loop
-            if equal_like(item(i),old_value) then
+            if safe_equal(item(i),old_value) then
                put(new_value,i);
             end;
             i := i + 1;

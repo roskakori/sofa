@@ -18,7 +18,7 @@ class E_TRUE
    -- When using explicit constant `true'.
    --
 
-inherit BOOLEAN_CONSTANT redefine to_integer end;
+inherit BOOLEAN_CONSTANT;
 
 creation make
 
@@ -26,7 +26,7 @@ feature
 
    value: BOOLEAN is true;
 
-   to_integer: INTEGER is 1;
+   to_integer_or_error: INTEGER is 1;
 
    is_static: BOOLEAN is true;
 

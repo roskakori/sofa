@@ -12,7 +12,7 @@
 
    For example, if you are allowed to write the corresponding file, you
    can reprints the source file of class HELLO_WORLD using command :
-   pretty hello_world
+          pretty hello_world
 
    There are four modes of pretty printing -zen, -default, -end and
    -parano mode. Only one mode can be selected and mode -default is the

@@ -31,6 +31,8 @@
    Q19: [19]How can I help ?
    Q20: [20]Why don't you change this and add that?! It would be much
    better/cooler/whatever !
+   Q21: [21]How to customize the Garbage Collector for a new architecture
+   ?
 
    Questions and answers
 
@@ -62,18 +64,18 @@
    products made with it. They do not have to pay royalties. However,
    SmallEiffel doesn't come with any warranty (please read the COPYING
    file in the distribution). For extended support as well as consulting,
-   see [21]here.
+   see [22]here.
 
    Q05: Is it possible to do incremental compilation with SmallEiffel?
    A05: Before release -0.91 the answer was no. The answer is now YES.
    Because of the SmallEiffel type inference mechanism, SmallEiffel
    always produces all needed C files from scratch. As old C files are
    automatically saved, only modified C files are recompiled. See
-   [22]man/compile for details.
+   [23]man/compile for details.
 
    Q06: Is there a SmallEiffel mailing list?
    A06: Yes! SmallEiffel users and developpers can share their
-   experiences and ideas by subscribing to the [23]SmallEiffel official
+   experiences and ideas by subscribing to the [24]SmallEiffel official
    mailing list.
 
    Q07: What about the Guru section?
@@ -98,9 +100,9 @@
 
    Q09: Are there mirror FTP sites for SmallEiffel?
    A09: Australia
-   [24]ftp://ftp.progsoc.uts.edu.au/pub/Eiffel/SmallEiffel/
-   Austria [25]http://gd.tuwien.ac.at/pub/languages/SmallEiffel/
-   USA [26]ftp://ftp.cs.rit.edu/pub/mirrors/SmallEiffel/
+   [25]ftp://ftp.progsoc.uts.edu.au/pub/Eiffel/SmallEiffel/
+   Austria [26]http://gd.tuwien.ac.at/pub/languages/SmallEiffel/
+   USA [27]ftp://ftp.cs.rit.edu/pub/mirrors/SmallEiffel/
 
    Q10: Is it possible to use the Boehm-Demers-Weiser garbage collector
    with SmallEiffel?
@@ -108,9 +110,9 @@
    You just have to disable the generation of the GC by SmallEiffel
    (option -no_gc) and replace it by the BDW library. Note that the BDW
    GC can be easily added because SmallEiffel only uses
-   malloc/realloc/calloc/free.
+   malloc/realloc/calloc.
    You can download the BDW library from :
-   [27]http://reality.sgi.com/boehm_mti/gc_source
+          [28]http://reality.sgi.com/boehm_mti/gc_source
 
    How to integrate the Boehm-Demers-Weiser garbage collector with
    SmallEiffel (from a message of Dietmar Wolz) :
@@ -149,12 +151,12 @@
        -no_warning flag, and with all assertions on (default mode, or
        -all_check flag). This may reveal a problem in the code you're
        trying to compile rather than in SmallEiffel...
-    2. Check that you've got the [28]latest version of SmallEiffel.
-    3. Check that the bug has not been fixed in our [29]latest (beta or
+    2. Check that you've got the [29]latest version of SmallEiffel.
+    3. Check that the bug has not been fixed in our [30]latest (beta or
        working) version
-    4. Verify that is it not a known problem by [30]looking at our "not
+    4. Verify that is it not a known problem by [31]looking at our "not
        yet implemented" page
-    5. Check whether the problem has not already been reported in [31]the
+    5. Check whether the problem has not already been reported in [32]the
        SmallEiffel mailing-list
 
    A good and useful bug report -- that is, one that is more likely to be
@@ -177,8 +179,8 @@
        Whether the problem occurs with any assertion level or not.
        Whether the GC is concerned (try with and w/o the -no_gc flag).
 
-   Bug reports can be sent either to [32]Dominique.Colnet@loria.fr and
-   Olivier.Zendra@loria.fr, or to [33]the SmallEiffel mailing-list.
+   Bug reports can be sent either to [33]Dominique.Colnet@loria.fr and
+   Olivier.Zendra@loria.fr, or to [34]the SmallEiffel mailing-list.
    Don't worry if you don't get an ack: we don't send them because it
    takes time, but we store all the bug reports we receive. And we even
    try to fix them ASAP! :)
@@ -199,37 +201,37 @@
 
    Q16: How do I keep well informed about SmallEiffel?
    A16: The best way is to keep an eye on our web pages, more especially
-   on the [34]What's New? page and the [35]History of Changes.
+   on the [35]What's New? page and the [36]History of Changes.
    People who want detailed information may also decide to stay tuned to
-   [36]the SmallEiffel mailing-list.
+   [37]the SmallEiffel mailing-list.
 
    Q17: What documentation is provided with SmallEiffel?
    Where can I find Eiffel documentation?
    A17: The documentation provided with SmallEiffel is a transcript of
    what you can find on the original SmallEiffel Web site, at
-   [37]http://SmallEiffel.loria.fr. It is related only to the use and
+   [38]http://SmallEiffel.loria.fr. It is related only to the use and
    internals of SmallEiffel (yes, we know we still have to improve it ;)
    ).
    For information and documentation about the Eiffel language, check the
-   links on our [38]Internet resources page. Note that we are not aware
+   links on our [39]Internet resources page. Note that we are not aware
    of any complete Eiffel language manual freely available on the Web
    (yet?).
 
    Q18: Does SmallEiffel compile the whole Eiffel language ?
    A18: Yes. "Small" in SmallEiffel does not mean that a subset of the
-   language is used. See the [39]question about the SmallEiffel name.
+   language is used. See the [40]question about the SmallEiffel name.
 
    Q19: How can I help ?
    A19: The best way to help SmallEiffel and its users is probably to
    pick up some area you're interested in, and develop with SmallEiffel
    your own library, application, tool, extension, etc., releasing it to
    other users.
-   To avoid duplicate efforts, we suggest you have a look to [40]what
+   To avoid duplicate efforts, we suggest you have a look to [41]what
    other people are already doing around SmallEiffel and help them if
    something that's of interest to you is already under work. There are
    actually very good things in there, some we were not even aware of,
    when they were under development ! :)
-   Another very good way to help us is to follow the [41]bug report
+   Another very good way to help us is to follow the [42]bug report
    guidelines when you find some problem with SmallEiffel :))
    Finally, you may also consider funding the development of particular
    features you wouls like to have.
@@ -245,17 +247,43 @@
    need things we don't provide can always implement them and have them
    benefit everybody. A good way to do this is to start working on it,
    and ask other people (i.e. not the SmallEiffel team ;) ) to join and
-   help. See the [42]"How can I help ?" question.
+   help. See the [43]"How can I help ?" question.
    Alternatively, someone or some company who does need us to implement
    something may always consider funding a bit the development of
    SmallEiffel... After all, we've even heard that some people were
    selling sofware and making a bit of money with it... ;)))
 
+   Q21: How to customize the Garbage Collector for a new architecture ?
+   A21: The [44]install command is supposed to tune the GC automatically
+   for you. Unfortunately, on some systems, this is not yet automatic.
+   Here the way to fix your installation manually (hence to provide a
+   patch for the install command itself).
+   The content of file SmallEiffel/sys/gc indicates the appropriate
+   `mark_stack_and_registers' C function for your system. As an example,
+   if the file SmallEiffel/sys/gc contains on the very first line the
+   name linux.c, the file SmallEiffel/sys/gc_lib/linux.c is used to get
+   the appropriate definition of the `mark_stack_and_registers' C
+   function. This definition is automatically included in the generated C
+   files (use the -verbose flag to check for the path of the selected
+   gc_lib file).
+   If the very first line of the file SmallEiffel/sys/gc is NONE, the
+   compiler will continue to emit a warning about GC configuration and
+   will use the default SmallEiffel/sys/gc_lib/generic.c definition. To
+   fix this, you have to select the appropriate file of the
+   SmallEiffel/sys/gc_lib directory and update SmallEiffel/sys/gc
+   accordingly.
+   In order to check the GC, you should be able to run all files of the
+   SmallEiffel/misc/benchmarks/gc directory. If you don't find an
+   appropriate file for your system in the SmallEiffel/sys/gc_lib
+   directory, you should first check that the generic.c definition works.
+   The generic.c file contains some more information to allow you to
+   write your own new configuration.
+
                                    [Line]
 
              Copyright © Dominique COLNET and Suzanne COLLIN -
-                           [43]<colnet@loria.fr>
-                     Last update: 30 June 1999, by OZ.
+                           [45]<colnet@loria.fr>
+                   Last update: 26 November 2000, by DC.
 
 References
 
@@ -279,26 +307,28 @@ References
   18. file://localhost/home/colnet/SmallEiffel/man/man/SmallEiffelFAQ.html#Q18
   19. file://localhost/home/colnet/SmallEiffel/man/man/SmallEiffelFAQ.html#Q19
   20. file://localhost/home/colnet/SmallEiffel/man/man/SmallEiffelFAQ.html#Q20
-  21. file://localhost/home/colnet/SmallEiffel/man/support/support.html
-  22. file://localhost/home/colnet/SmallEiffel/man/man/compile.html
-  23. file://localhost/home/colnet/SmallEiffel/man/support/mailing-list.html
-  24. ftp://ftp.progsoc.uts.edu.au/pub/Eiffel/SmallEiffel/
-  25. http://gd.tuwien.ac.at/pub/languages/SmallEiffel/
-  26. ftp://ftp.cs.rit.edu/pub/mirrors/SmallEiffel/
-  27. http://reality.sgi.com/boehm_mti/gc_source/
-  28. file://localhost/home/colnet/SmallEiffel/man/misc/HISTORY.html
+  21. file://localhost/home/colnet/SmallEiffel/man/man/SmallEiffelFAQ.html#Q21
+  22. file://localhost/home/colnet/SmallEiffel/man/support/support.html
+  23. file://localhost/home/colnet/SmallEiffel/man/man/compile.html
+  24. file://localhost/home/colnet/SmallEiffel/man/support/mailing-list.html
+  25. ftp://ftp.progsoc.uts.edu.au/pub/Eiffel/SmallEiffel/
+  26. http://gd.tuwien.ac.at/pub/languages/SmallEiffel/
+  27. ftp://ftp.cs.rit.edu/pub/mirrors/SmallEiffel/
+  28. http://reality.sgi.com/boehm_mti/gc_source/
   29. file://localhost/home/colnet/SmallEiffel/man/misc/HISTORY.html
-  30. file://localhost/home/colnet/SmallEiffel/man/misc/NOT_YET_IMPLEMENTED.html
-  31. file://localhost/home/colnet/SmallEiffel/man/Mailing-list/threads.html
-  32. mailto:Dominique.Colnet@loria.fr,Olivier.Zendra@loria.fr
-  33. file://localhost/home/colnet/SmallEiffel/man/support/mailing-list.html
-  34. file://localhost/home/colnet/SmallEiffel/man/general/whatsnew.html
-  35. file://localhost/home/colnet/SmallEiffel/man/misc/HISTORY.html
-  36. file://localhost/home/colnet/SmallEiffel/man/support/mailing-list.html
-  37. http://SmallEiffel.loria.fr/
-  38. file://localhost/home/colnet/SmallEiffel/man/general/resources.html
-  39. file://localhost/home/colnet/SmallEiffel/man/man/SmallEiffelFAQ.html#Q01
-  40. file://localhost/home/colnet/SmallEiffel/man/general/repository.html
-  41. file://localhost/home/colnet/SmallEiffel/man/man/SmallEiffelFAQ.html#Q13
-  42. file://localhost/home/colnet/SmallEiffel/man/man/SmallEiffelFAQ.html#Q19
-  43. mailto:colnet@loria.fr
+  30. file://localhost/home/colnet/SmallEiffel/man/misc/HISTORY.html
+  31. file://localhost/home/colnet/SmallEiffel/man/misc/NOT_YET_IMPLEMENTED.html
+  32. file://localhost/home/colnet/SmallEiffel/man/Mailing-list/threads.html
+  33. mailto:Dominique.Colnet@loria.fr,Olivier.Zendra@loria.fr
+  34. file://localhost/home/colnet/SmallEiffel/man/support/mailing-list.html
+  35. file://localhost/home/colnet/SmallEiffel/man/general/whatsnew.html
+  36. file://localhost/home/colnet/SmallEiffel/man/misc/HISTORY.html
+  37. file://localhost/home/colnet/SmallEiffel/man/support/mailing-list.html
+  38. http://SmallEiffel.loria.fr/
+  39. file://localhost/home/colnet/SmallEiffel/man/general/resources.html
+  40. file://localhost/home/colnet/SmallEiffel/man/man/SmallEiffelFAQ.html#Q01
+  41. file://localhost/home/colnet/SmallEiffel/man/general/repository.html
+  42. file://localhost/home/colnet/SmallEiffel/man/man/SmallEiffelFAQ.html#Q13
+  43. file://localhost/home/colnet/SmallEiffel/man/man/SmallEiffelFAQ.html#Q19
+  44. file://localhost/home/colnet/SmallEiffel/man/man/install.html
+  45. mailto:colnet@loria.fr

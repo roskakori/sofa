@@ -15,16 +15,15 @@
 --
 class TICKET
 
-creation {ANY}
-   make
+creation make
 
-feature {ANY} -- Consultations :
+feature
 
    arrival_time: DATE;
 
    price(departure_time: DATE; hour_price: REAL): REAL is
       require
-         departure_time >= arrival_time;
+         departure_time >= arrival_time
       local
          nb_min: ARRAY[INTEGER];
       do
@@ -34,13 +33,11 @@ feature {ANY} -- Consultations :
                     + (hour_price * (nb_min @ nb_min.lower))) / 60;
       end;
 
-feature {ANY}
-
-   make (arrival: DATE) is
+   make(arrival: DATE) is
       do
          arrival_time := arrival;
       ensure
-         arrival_time = arrival;
+         arrival_time = arrival
       end;
 
 end -- TICKET

@@ -55,7 +55,7 @@
    Example 1
    When SmallEiffel is correctly installed, you can simply type the
    following command to test the hello world program:
-   compile hello_world
+          compile hello_world
 
    The compiler should tell you what's wrong or should compile Eiffel
    source files telling you the full path used to load the Eiffel source
@@ -64,7 +64,7 @@
 
    Example 2
    Type following command to finalize the hello_world simple program:
-   compile -boost -no_split -O3 hello_world
+          compile -boost -no_split -O3 hello_world
 
    Note that option -O3 is passed to the C compiler (see the manual of
    your C compiler). Options -boost and -no_split are passed to command
@@ -75,7 +75,7 @@
    Example 3
    To compile a big project (class PROJECT) with C files splitting and
    require assertions checked:
-   compile -require_check project
+          compile -require_check project
 
    The very first time, all C files are produced and compiled. Then, if
    you type the same command after some changes in the Eiffel source
@@ -84,10 +84,10 @@
    to the C compiler (previous object files have been saved).
    Keep in mind that C compiler options are not taken into account. Thus
    if you now want to do:
-   compile -require_check project -O3
+          compile -require_check project -O3
 
    You must use the clean command before:
-   clean project
+          clean project
 
    All C files will be then recompiled using the new C option -O3. You
    are thus sure that the new C options are taken into account.

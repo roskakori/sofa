@@ -8,8 +8,8 @@ indexing
 	author:     "Eric Bezault <ericb@gobosoft.com>"
 	copyright:  "Copyright (c) 1999, Eric Bezault and others"
 	license:    "Eiffel Forum Freeware License v1 (see forum.txt)"
-	date:       "$Date: 1999/10/02 12:43:21 $"
-	revision:   "$Revision: 1.9 $"
+	date:       "$Date: 1999/10/10 17:46:42 $"
+	revision:   "$Revision: 1.10 $"
 
 class ASCII2PS
 
@@ -154,6 +154,7 @@ feature {NONE} -- Initialization
 				end
 			end
 			if out_file /= Void and then not OUTPUT_STREAM_.is_closed (out_file) then
+				output_file := std.output
 				OUTPUT_STREAM_.close (out_file)
 			end
 		rescue

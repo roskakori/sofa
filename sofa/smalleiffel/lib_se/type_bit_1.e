@@ -36,11 +36,6 @@ feature
          fmt.put_integer(nb);
       end;
 
-   run_class: RUN_CLASS is
-      do
-         Result := small_eiffel.run_class(Current);
-      end;
-
    run_time_mark: STRING is
       do
          Result := written_mark;

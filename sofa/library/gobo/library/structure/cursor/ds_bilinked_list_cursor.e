@@ -8,8 +8,8 @@ indexing
 	author:     "Eric Bezault <ericb@gobosoft.com>"
 	copyright:  "Copyright (c) 1999, Eric Bezault and others"
 	license:    "Eiffel Forum Freeware License v1 (see forum.txt)"
-	date:       "$Date: 1999/09/01 12:32:07 $"
-	revision:   "$Revision: 1.4 $"
+	date:       "$Date: 1999/11/27 14:13:04 $"
+	revision:   "$Revision: 1.5 $"
 
 class DS_BILINKED_LIST_CURSOR [G]
 
@@ -40,8 +40,8 @@ feature -- Cursor movement
 		do
 			if after then
 				was_off := True
-				after := False
 				current_cell := container.last_cell
+				after := False
 			else
 				current_cell := current_cell.left
 			end

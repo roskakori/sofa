@@ -115,11 +115,6 @@ feature {NONE}
          end;
          check_for_root_class;
          if run_control.trace then
-            if cpp.wedit then
-               echo.w_put_string(command_name);
-               echo.w_put_string(" : cannot use -wedit with -trace flag.%N");
-               die_with_code(exit_failure_code);
-            end;
             if run_control.boost then
                echo.w_put_string(command_name);
                echo.w_put_string(" : cannot use -trace with -boost flag.%N");

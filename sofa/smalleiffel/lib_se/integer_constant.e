@@ -18,7 +18,7 @@ class INTEGER_CONSTANT
    -- For Manifest Constant of class INTEGER.
    --
 
-inherit BASE_TYPE_CONSTANT redefine to_integer end;
+inherit BASE_TYPE_CONSTANT;
 
 creation make
 
@@ -27,6 +27,11 @@ feature
    value: INTEGER;
 
    is_static: BOOLEAN is true;
+
+   to_integer_or_error: INTEGER is
+      do
+	 Result := value;
+      end;
 
    static_result_base_class: BASE_CLASS is
       do
@@ -59,11 +64,6 @@ feature
    compile_to_jvm_into(dest: TYPE): INTEGER is
       do
          Result := standard_compile_to_jvm_into(dest);
-      end;
-
-   to_integer: INTEGER is
-      do
-         Result := value;
       end;
 
    c_simple: BOOLEAN is

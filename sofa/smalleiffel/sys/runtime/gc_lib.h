@@ -19,12 +19,12 @@
 #define SE_GC_LIB 1
 
 #define RSOH_UNMARKED 15253
-#define RSOH_MARKED 0
 #define RSOH_FREE 1
+#define RSOH_MARKED 2
 
 
 #define FSOH_UNMARKED 1
-#define FSOH_MARKED 0
+#define FSOH_MARKED 2
 
 /* To codify the state and the type of some Memory Chunk, we are
    using the following definitions :
@@ -126,3 +126,4 @@ int fsocfl_count(void);
 int rsocfl_count(void);
 void gc_dispose_before_exit(void);
 void rsocfl_info(void);
+void mark_stack_and_registers (void);

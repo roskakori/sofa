@@ -28,7 +28,9 @@ feature
 
 feature {E_INSPECT}
 
-   incorrect_inspect_value(p: POSITION) is
+   bad_inspect_value(p: POSITION) is
+	 -- When some Eiffel "inspect" instruction without the optional 
+	 -- "else" part does not match the input. 
       require
          run_control.no_check
       do
@@ -62,8 +64,6 @@ feature {C_PRETTY_PRINTER}
          end;
       end;
 
-feature {C_PRETTY_PRINTER}
-
    initialize_runtime is
       do
          if used then
@@ -76,9 +76,9 @@ feature {C_PRETTY_PRINTER}
          run_control.boost
       do
          if used then
-            cpp.put_string("(internal_exception_handler(Void_call_target))");
+            cpp.put_string("internal_exception_handler(Void_call_target)");
          else
-            cpp.put_string("(se_print_run_time_stack(),exit(1))");
+            cpp.put_string("se_print_run_time_stack(),exit(1)");
          end;
       end;
 

@@ -6,34 +6,23 @@ indexing
 
 	library:    "Gobo Eiffel Structure Library"
 	author:     "Eric Bezault <ericb@gobosoft.com>"
-	copyright:  "Copyright (c) 1999, Eric Bezault and others"
+	copyright:  "Copyright (c) 2000, Eric Bezault and others"
 	license:    "Eiffel Forum Freeware License v1 (see forum.txt)"
-	date:       "$Date: 1999/10/02 14:08:29 $"
-	revision:   "$Revision: 1.6 $"
+	date:       "$Date: 2000/04/16 13:54:37 $"
+	revision:   "$Revision: 1.8 $"
 
 class DS_HASH_TABLE_CURSOR [G, K -> HASHABLE]
 
 inherit
 
 	DS_SPARSE_TABLE_CURSOR [G, K]
+		redefine
+			container
+		end
 
 creation
 
 	make
-
-feature {NONE} -- Initialization
-
-	make (a_table: like container) is
-			-- Create a new cursor for `a_table'.
-		require
-			a_table_not_void: a_table /= Void
-		do
-			container := a_table
-			position := Before_position
-		ensure
-			container_set: container = a_table
-			before: before
-		end
 
 feature -- Access
 

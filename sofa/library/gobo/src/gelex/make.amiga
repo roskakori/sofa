@@ -1,8 +1,0 @@
-; compile it for once and for all
-echo "compiling..."
-execute se.amiga
-echo "done."
-copy quiet clone gelex //bin
-clean gelex
-delete quiet gelex
-

@@ -715,10 +715,10 @@ rm -f AECL
 rm -f Ucomment
 
 # "op_quote" - To replace the default opening quote mark "`".
-echo $eopt '</EM></FONT><FONT COLOR="#000000">'$eend > op_quote
+echo $eopt '<STRONG>'$eend > op_quote
 
 # "cl_quote" - To close an "op_quote" to replace the closing quote mark "'".
-echo $eopt '</FONT><EM><FONT COLOR="#008F00">'$eend > cl_quote
+echo $eopt '</STRONG>'$eend > cl_quote
 
 # ---------------------------------------------------------------------------
 # 2.20. Miscellaneous tuning 

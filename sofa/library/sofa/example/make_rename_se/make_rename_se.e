@@ -369,6 +369,7 @@ feature {NONE}
 			rename_line: STRING;
 			short_name: STRING
 			long_name: STRING
+			rename_count: INTEGER
 		do  
 			print_status_line("rename " + directory.name);
 			rename_se_path := directory.name + "rename.se";
@@ -413,6 +414,7 @@ feature {NONE}
 									if pass = 1 then 
 										rename_line := class_file.name + ".e " + class_file.short_name + ".e%N";
 										rename_se_file.put_string(rename_line);
+										rename_count := rename_count + 1
 									end; 
 								else 
 									set_error_message("cannot extract %"" + class_file.old_path + "%" as %"" + class_file.new_path + "%" from %"" + archive_path + "%"");
@@ -424,6 +426,9 @@ feature {NONE}
 					pass := pass + 1;
 				end; 
 				rename_se_file.disconnect;
+				if rename_count = 0 then
+					file_tools.delete(rename_se_path)
+				end
 			else 
 				set_error_message("cannot write %"" + rename_se_path + "%"");
 			end; 

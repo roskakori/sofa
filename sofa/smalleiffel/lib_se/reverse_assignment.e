@@ -193,7 +193,9 @@ feature
             if nb_errors = 0 and then
                right_type.run_type.is_a(left_type.run_type) then
                if not right_side.is_current and then
-                  not left_type.is_like_current
+                  not left_type.is_like_current and then
+		  not right_type.is_formal_generic and then
+		  not left_type.is_formal_generic
                 then
                   eh.add_type(right_type," is a ");
                   eh.add_type(left_type,". Simple assignment is allowed");

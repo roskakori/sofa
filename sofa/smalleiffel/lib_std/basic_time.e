@@ -18,8 +18,8 @@ expanded class BASIC_TIME
 -- Basic time and date facilities.
 --
 
-inherit HASHABLE; COMPARABLE;
-
+inherit HASHABLE; COMPARABLE  redefine is_equal end;
+   
 feature
 
    is_local_time: BOOLEAN is
@@ -118,13 +118,19 @@ feature -- Setting :
    set(a_year, a_month, a_day, a_hour, a_min, sec: INTEGER): BOOLEAN is
          -- Try to set `Current' using the given information. If this input
          -- is not a valid date, the `Result' is false and `Current' is not updated.
+      require
+	 valid_month: a_month.in_range(1,12);
+	 valid_day: a_day.in_range(1,31);
+	 valid_hour: a_hour.in_range(0,23);
+	 valid_minute: a_min.in_range(0,59);
+	 valid_second: sec.in_range(0,59)
       local
-         time_mem: INTEGER;
+         tm: like time_memory;
       do
-         time_mem := basic_time_mktime(a_year,a_month,a_day,a_hour,a_min,sec);
-         if time_mem /= -1 then
+         tm := basic_time_mktime(a_year,a_month,a_day,a_hour,a_min,sec);
+         if tm /= -1 then
+            time_memory := tm;
             Result := true;
-            time_memory := time_mem;
          end;
       ensure
          Result implies (year = a_year);
@@ -148,35 +154,14 @@ feature
          Result >= 0
       end;
 
-   infix "<" (other: like Current): BOOLEAN is
-      local
-         v1, v2: INTEGER;
+   is_equal(other: like Current): BOOLEAN is
       do
-         v1 := year;
-         v2 := other.year;
-         if v1 < v2 then
-            Result := true;
-         elseif v1 = v2 then
-            v1 := year_day;
-            v2 := other.year_day;
-            if v1 < v2 then
-               Result := true;
-            elseif v1 = v2 then
-               v1 := hour;
-               v2 := other.hour;
-               if v1 < v2 then
-                  Result := true;
-               elseif v1 = v2 then
-                  v1 := minute;
-                  v2 := other.minute;
-                  if v1 < v2 then
-                     Result := true;
-                  elseif v1 = v2 then
-                     Result := second < other.second;
-                  end;
-               end;
-            end;
-         end;
+         Result := basic_time_difftime(other.time_memory,time_memory) = 0
+      end;
+
+   infix "<" (other: like Current): BOOLEAN is
+      do
+         Result := basic_time_difftime(other.time_memory,time_memory) > 0
       end;
    
 feature -- Setting common time mode (local or universal) :
@@ -212,9 +197,9 @@ feature -- Hashing :
    
 feature {BASIC_TIME}
 
-   time_memory : INTEGER
+   time_memory: DOUBLE;
          -- The current time value of `Current'. As far as I know, this 
-         -- kind of information fits on 32 bits for all platforms.
+         -- kind of information should always fit into a double.
    
 feature {NONE}
 
@@ -231,52 +216,52 @@ feature {NONE}
          Result = 0 or Result = 1
       end;
 
-   basic_time_time : INTEGER is
+   basic_time_time: DOUBLE is
       external "SmallEiffel"
       end;
    
-   basic_time_difftime (time2, time1 : INTEGER) : INTEGER is
+   basic_time_difftime(time2, time1: DOUBLE): INTEGER is
       external "SmallEiffel"
       end;
    
-   basic_time_getyear (tm: INTEGER; mode: INTEGER): INTEGER is
+   basic_time_getyear(tm: DOUBLE; mode: INTEGER): INTEGER is
       external "SmallEiffel"
       end;
    
-   basic_time_getmonth (tm: INTEGER; mode: INTEGER): INTEGER is
+   basic_time_getmonth(tm: DOUBLE; mode: INTEGER): INTEGER is
       external "SmallEiffel"
       end;
    
-   basic_time_getday (tm: INTEGER; mode: INTEGER): INTEGER is
+   basic_time_getday(tm: DOUBLE; mode: INTEGER): INTEGER is
       external "SmallEiffel"
       end;
    
-   basic_time_gethour (tm: INTEGER; mode: INTEGER): INTEGER is
+   basic_time_gethour(tm: DOUBLE; mode: INTEGER): INTEGER is
       external "SmallEiffel"
       end;
    
-   basic_time_getminute(tm: INTEGER; mode: INTEGER): INTEGER is
+   basic_time_getminute(tm: DOUBLE; mode: INTEGER): INTEGER is
       external "SmallEiffel"
       end;
    
-   basic_time_getsecond(tm: INTEGER; mode: INTEGER): INTEGER is
+   basic_time_getsecond(tm: DOUBLE; mode: INTEGER): INTEGER is
       external "SmallEiffel"
       end;
    
-   basic_time_is_summer_time_used(tm: INTEGER): BOOLEAN is
+   basic_time_is_summer_time_used(tm: DOUBLE): BOOLEAN is
       external "SmallEiffel"
       end;
    
-   basic_time_getyday(tm: INTEGER; mode: INTEGER): INTEGER is
+   basic_time_getyday(tm: DOUBLE; mode: INTEGER): INTEGER is
       external "SmallEiffel"
       end;
    
-   basic_time_getwday(tm: INTEGER; mode: INTEGER): INTEGER is
+   basic_time_getwday(tm: DOUBLE; mode: INTEGER): INTEGER is
       external "SmallEiffel"
       end;
    
    basic_time_mktime(a_year, a_mon, a_day, 
-                     a_hour, a_min, a_sec: INTEGER): INTEGER is
+                     a_hour, a_min, a_sec: INTEGER): DOUBLE is
       external "SmallEiffel"
       end;
    

@@ -8,8 +8,8 @@ indexing
 	author:     "Eric Bezault <ericb@gobosoft.com>"
 	copyright:  "Copyright (c) 1999, Eric Bezault and others"
 	license:    "Eiffel Forum Freeware License v1 (see forum.txt)"
-	date:       "$Date: 1999/10/02 13:46:32 $"
-	revision:   "$Revision: 1.4 $"
+	date:       "$Date: 2000/04/16 13:54:09 $"
+	revision:   "$Revision: 1.6 $"
 
 class KL_OUTPUT_STREAM_ROUTINES
 

@@ -8,8 +8,8 @@ indexing
 	author:     "Eric Bezault <ericb@gobosoft.com>"
 	copyright:  "Copyright (c) 1999, Eric Bezault and others"
 	license:    "Eiffel Forum Freeware License v1 (see forum.txt)"
-	date:       "$Date: 1999/10/02 13:56:42 $"
-	revision:   "$Revision: 1.9 $"
+	date:       "$Date: 2000/02/09 18:37:15 $"
+	revision:   "$Revision: 1.10 $"
 
 deferred class LX_TABLES
 
@@ -58,6 +58,12 @@ feature -- Constants
 	yyNull_equiv_class: INTEGER
 			-- Equivalence code for NULL character
 
+	yyLine_used: BOOLEAN
+			-- Are line and column numbers used?
+
+	yyPosition_used: BOOLEAN
+			-- Is `position' used?
+
 feature -- Conversion
 
 	from_tables (other: like to_tables) is
@@ -75,7 +81,7 @@ feature -- Conversion
 		ensure
 			tables_not_void: Result /= Void
 			-- set: forall attribute, Result.attribute = attribute
-		end	
+		end
 
 invariant
 

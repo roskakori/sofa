@@ -205,7 +205,7 @@ feature {NONE} -- For `compile_to_c' as well as `compile_to_jvm' :
       require
 	 bf /= Void
       do
-	 Result := ".....................";
+	 Result := o_flag_buffer;
          Result.clear;
          Result.append("fBC");
          bf.base_class.id.append_in(Result);
@@ -220,9 +220,24 @@ feature {NONE} -- For `compile_to_c' as well as `compile_to_jvm' :
 	 !!Result.make(64);
       end;
 
-   buffer2: STRING is 
+   c_define_o_result_buffer: STRING is 
       once
 	 !!Result.make(64);
+      end;
+
+   o_flag_buffer: STRING is
+      once
+	 !!Result.make(32);
+      end;
+
+   o_result_buffer: STRING is
+      once
+	 !!Result.make(32);
+      end;
+
+   jvm_descriptor_buffer: STRING is
+      once
+	 !!Result.make(32);
       end;
 
 feature {ABSTRACT_RESULT,RUN_FEATURE}
@@ -231,7 +246,7 @@ feature {ABSTRACT_RESULT,RUN_FEATURE}
       require
 	 bf /= Void
       do
-	 Result := "................";
+	 Result := o_result_buffer;
          Result.clear;
          Result.append("oBC");
          bf.base_class.id.append_in(Result);
@@ -356,9 +371,9 @@ feature {RUN_FEATURE} -- For `compile_to_c' :
 	       buffer.extend('*');
 	    end;
 	    buffer.append(oresult);
-	    buffer2.clear;
-	    rt.c_initialize_in(buffer2);
-	    cpp.put_extern5(buffer,buffer2);
+	    c_define_o_result_buffer.clear;
+	    rt.c_initialize_in(c_define_o_result_buffer);
+	    cpp.put_extern5(buffer,c_define_o_result_buffer);
 	 end;
      end;
 
@@ -415,7 +430,7 @@ feature {NONE} -- For `compile_to_jvm' :
 
    jvm_descriptor(rt: TYPE): STRING is
       do
-	 Result := ".............................";
+	 Result := jvm_descriptor_buffer;
          Result.clear;
          if rt.is_reference then
             Result.append(jvm_root_descriptor)
@@ -459,20 +474,18 @@ feature {NONE}
       local
 	 result_type: TYPE;
 	 local_vars: LOCAL_VAR_LIST;
+	 rf3: RUN_FEATURE_3;
       do
          if run_control.require_check then
             if rf.require_assertion /= Void then
                rf.require_assertion.compile_to_c;
             end;
          end;
-	 --
 	 result_type := rf.result_type;
-         if result_type.expanded_initializer /= Void then 
-            c_put_o_result(rf);
-	    cpp.put_character('=');
-	    result_type.c_initialize;
-            cpp.put_string(fz_00);
-         end;
+	 rf3 := result_type.expanded_initializer;
+	 if rf3 /= Void then 
+	    cpp.put_proc_call_0(rf3,Void,o_result(rf.base_feature));
+	 end;
 	 --
 	 local_vars := rf.local_vars;
          if local_vars /= Void then

@@ -202,7 +202,7 @@ feature {NONE}
          if ("-cecil").is_equal(flag) then
             Result := true;
             if argi < argc then
-               run_control.set_cecil_path(argument(argi + 1));
+               cecil_pool.add_file(argument(argi + 1));
             else
                echo.w_put_string(command_name);
                echo.w_put_string(" : missing file name after -cecil flag.%N");

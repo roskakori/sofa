@@ -25,7 +25,16 @@ creation {SMALL_EIFFEL} make
 feature
 
    current_type: TYPE;
-         -- Runnable corresponding one.
+         -- The runnable corresponding one.
+
+   run_time_mark: STRING;
+	 -- Alias the one of `current_type'.
+
+   base_class: BASE_CLASS;
+         -- Alias the one of `current_type'.
+
+   base_class_name: CLASS_NAME;
+         -- Alias the one of `base_class'.
 
    id: INTEGER;
          -- Id of the receiver to produce C code.
@@ -38,17 +47,17 @@ feature
          -- Void or the set of all `at_run_time' directly compatible
          -- run classes. A run class is directly compatible with one
          -- another only when it can be directly substitute with
-         -- current run class.
-         -- Thus, if current run class is reference, `running' are all
-         -- reference run classes. If current run class is expanded,
-         -- `running' has only one element (the current class itself).
+         -- current run class. Thus, if current run class is 
+	 -- reference, `running' are all reference run classes. If current 
+	 -- run class is expanded, `running' has only one element (the 
+	 -- current class itself).
 
    class_invariant: CLASS_INVARIANT;
          -- Collected Runnable invariant if any.
-
+   
    compile_to_c_done: BOOLEAN;
          -- True if `compile_to_c' has already be called.
-
+   
 feature {RUN_CLASS,E_STRIP}
 
    feature_dictionary: DICTIONARY[RUN_FEATURE,STRING];
@@ -61,34 +70,32 @@ feature {NONE}
    tagged_mem: INTEGER;
          -- 0 when not computed, 1 when tagged or -1
 
-   debug_info: STRING;
-
-   make(t: like current_type) is
+   make(t: like current_type; rtm: STRING) is
       require
-         t.run_type = t
+	 rtm = t.run_time_mark;
+         t.run_type = t;
       local
-         run_string: STRING;
          rcd: DICTIONARY[RUN_CLASS,STRING];
          rc: RUN_CLASS;
          i: INTEGER;
+	 type_tuple: TYPE_TUPLE;
       do
-	 debug
-	    debug_info := t.run_time_mark;
-	 end;
+	 run_time_mark := rtm;
+         !!feature_dictionary.make;
+         check
+            not small_eiffel.run_class_dictionary.has(rtm);
+         end;
+         small_eiffel.run_class_dictionary.put(Current,rtm);
          compile_to_c_done := true;
          current_type := t;
          !!actuals_clients.with_capacity(16);
-         run_string := t.run_time_mark;
-         id := id_provider.item(run_string);
-         check
-            not small_eiffel.run_class_dictionary.has(run_string);
-         end;
-         small_eiffel.run_class_dictionary.put(Current,run_string);
-         !!feature_dictionary.make;
+         base_class := t.base_class;
+         base_class_name := t.base_class_name;
+         id := id_provider.item(rtm);
          small_eiffel.incr_magic_count;
          if t.is_expanded then
             set_at_run_time;
-            t.base_class.check_expanded_with(t);
+            base_class.check_expanded_with(t);
          else
             from
                rcd := small_eiffel.run_class_dictionary;
@@ -106,6 +113,10 @@ feature {NONE}
                i := i + 1;
             end;
          end;
+	 type_tuple ?= Current;
+	 if type_tuple /= Void then
+	    type_tuple.load_basic_features;
+	 end;
       ensure
          current_type = t
       end;
@@ -230,6 +241,95 @@ feature
          if Result = 0 then
             Result := 1;
          end;
+      end;
+
+feature {TYPE_TUPLE,SMALL_EIFFEL}
+
+   definitions_for_tuple(type_tuple: TYPE_TUPLE; types: ARRAY[TYPE]) is
+	 -- Add extra Eiffel code to handle the TUPLE type.
+      local
+	 count, i: INTEGER;
+	 name: STRING;
+	 sp: POSITION;
+	 sfn: SIMPLE_FEATURE_NAME;
+	 cai: CST_ATT_INTEGER;
+	 rf: RUN_FEATURE;
+      do
+	 if not feature_dictionary.has(as_count) then
+	    if types /= Void then
+	       count := types.count;
+	    end;
+	    -- Adding `count':
+	    sp.set_in(type_tuple.base_class);
+	    !!sfn.make(as_count,sp);
+	    !!cai.implicit(type_tuple.base_class,sfn,count);
+	    rf := cai.to_run_feature(type_tuple,sfn);
+	    -- Adding attributes (read/write):
+	    if count >= 1 then
+	       tuple_field(type_tuple,as_first,types.item(1));
+	    end;
+	    if count >= 2 then
+	       tuple_field(type_tuple,as_second,types.item(2));
+	    end;
+	    if count >= 3 then
+	       tuple_field(type_tuple,as_third,types.item(3));
+	    end;
+	    if count >= 4 then
+	       tuple_field(type_tuple,as_fourth,types.item(4));
+	    end;
+	    if count >= 5 then
+	       tuple_field(type_tuple,as_fifth,types.item(5));
+	    end;
+	    from
+	       i := 6;
+	    until
+	       i > count
+	    loop
+	       !!name.make(8);
+	       name.copy("item_");
+	       i.append_in(name);
+	       name := string_aliaser.item(name);
+	       tuple_field(type_tuple,name,types.item(i));
+	       i := i + 1;
+	    end;
+	 end;
+      end;
+
+feature {NONE}
+
+   tuple_field(type_tuple: TYPE; name: STRING; type: TYPE) is
+	 -- Add a new writable attribute supposed to be written in 
+	 -- `type_tuple'.
+      require
+	 not feature_dictionary.has(name)
+	 type_tuple /= Void;
+	 string_aliaser.item(name) = name;
+	 type /= Void
+      local
+	 sp: POSITION;
+	 bc: BASE_CLASS;
+	 wa: WRITABLE_ATTRIBUTE;
+	 sfn, set_sfn: SIMPLE_FEATURE_NAME;
+	 rf2: RUN_FEATURE_2;
+	 rf: RUN_FEATURE;
+	 set_name: STRING;
+	 aw: PROCEDURE;	 
+      do
+	 bc := type_tuple.base_class;
+	 sp.set_in(bc);
+	 -- The attribute:
+	 !!sfn.make(name,sp);
+	 !!wa.implicit(bc,sfn,type);
+	 rf2 := wa.to_run_feature(type_tuple,sfn);
+	 sfn.set_run_feature_2(rf2);
+	 -- The procedure to write the attribute:
+	 set_name := "set_" + name;
+	 set_name := string_aliaser.item(set_name);
+	 !!set_sfn.make(set_name,sp);
+	 !!aw.attribute_writer(bc,set_sfn,sfn);
+	 rf := aw.to_run_feature(type_tuple,set_sfn);
+      ensure 
+	 feature_dictionary.has(name)
       end;
 
 feature {TYPE}
@@ -380,24 +480,6 @@ feature
 
 feature
 
-   base_class: BASE_CLASS is
-         -- Corresponding base class.
-      do
-         Result := current_type.base_class;
-      ensure
-         Result /= Void
-      end;
-
-   base_class_name: CLASS_NAME is
-         -- Corresponding base class name.
-      do
-         Result := current_type.base_class_name;
-      ensure
-         Result /= Void
-      end;
-
-feature
-
    set_at_run_time is
          -- Set Current `at_run_time' and do needed update of others
          -- instances of RUN_CLASS.
@@ -473,7 +555,8 @@ feature {TYPE}
          wa: like writable_attributes;
          rf2: RUN_FEATURE_2;
       do
-         body := "... (to change ;-)";
+         body := c_print_function_buffer;
+         body.clear;
          ct := current_type;
          tmp_string.copy("void se_prinT");
          id.append_in(tmp_string);
@@ -483,14 +566,13 @@ feature {TYPE}
             tmp_string.extend('*');
          end;
          tmp_string.append("*o)");
-         body.clear;
          if ct.is_reference then
             body.append("if(*o==NULL){%N%
                         %fprintf(SE_ERR,%"Void%");%N%
                         %return;%N}%N");
          end;
          body.append("fprintf(SE_ERR,%"");
-         body.append(ct.run_time_mark);
+         body.append(run_time_mark);
          body.append("%");%N");
          if ct.is_reference or else ct.is_native_array then
             body.append("fprintf(SE_ERR,%"#%%p%",*o);%N");
@@ -510,12 +592,13 @@ feature {TYPE}
                body.append(" = %");%Nse_prinT");
                if t.is_expanded then
                   t.id.append_in(body);
-               elseif t.is_string then
-                  body.extend('7');
+		  body.extend('(');
+              elseif t.is_string then
+		  body.append("7((EIF_STRING*)");
                else
-                  body.extend('0');
+		  body.append("0((T0**)");
                end;
-               body.append("((void*)(&((*o)");
+               body.append("(&((*o)");
                if ct.is_reference then
                   body.append("->");
                else
@@ -983,13 +1066,13 @@ feature {RUN_CLASS}
          end;
       end;
 
-feature {E_FEATURE}
+feature
 
    at(fn: FEATURE_NAME): RUN_FEATURE is
-         -- Simple look in the dictionary to see if the feature
-         -- is already computed.
+         -- Simple read acces into the `feature_dictionary' using `fn' as the final 
+         -- name to know if this one is already computed.
       require
-         fn /= Void;
+         fn /= Void
       local
          to_key: STRING;
       do
@@ -999,12 +1082,11 @@ feature {E_FEATURE}
          end;
       end;
 
-feature
-
    get_feature_with(n: STRING): RUN_FEATURE is
          -- Assume that `n' is really the final name in current RUN_CLASS.
+	 -- Retrieve or compute the corresponding one.
       require
-         n /= Void;
+         n /= Void
       local
          sfn: SIMPLE_FEATURE_NAME;
       do
@@ -1046,10 +1128,12 @@ feature
                efnf(bc,fn);
             else
                Result := f.to_run_feature(current_type,fn);
-               if Result /= Void  then
-                  store_feature(Result);
-               else
+               if Result = Void  then
                   efnf(bc,fn);
+               else
+                  check
+		     feature_dictionary.has(Result.name.to_key);
+		  end;
                end;
             end;
          end;
@@ -1106,7 +1190,7 @@ feature {SMALL_EIFFEL}
          type_ref_to_exp: TYPE_REF_TO_EXP;
       do
          echo.put_character('%T');
-         echo.put_string(current_type.run_time_mark);
+         echo.put_string(run_time_mark);
          echo.put_character('%N');
          jvm.start_new_class(Current);
          from
@@ -1306,6 +1390,7 @@ feature {NATIVE_SMALL_EIFFEL}
 		  body.append("new->_");
 		  body.append(name);
 		  body.append(",new->_capacity);%N");
+	       elseif t.is_dummy_expanded then
 	       elseif t.is_user_expanded then
 		  body.append("new->_");
 		  body.append(name);
@@ -1337,10 +1422,16 @@ feature {NATIVE_SMALL_EIFFEL}
 	 rf2: RUN_FEATURE_2;
 	 ct, t: TYPE;
 	 name: STRING;
+	 check_type: BOOLEAN;
       do
 	 ct := current_type;
 	 body.append("se_deep_equal_start();%N");
 	 if ct.is_reference then
+	    check_type := ct.run_class.is_tagged;
+	    if check_type then
+	       body.append("R=(C->id==a1->id);%N%
+			   %if(R){%N");
+	    end;
 	    body.append("R=se_deep_equal_search(C,a1);%N");
 	 end;
 	 body.append("if(!R){%N");
@@ -1413,6 +1504,7 @@ feature {NATIVE_SMALL_EIFFEL}
 		  body.append(",deep->_");
 		  body.append(name);
 		  body.append(",C->_capacity);%N");
+	       elseif t.is_dummy_expanded then
 	       elseif t.is_user_expanded then
 		  body.append("if(R)R=r");
 		  t.id.append_in(body);
@@ -1430,6 +1522,9 @@ feature {NATIVE_SMALL_EIFFEL}
                i := i - 1;
             end;
          end;
+	 if check_type then
+	    body.append("}%N");
+	 end;
 	 body.append("}%Nse_deep_equal_trats();%N");
       end;
 
@@ -1437,11 +1532,8 @@ feature {JVM}
 
    unqualified_name: STRING is
          -- Also used for the corresponding file name.
-      local
-         ct: TYPE;
       do
-         ct := current_type;
-         unqualified_name_memory.copy(ct.run_time_mark);
+         unqualified_name_memory.copy(run_time_mark);
          unqualified_name_memory.to_lower;
          unqualified_name_memory.replace_all('[','O');
          unqualified_name_memory.replace_all(']','F');
@@ -1468,7 +1560,7 @@ feature {SMALL_EIFFEL}
          r: like running;
          i: INTEGER;
       do
-         str := "......................................................";
+         str := demangling_buffer;
          str.clear;
          if at_run_time then
             str.extend('A');
@@ -1763,12 +1855,15 @@ feature {RUN_FEATURE}
          end;
       end;
 
-   add_rf(rf: RUN_FEATURE; key: STRING) is
+   add_run_feature(rf: RUN_FEATURE; fn: FEATURE_NAME) is
+      require
+	 rf.run_class = Current;
+	 rf.name = fn
       do
          check
-            not feature_dictionary.has(key)
+            not feature_dictionary.has(fn.to_key)
          end;
-         feature_dictionary.put(rf,key);
+         feature_dictionary.add(rf,fn.to_key);
       end;
 
 feature {CONVERSION_HANDLER}
@@ -1846,13 +1941,23 @@ feature {NONE}
          !!Result.make(32);
       end;
 
+   c_print_function_buffer: STRING is
+      once
+         !!Result.make(256);
+      end;
+
+   demangling_buffer: STRING is
+      once
+         !!Result.make(256);
+      end;
+
    efnf(bc: BASE_CLASS; fn: FEATURE_NAME) is
       require
          bc /= Void;
          fn /= Void
       do
          eh.append("Current type is ");
-         eh.append(current_type.run_time_mark);
+         eh.append(run_time_mark);
          eh.append(". There is no feature ");
          eh.append(fn.to_string);
          eh.append(" in class ");
@@ -1950,7 +2055,7 @@ feature {NONE}
       do
          compile_to_c_done := true;
          echo.put_character('%T');
-         echo.put_string(current_type.run_time_mark);
+         echo.put_string(run_time_mark);
          echo.put_character('%N');
          from
             i := 1;
@@ -1988,27 +2093,6 @@ feature {NONE}
          !!Result.make(256);
       end;
 
-   store_feature(rf: like get_feature) is
-         -- To update the dictionary from outside.
-         -- Note : this routine is necessary because of recursive call.
-      require
-         rf.run_class = Current
-      local
-         rf_key: STRING;
-      do
-         rf_key := rf.name.to_key;
-         if feature_dictionary.has(rf_key) then
-            check
-               feature_dictionary.at(rf_key) = rf
-            end;
-         else
-            feature_dictionary.put(rf,rf_key);
-            small_eiffel.incr_magic_count;
-         end;
-      ensure
-         get_feature(rf.name) = rf
-      end;
-
    get_or_fatal_error(fn: FEATURE_NAME): RUN_FEATURE is
       do
          Result := get_feature(fn);
@@ -2032,6 +2116,10 @@ feature {NONE}
 invariant
 
    current_type.run_type = current_type;
+
+   base_class = current_type.base_class;
+
+   base_class_name = current_type.base_class_name;
 
 end -- RUN_CLASS
 

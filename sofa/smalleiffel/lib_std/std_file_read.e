@@ -29,16 +29,10 @@ feature
          -- Not Void when connected to the corresponding file 
          -- on the disk.
    
-feature {INPUT_STREAM}
-   
-   input_stream: POINTER;
-
-feature {NONE}
-
-   memory: INTEGER;
-         -- Memory of the last available user's value.
-
-feature 
+   is_connected: BOOLEAN is
+      do
+         Result := path /= Void;
+      end;
    
    make is
       do
@@ -60,19 +54,12 @@ feature
          end;
       end;
 
-feature    
-
    disconnect is
       require
          is_connected
       do
          fclose(input_stream); 
          path := Void;
-      end;
-   
-   is_connected: BOOLEAN is
-      do
-         Result := path /= Void;
       end;
    
    read_character is
@@ -101,38 +88,26 @@ feature
          end;
       end;
 
-feature
-
    read_line_in(buffer: STRING) is
-      local
-         mem: INTEGER;
-         stream: POINTER;
       do
-         stream := input_stream;
          from  
-            if push_back_flag then
-               push_back_flag := false;
-               mem := memory;
-            else
-               mem := read_byte(stream);
-            end;
+            read_character;
          until
-            mem = eof_code 
+            memory = eof_code 
                or else 
-            mem = ('%N').code
+            memory = ('%N').code
                or else
-            mem = ('%R').code
+            memory = ('%R').code
          loop
-            buffer.extend(mem.to_character);
-            mem := read_byte(stream);
+            buffer.extend(memory.to_character);
+            read_character;
          end;
-         if mem = ('%R').code then
-            mem := read_byte(stream);
-            if mem /= ('%N').code then
+         if memory = ('%R').code then
+            read_character;
+            if memory /= ('%N').code then
                push_back_flag := true;
             end;
          end;
-         memory := mem;
       end;
 
 feature {FILE_TOOLS}
@@ -162,6 +137,10 @@ feature {FILE_TOOLS}
          not other.is_connected
       end;
 
+feature {INPUT_STREAM}
+   
+   input_stream: POINTER;
+
 feature {NONE}
 
    sfr_open(path_pointer: POINTER): POINTER is
@@ -171,6 +150,9 @@ feature {NONE}
    fclose(stream_pointer : POINTER) is
       external "C_InlineWithoutCurrent"
       end;
+
+   memory: INTEGER;
+         -- Memory of the last available user's value.
 
 end -- STD_FILE_READ 
 

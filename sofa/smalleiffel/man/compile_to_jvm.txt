@@ -68,24 +68,24 @@
    Example 1
    When SmallEiffel is correctly installed, you can simply type the
    following command to test the hello world program :
-   compile_to_jvm hello_world
+          compile_to_jvm hello_world
 
    Then, in order to execute the produced Java byte code, you can use
    command :
-   java hello_world
+          java hello_world
 
    Example 2
    As for command compile_to_c you can add the option -boost to avoid all
    assertions checks :
-   compile_to_jvm -boost hello_world
+          compile_to_jvm -boost hello_world
 
    Example 3
    To change the name of the output main class, you have to add the
    option -o :
-   compile_to_jvm -boost -o out hello_world
+          compile_to_jvm -boost -o out hello_world
 
    Then, you can run the Java byte code with :
-   java out
+          java out
 
    Note that the name used for the class files directory is also changed
    (this directory is also named out).
@@ -93,7 +93,7 @@
    Example 4
    Finally, the -verbose option may be useful to check what files are
    loaded, what files are created, or to fix some installation problem :
-   compile_to_jvm -verbose hello_world
+          compile_to_jvm -verbose hello_world
 
                                    [Line]
    Copyright © Dominique COLNET and Suzanne COLLIN - [4]<colnet@loria.fr>

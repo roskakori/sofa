@@ -6,10 +6,10 @@ indexing
 
 	library:    "Gobo Eiffel Structure Library"
 	author:     "Eric Bezault <ericb@gobosoft.com>"
-	copyright:  "Copyright (c) 1999, Eric Bezault and others"
+	copyright:  "Copyright (c) 2000, Eric Bezault and others"
 	license:    "Eiffel Forum Freeware License v1 (see forum.txt)"
-	date:       "$Date: 1999/09/01 12:53:05 $"
-	revision:   "$Revision: 1.3 $"
+	date:       "$Date: 2000/04/16 13:55:20 $"
+	revision:   "$Revision: 1.5 $"
 
 deferred class DS_TABLE [G, K]
 
@@ -61,6 +61,17 @@ feature -- Element change
 			inserted: has (k) and then item (k) = v
 			same_count: (old has (k)) implies (count = old count)
 			one_more: (not old has (k)) implies (count = old count + 1)
+		end
+
+	put_new (v: G; k: K) is
+			-- Associate `v' with key `k'.
+		require
+			valid_key: valid_key (k)
+			new_item: not has (k)
+		deferred
+		ensure
+			one_more: count = old count + 1
+			inserted: has (k) and then item (k) = v
 		end
 
 	swap (k, l: K) is

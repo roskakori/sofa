@@ -30,31 +30,34 @@ if [ -f ${SE} ]; then
    exit 1
 fi
 cd ${SE}/sys
-if [ `uname` = Linux ]
+un=`uname`
+if [ $un = Linux ]
  then
   gc=linux.c
-elif [ `uname` = FreeBSD ]
+elif [ $un = FreeBSD -o $un = BSD/OS -o $un = NetBSD -o $un = OpenBSD ]
  then
-  gc=freebsd.c
-elif [ `uname` = SunOS ]
+  gc=bsd.c
+elif [ $un = SunOS ]
  then
   gc=sparc.c
-elif [ `uname` = OSF1 ]
+elif [ $un = OSF1 ]
  then
   gc=alpha.c
-elif [ `uname` = HP-UX ]
+elif [ $un = HP-UX ]
  then
   gc=hp-pa.c
-elif [ `uname` = AIX ]
+elif [ $un = AIX ]
  then
   gc=aix.c
+elif [ $un = QNX ]
+ then
+  gc=qnx.c
 else
   echo GC is not supported for this architecture.
-  echo Read file ${SE}/sys/gc to try to fix this.
+  echo Have a look in the SmallEiffel FAQ to try to fix this.
+  echo Also read file ${SE}/gc_lib/generic.c to try to fix this.
   gc="NONE"
 fi
 echo GC for ${gc} selected \(${SE}/sys/gc updated\).
-/bin/rm -rf gc_tmp
-echo ${gc} > gc_tmp
-cat gc >> gc_tmp
-mv -f gc_tmp gc
+/bin/rm -rf gc
+echo ${gc} > gc

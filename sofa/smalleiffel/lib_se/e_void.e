@@ -38,6 +38,8 @@ feature
 
    static_value: INTEGER is 0;
 
+   to_integer_or_error: INTEGER is 0;
+
    is_pre_computable: BOOLEAN is true;
 
    is_manifest_string: BOOLEAN is false;

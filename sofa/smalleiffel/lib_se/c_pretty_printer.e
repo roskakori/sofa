@@ -212,9 +212,9 @@ feature
 	 current_out.put_character(']');
       end;
 
-   put_se_string_from_external_copy(c_string: STRING) is
+   put_se_string(c_string: STRING) is
       do
-	 current_out.put_string("se_string_from_external_copy(");
+	 current_out.put_string("se_string(");
 	 put_string_c(c_string);
 	 current_out.put_character(')');
       end;
@@ -277,7 +277,12 @@ feature
 	    end;
 	 when C_inline_dca then
 	    put_character('(');
-	    stack_rf.item(top).current_type.mapping_cast;
+	    ct := stack_rf.item(top).current_type;
+	    check
+	       ct.run_class.running.count = 1
+	    end;
+	    ct := ct.run_class.running.first.current_type;
+	    ct.mapping_cast;
 	    put_character('(');
 	    put_target_as_value;
 	    put_string(fz_13);
@@ -418,13 +423,15 @@ feature {SMALL_EIFFEL}
 	    backup_sfw_connect(out_c,path_c);
 	 end;
 	 current_out := out_c;
+	 begin_c_linkage (out_c)
 	 add_first_include(path_h);
 	 !!out_h.make;
 	 echo.sfw_connect(out_h,path_h);
 	 current_out := out_h;
+	 begin_c_linkage (out_h)
 	 put_banner(out_h);
 	 out_h.put_character('%N');
-	 sys_runtime_h(fz_base);
+	 sys_runtime_h_and_c(fz_base);
 	 current_out := out_c;
       ensure
 	 on_c
@@ -436,7 +443,7 @@ feature {SMALL_EIFFEL}
       do
 	 save_out_h := out_h;
 	 cecil_pool.c_define_users;
-	 out_h := save_out_h;
+	 out_h := save_out_h; 
       end;
 
    define_used_basics is
@@ -470,16 +477,20 @@ feature {SMALL_EIFFEL}
 	 end;
 
     customize_runtime(basic_sys_runtime: FIXED_ARRAY[STRING]) is
+      require 
+	 basic_sys_runtime /= Void
       local
 	 i: INTEGER;
+	 item: STRING;
       do
 	 if run_control.no_check then
 	    sys_runtime_h_and_c("no_check");
+	    if wedit then
+	       out_h.put_string("#define SE_WEDIT 1%N");
+	    end;
 	    if run_control.trace then
 	       put_extern2("int se_trace_flag",'0');
 	       out_h.put_string("#define SE_TRACE 1%N");
-	    elseif wedit then
-	       out_h.put_string("#define SE_WEDIT 1%N");
 	    end;
 	    sys_runtime_h_and_c("trace");
 	 else
@@ -488,15 +499,17 @@ feature {SMALL_EIFFEL}
 	 if run_control.deep_twin_used then
 	    sys_runtime_h_and_c(as_deep_twin);
 	 end;
-	 if basic_sys_runtime /= void then
-	    from
-	       i := basic_sys_runtime.upper;
-	    until
-	       i < 0
-	    loop
-	       sys_runtime_h_and_c(basic_sys_runtime.item(i));
-	       i := i - 1;
+	 from
+	    i := basic_sys_runtime.upper;
+	 until
+	    i < 0
+	 loop
+	    item := basic_sys_runtime.item(i);
+	    if item.has_prefix("basic_gui") then
+	       system_tools.add_lib_basic_gui;
 	    end;
+	    sys_runtime_h_and_c(item);
+	    i := i - 1;
 	 end;
 	 exceptions_handler.get_started;
       end;
@@ -591,6 +604,7 @@ feature
 	 inspect
 	    code
 	 when C_expanded_initialize then
+	    check false end;
 	 when C_inside_twin then
 	    put_ith_argument(1);
 	 when C_direct_call then
@@ -803,7 +817,7 @@ feature {NATIVE_SMALL_EIFFEL}
 	 end;
       end;
 
-feature {CECIL_POOL}
+feature {CECIL_FILE}
 
    connect_cecil_out_h(user_path_h: STRING) is
       do
@@ -940,18 +954,20 @@ feature {SWITCH}
 	 end;
       end;
 
-feature {CREATION_CALL_3_4,LOCAL_VAR_LIST}
+feature 
 
-   expanded_writable(rf3: RUN_FEATURE_3; writable: EXPRESSION) is
-	 -- Call the expanded initializer `rf3' using `writable'
-	 -- as target.
+   put_proc_call_0(rf3: RUN_FEATURE_3; writable: EXPRESSION; c_name: STRING) is
+	 -- To call the expanded initializer `rf3' (ie. a procedure without 
+	 -- arguments) using `writable' or `c_name' as target.
       require
 	 rf3.current_type.is_expanded;
-	 writable /= Void
+	 rf3.arguments = Void;
+	 (writable /= Void) xor (c_name /= Void)
       do
 	 stack_push(C_expanded_initialize);
 	 stack_target.put(writable,top);
-	 stack_rf.put(Void,top); -- *** UNNEEDED ???
+	 stack_string.put(c_name,top);
+	 stack_rf.put(Void,top);
 	 direct_call_count := direct_call_count + 1;
 	 rf3.mapping_c;
 	 pop;
@@ -1040,9 +1056,9 @@ feature
    se_trace_exp(p: POSITION) is
       do
 	 if run_control.no_check then
-	    if run_control.trace then
-	       out_c.put_string("se_trace(&ds,");
-	    elseif wedit then
+	    if wedit then
+	       out_c.put_string("ds.p=se_trace(");
+	    elseif run_control.trace then
 	       out_c.put_string("se_trace(&ds,");
 	    else
 	       out_c.put_string("(ds.p=");
@@ -1220,10 +1236,10 @@ feature {CREATION_CALL}
 	    loop
 	       a := wa.item(i);
 	       at := a.result_type.run_type;
-
 	       rf3 := at.expanded_initializer;
 	       if rf3 /= Void then
 		  stack_push(C_expanded_initialize);
+		  stack_string.put(Void,top);
 		  stack_target.put(Void,top);
 		  stack_rf.put(a,top);
 		  direct_call_count := direct_call_count + 1;
@@ -1248,18 +1264,22 @@ feature
       do
 	 --
 	 out_h.put_character('%N');
-      out_h.disconnect;
-      out_c.put_character('%N');
-      out_c.disconnect;
-      --
-      c_plus_plus_definitions;
-   echo.sfw_connect(out_make,path_make);
+	 end_c_linkage (out_h)
+	 out_h.disconnect;
+	 out_c.put_character('%N');
+	 end_c_linkage (out_c)
+	 out_c.disconnect;
+	 --
+	 c_plus_plus_definitions;
+         echo.sfw_connect(out_make,path_make);
 	 if no_split then
 	    write_make_file_no_split;
 	 else
 	    write_make_file_split;
 	 end;
-	 if system_tools.strip_executable(tmp_string) then
+	 if not executable_is_up_to_date and then 
+	    system_tools.strip_executable(tmp_string) 
+	  then
 	    echo_make;
 	 end;
 	 out_make.disconnect;
@@ -1391,7 +1411,7 @@ feature {COMPOUND}
 feature {COMPOUND,ASSERTION_LIST,E_LOOP}
 
    se_tmp_open_declaration: BOOLEAN is
-	 -- True if some `se_tmpXX' is needed.
+	 -- True if some `se_tmpXX' temporay is needed.
       local
 	 i: INTEGER;
 	 rf: RUN_FEATURE;
@@ -1418,7 +1438,7 @@ feature {COMPOUND,ASSERTION_LIST,E_LOOP}
 	    out_c.put_string(tmp_string);
 	 end;
       end;
-
+   
    se_tmp_close_declaration is
       do
 	 check
@@ -1430,7 +1450,7 @@ feature {COMPOUND,ASSERTION_LIST,E_LOOP}
 	    se_tmp_list.clear;
 	 end;
       end;
-
+   
 feature {RUN_FEATURE}
 
    se_tmp_add(rf: RUN_FEATURE) is
@@ -1440,35 +1460,46 @@ feature {RUN_FEATURE}
 
    se_tmp_open(rf: RUN_FEATURE): INTEGER is
 	 -- Result >= 0 implies a temporary variable is used and thus
-	 -- `se_tmp_close' must be called.
-	 -- Result < 0 indicate that no temporary variable is mandatory.
+	 -- `se_tmp_close' must be called. Actually, this `Result' is 
+	 -- the number of the corresponding temporary.
+	 -- Result < 0 indicate that no temporary variable is used.
       require
 	 rf.result_type /= Void
       local
 	 rt: TYPE;
+	 stop: BOOLEAN;
       do
-	 rt := rf.result_type;
-	 Result := se_tmp_list.fast_index_of(rf);
-	 if se_tmp_list.valid_index(Result) then 
-	    check
-	       rt.is_user_expanded and then not rt.is_dummy_expanded
+	 from
+	    Result := se_tmp_list.upper;
+	 until
+	    stop
+	 loop
+	    if Result < 0 then
+	       stop := true;
+	    elseif rf = se_tmp_list.item(Result) then
+	       stop := true;
+	       rt := rf.result_type;
+	       check
+		  rt.is_user_expanded and then not rt.is_dummy_expanded
+	       end;
+	       se_tmp_list.put(Void,Result);
+	       out_c.put_string("(*(se_tmp");
+	       out_c.put_integer(Result);
+	       out_c.put_character('=');
+	    else
+	       Result := Result - 1;
 	    end;
-	    se_tmp_list.put(Void,Result);
-	    out_c.put_string("(*(se_tmp");
-	    out_c.put_integer(Result);
-	    out_c.put_character('=');
-	 else
-	    Result := -1
 	 end;
       end;
-
-   se_tmp_close(i: INTEGER) is
+   
+   se_tmp_close(se_tmp_number: INTEGER) is
+	 -- Assume `se_tmp_number' is the value obtained with `se_tmp_open'.
       do
-	 check
-	    se_tmp_list.item(i) = Void
+	 check -- Probably obtained with `se_tmp_open' ?
+	    se_tmp_list.item(se_tmp_number) = Void
 	 end;
 	 out_c.put_string(",&se_tmp");
-	 out_c.put_integer(i);
+	 out_c.put_integer(se_tmp_number);
 	 out_c.put_string(fz_13);
       end;
 
@@ -1557,6 +1588,7 @@ feature {NATIVE_C_PLUS_PLUS}
 
    add_include_on(output: STD_FILE_WRITE; include: STRING) is
       do
+	 end_c_linkage (output)
 	 output.put_string("#include ");
 	 inspect
 	    include.first
@@ -1572,6 +1604,7 @@ feature {NATIVE_C_PLUS_PLUS}
 	    output.put_character('%"');
 	 end;
 	 output.put_character('%N');
+	 begin_c_linkage (output)
       end;
 
 feature {RUN_FEATURE_2}
@@ -1665,6 +1698,18 @@ feature {NONE}
 
    c_plus_plus: FIXED_ARRAY[NATIVE_C_PLUS_PLUS];
 
+   begin_c_linkage (output: STD_FILE_WRITE) is
+		 -- Begin wrap for C linkage
+      do
+	 output.put_string ("#ifdef __cplusplus%Nextern %"C%" {%N#endif%N")
+      end
+
+   end_c_linkage (output: STD_FILE_WRITE) is
+		 -- End wrap for C linkage
+      do
+	 output.put_string ("#ifdef __cplusplus%N}%N#endif%N")
+      end
+
    c_plus_plus_definitions is
       local
 	 cpp_path_h, cpp_path_c: STRING;
@@ -1683,6 +1728,8 @@ feature {NONE}
 	    cpp_path_c.append(c_plus_plus_suffix);
 	    echo.sfw_connect(out_h,cpp_path_h);
 	    echo.sfw_connect(out_c,cpp_path_c);
+	    begin_c_linkage (out_c)
+	    begin_c_linkage (out_h)
 	    add_first_include(cpp_path_h);
 	    system_tools.add_c_plus_plus_file(cpp_path_c);
 	    sys_runtime_h("c_plus_plus");
@@ -1696,6 +1743,8 @@ feature {NONE}
 		  i := i - 1;
 	       end;
 	    end;
+	    end_c_linkage (out_c)
+	    end_c_linkage (out_h)
 	    out_h.disconnect;
 	    out_c.disconnect;
 	    no_split := no_split_save;
@@ -1792,6 +1841,8 @@ feature {NONE}
       require
 	 rf /= Void;
 	 target /= Void
+      local
+	 rt: TYPE;
       do
 	 sure_void_count := sure_void_count + 1;
 	 put_character('(');
@@ -1808,12 +1859,23 @@ feature {NONE}
 	    put_character(',');
 	    exceptions_handler.se_evobt;
 	 end;
-	 if rf.result_type /= Void then
+	 rt := rf.result_type;
+	 if rt /= Void then
 	    put_character(',');
-	    rf.result_type.c_initialize;
+	    -- ***
+	    -- *** Because a bug in FreeBSD/gcc we have put here this 
+	    -- *** strange unnecessary cast to avoid a strange 
+	    -- *** warning:
+	    if rt.is_reference then
+	       put_string("(T0*)");
+	    end;
+	    -- *** Hope FreeBSD gcc will be fixed (to remove this 
+	    -- *** stuff placed here, 30 june 2000).
+	    -- ***
+	    rt.c_initialize;
 	 end;
 	 put_character(')');
-	 if rf.result_type = Void then
+	 if rt = Void then
 	    put_string(fz_00);
 	 end;
       end;
@@ -1827,28 +1889,6 @@ feature {NONE}
 	 stack_rf.put(rf,top);
 	 stack_target.put(t,top);
 	 stack_args.put(args,top);
-      end;
-
-   expanded_initializer(t: TYPE; a: RUN_FEATURE) is
-	 -- ***** CHANGE THIS ******
-	 -- Call the expanded initializer for type `t' if any.
-	 -- The result is assigned in writable `w' or to attribute
-	 -- `a' of the brand new created object in "n".
-      require
-	 t.is_expanded;
-	 a /= Void
-      local
-	 rf: RUN_FEATURE;
-      do
-	 rf := t.expanded_initializer;
-	 if rf /= Void then
-	    stack_push(C_expanded_initialize);
-	    stack_target.put(Void,top);
-	    stack_rf.put(a,top);
-	    direct_call_count := direct_call_count + 1;
-	    rf.mapping_c;
-	    pop;
-	 end;
       end;
 
    use_switch(up_rf: RUN_FEATURE; r: ARRAY[RUN_CLASS];
@@ -1932,10 +1972,11 @@ feature {NONE}
 	 put_c_heading("void initialize_eiffel_runtime(int argc,char*argv[])");
 	 if no_check then
 	    out_c.put_string(
-			     "se_frame_descriptor irfd={%"Initialysing runtime.%",0,0,%"%",1};%N%
-											 %se_dump_stack ds = {NULL,NULL,0,NULL,NULL};%N%
-											 %ds.fd=&irfd;%N%
-											 %ds.caller=se_dst;%N");
+             "se_frame_descriptor irfd={%"Initialysing runtime.%",%
+	     %0,0,%"%",1};%N%
+             %se_dump_stack ds = {NULL,NULL,0,NULL,NULL};%N%
+             %ds.fd=&irfd;%N%
+             %ds.caller=se_dst;%N");
 	 end;
 	 out_c.put_string("se_argc=argc;%Nse_argv=argv;%N");
 	 gc_handler.initialize_runtime;
@@ -1972,18 +2013,6 @@ feature {NONE}
 	 out_c.put_string(fz_12);
       ensure
 	 on_c
-      end;
-
-   define_is_equal_prototype(id: INTEGER) is
-      do
-	 tmp_string.copy("T6 r");
-	 (id).append_in(tmp_string);
-	 tmp_string.append(as_is_equal);
-	 tmp_string.append("(T");
-	 (id).append_in(tmp_string);
-	 tmp_string.append("*C, T0*a1)");
-	 out_h.put_string(tmp_string);
-	 out_c.put_string(tmp_string);
       end;
 
    check_assertion_mode: STRING;
@@ -2135,7 +2164,7 @@ feature {NONE}
       do
 	 output.put_string(fz_open_c_comment);
 	 output.put_string(
-			   "%N-- ANSI C code generated by :%N");
+			   "%NANSI C code generated by ");
 	 output.put_string(small_eiffel.copyright);
 	 output.put_string(fz_close_c_comment);
 	 output.put_character('%N');
@@ -2192,8 +2221,8 @@ feature {NONE}
 	 no_change, recompile: BOOLEAN;
 	 output_name: STRING;
       do
-	 no_change := true;
 	 from
+	    no_change := true;
 	    i := split_count;
 	 until
 	    i = 0
@@ -2232,7 +2261,8 @@ feature {NONE}
 	 else
 	    no_change := false;
 	 end;
-	 if no_change then
+	 if no_change and then not system_tools.is_linking_mandatory then
+	    executable_is_up_to_date := true;
 	    echo.put_string("Executable is up-to-date %
 			    %(no C compilation, no linking done).%N");
 	 else
@@ -2243,6 +2273,10 @@ feature {NONE}
 	    echo_make;
 	 end;
       end;
+
+   executable_is_up_to_date: BOOLEAN;
+	 -- When the executable seems to be already correct (no C 
+	 -- compilation and no linking is to be done).
 
    write_make_file_no_split is
       require
@@ -2258,6 +2292,7 @@ feature {NONE}
 	 flag: BOOLEAN;
 	 e: EXPRESSION;
 	 ct: TYPE;
+	 c_name: STRING;
       do
 	 inspect
 	    stack_code.item(top)
@@ -2285,13 +2320,18 @@ feature {NONE}
 	       call_invariant_end;
 	    end;
 	 when C_expanded_initialize then
+	    out_c.put_character('&');
 	    e := stack_target.item(top);
 	    if e /= Void then
-	       out_c.put_character('&');
 	       e.compile_to_c;
 	    else
-	       out_c.put_string("&n->_");
-	       out_c.put_string(stack_rf.item(top).name.to_string);
+	       c_name := stack_string.item(top);
+	       if c_name /= Void then
+		  out_c.put_string(c_name);
+	       else
+		  out_c.put_string("n->_");
+		  out_c.put_string(stack_rf.item(top).name.to_string);
+	       end;
 	    end;
 	 when C_inline_one_pc then
 	    print_current;

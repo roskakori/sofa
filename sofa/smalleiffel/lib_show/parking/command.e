@@ -15,13 +15,12 @@
 --
 class COMMAND
    --
-   -- Separate Handling of Keyboard Input.
+   -- To separate Handling of Keyboard Input.
    --
 
-creation {ANY}
-   make
+creation make
 
-feature {ANY}
+feature 
 
    arrival: BOOLEAN is
       do
@@ -32,61 +31,61 @@ feature {ANY}
       do
          Result := (code = c_departure)
       end;
-
+   
    level_count: BOOLEAN is
       do
          Result := (code = c_level_count)
       end;
-
+   
    hour_price: BOOLEAN is
-         do
+      do
          Result := (code = c_hour_price)
       end;
-
+   
    add_time: BOOLEAN is
-         do
+      do
          Result := (code = c_add_time)
       end;
-
+   
    clock: BOOLEAN is
-         do
+      do
          Result := (code = c_clock)
       end;
-
+   
    quit: BOOLEAN is
       do
          Result := (code = c_quit)
       end;
-
+   
    help: BOOLEAN is
       do
          Result := (code = c_help)
       end;
-
+   
    arg_real: REAL is
       do
          Result := cmd.to_real;
       end;
-
+   
    arg_integer: INTEGER is
       do
          Result := cmd.to_integer;
       end;
-
+   
    count: BOOLEAN is
       do
          Result := (code = c_count)
       end;
-
-feature {ANY} -- Modifications :
+   
+feature -- Modifications:
 
    make is
       do
       end;
-
+   
    get_command(sio: STD_INPUT_OUTPUT) is
       require
-         sio /= Void;
+         sio /= Void
       local
          stop: BOOLEAN;
       do
@@ -102,27 +101,28 @@ feature {ANY} -- Modifications :
             cmd.remove(1);
             stop := ((code /= ' ') and (code /= '%T')) or (cmd.count < 1)
          end;
-      end; -- get_command
+      end;
 
    print_help_on(sio: STD_INPUT_OUTPUT) is
       require
-         sio /= Void;
+         sio /= Void
       do
-         sio.put_string(" Commands :%N%
-                         % -------------------%N%
-                         % q        Quit%N%
-                         % a        Arrival of a car%N%
-                         % d <i>    Departure of car number <i>%N%
-                         % l <i>    number of car at Level <i>%N%
-                         % h <x>    set Hour price with <x>%N%
-                         % c        total Count of cars%N%
-                         % t <i>    add Time <i> minutes%N%
-                         % T        current Time%N%
-                         % ?        help%N");
+         sio.put_string(
+            " Commands :%N%
+	    % -------------------%N%
+	    % q        Quit%N%
+	    % a        Arrival of a car%N%
+	    % d <i>    Departure of car number <i>%N%
+	    % l <i>    number of car at Level <i>%N%
+	    % h <x>    set Hour price with <x>%N%
+	    % c        total Count of cars%N%
+	    % t <i>    add Time <i> minutes%N%
+	    % T        current Time%N%
+	    % ?        help%N");
       end;
-
+   
 feature {COMMAND}
-
+   
    c_arrival : CHARACTER is 'a';
    c_departure : CHARACTER is 'd';
    c_level_count : CHARACTER is 'l';
@@ -132,11 +132,11 @@ feature {COMMAND}
    c_quit : CHARACTER is 'q';
    c_count : CHARACTER is 'c';
    c_help : CHARACTER is '?';
-
+   
    code : CHARACTER;
-
+   
 feature {NONE}
-
+   
    cmd: STRING;
-
+   
 end -- COMMAND

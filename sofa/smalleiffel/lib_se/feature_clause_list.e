@@ -19,20 +19,6 @@ inherit GLOBALS;
 
 creation {BASE_CLASS} make
 
-feature {NONE}
-
-   list: ARRAY[FEATURE_CLAUSE];
-
-   make(first: FEATURE_CLAUSE) is
-      require
-         first /= Void
-      do
-         !!list.with_capacity(4,1);
-	 list.add_last(first);
-      ensure
-         list.first = first
-      end;
-
 feature
 
    pretty_print is
@@ -40,7 +26,7 @@ feature
          i: INTEGER;
       do
          from
-            i := 1;
+            i := list.lower;
          until
             i > list.upper
          loop
@@ -53,7 +39,7 @@ feature
             i := i + 1;
          end;
       ensure
-         fmt.indent_level = 0;
+         fmt.indent_level = 0
       end;
 
 feature {SHORT}
@@ -65,7 +51,7 @@ feature {SHORT}
          fc: FEATURE_CLAUSE;
       do
          from
-            i := 1;
+            i := list.lower;
          until
             i > list.upper
          loop
@@ -82,25 +68,37 @@ feature {BASE_CLASS}
          i: INTEGER;
       do
          from
-            i := 1;
+            i := list.upper;
          until
-            i > list.upper
+            i < list.lower
          loop
             list.item(i).add_into(fd);
-            i := i + 1;
+            i := i - 1;
          end;
       end;
 
    add_last(fc: FEATURE_CLAUSE) is
       require
-         fc /= Void;
+         fc /= Void
       do
          list.add_last(fc);
       end;
 
-invariant
+feature {NONE}
 
-   list.lower = 1;
+   list: FIXED_ARRAY[FEATURE_CLAUSE];
+
+   make(first: FEATURE_CLAUSE) is
+      require
+         first /= Void
+      do
+         !!list.with_capacity(12);
+	 list.add_last(first);
+      ensure
+         list.first = first
+      end;
+
+invariant
 
    not list.is_empty;
 

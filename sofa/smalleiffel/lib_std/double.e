@@ -19,8 +19,7 @@ inherit
       redefine
          infix "+", infix "-", infix "*", infix "/", infix "^", prefix "+",
          prefix "-", divisible, infix "<", infix "<=", infix ">", infix ">=",
-         one, zero, fill_tagged_out_memory, out_in_tagged_out_memory,
-         hash_code
+         fill_tagged_out_memory, out_in_tagged_out_memory, hash_code
       end;
    
 feature {ANY}
@@ -42,7 +41,7 @@ feature {ANY}
       end;
 
    infix "^" (e: INTEGER): DOUBLE is
-         -- Raise Current to `e'-th power (ANSI C pow).
+         -- Raise Current to `e'-th power (see also `pow').
       external "SmallEiffel" 
       end;
 
@@ -85,10 +84,6 @@ feature {ANY}
          Result := (other /= 0.0)
       end;
    
-   one: DOUBLE is 1.0;
-   
-   zero: DOUBLE is 0.0;
-
    double_floor: DOUBLE is
          -- Greatest integral value no greater than Current.
       external "SmallEiffel"
@@ -102,10 +97,10 @@ feature {ANY}
          d := double_floor;
          Result := d.truncated_to_integer;
       ensure 
-         result_no_greater: Result.to_double <= Current;
-         close_enough: Current - Result < one;
+         result_no_greater: Result <= Current;
+	 close_enough: Current - Result < one
       end;
-      
+
    double_ceiling: DOUBLE is
          -- Smallest integral value no smaller than Current.
       do
@@ -120,10 +115,10 @@ feature {ANY}
          d := double_ceiling;
          Result := d.truncated_to_integer;
       ensure
-         result_no_smaller: Current <= Result;
-         close_enough: Current - Result < one;
+	 result_no_smaller: Result >= Current;
+	 close_enough: Result - Current < one
       end;
-   
+
    rounded: INTEGER is
          -- Rounded integral value.
       do
@@ -202,69 +197,79 @@ feature {ANY}
 feature -- Maths functions :
 
    sqrt: DOUBLE is
-         -- Square routine (ANSI C sqrt).
+         -- Square root of `Current' (ANSI C `sqrt').
       require
-         Current >= 0;
+         Current >= 0
       external "SmallEiffel"
       end;
 
    sin: DOUBLE is
-         -- Sinus (ANSI C sin).
+         -- Sine of `Current' (ANSI C `sin').
       external "SmallEiffel"
       end;
 
    cos: DOUBLE is
-         -- Cosinus (ANSI C cos).
+         -- Cosine of `Current' (ANSI C `cos').
       external "SmallEiffel"
       end;
 
    tan: DOUBLE is
-         -- (ANSI C tan).
+         -- Tangent of `Current' (ANSI C `tan').
       external "SmallEiffel"
       end;
 
    asin: DOUBLE is
-         -- (ANSI C asin).
+         -- Arc Sine of `Current' (ANSI C `asin').
       external "SmallEiffel"
       end;
 
    acos: DOUBLE is
-         -- (ANSI C acos).
+         -- Arc Cosine of `Current' (ANSI C `acos').
       external "SmallEiffel"
       end;
 
    atan: DOUBLE is
-         -- (ANSI C atan).
+         -- Arc Tangent of `Current' (ANSI C `atan').
+      external "SmallEiffel"
+      end;
+
+   atan2(x: DOUBLE): DOUBLE is
+         -- Arc Tangent of `Current' / `x'  (ANSI C `atan2').
       external "SmallEiffel"
       end;
 
    sinh: DOUBLE is
-         -- (ANSI C sinh).
+         -- Hyperbolic Sine of `Current' (ANSI C `sinh').
       external "SmallEiffel"
       end;
 
    cosh: DOUBLE is
-         -- (ANSI C cosh).
+         -- Hyperbolic Cosine of `Current' (ANSI C `cosh').
       external "SmallEiffel"
       end;
 
    tanh: DOUBLE is
-         -- (ANSI C tanh).
+	 -- Hyperbolic Tangent of `Current' (ANSI C `tanh').
       external "SmallEiffel"
       end;
 
    exp: DOUBLE is
-         -- (ANSI C exp).
+         -- Exponential of `Current' (ANSI C `exp').
       external "SmallEiffel"
       end;
 
    log: DOUBLE is
-         -- (ANSI C log).
+         -- Natural Logarithm of `Current' (ANSI C `log').
       external "SmallEiffel"
       end;
 
    log10: DOUBLE is
-         -- (ANSI C log10).
+         -- Base-10 Logarithm of Current (ANSI C `log10').
+      external "SmallEiffel"
+      end;
+
+   pow(e: DOUBLE): DOUBLE is
+	 -- `Current' raised to the power of `e' (ANSI C `pow').
       external "SmallEiffel"
       end;
 

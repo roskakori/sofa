@@ -88,19 +88,25 @@ feature
 
    one: like Current is
       do
-         !!Result;
-         Result.set_item(1.0);
+         Result := (1.0).to_double;
       end;
 
    zero: like Current is
       do
-         !!Result;
-         Result.set_item(0.0);
+         Result := (0.0).to_double;
+      end;
+
+   sign: INTEGER is
+      do
+	 if item < 0.0 then
+	    Result := -1;
+	 elseif item > 0.0 then
+	    Result := 1;
+	 end;
       end;
 
    out_in_tagged_out_memory, fill_tagged_out_memory is
       do
-         tagged_out_memory.append("item: "); 
          item.fill_tagged_out_memory;
       end;
 

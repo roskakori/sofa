@@ -8,8 +8,8 @@ indexing
 	author:     "Eric Bezault <ericb@gobosoft.com>"
 	copyright:  "Copyright (c) 1999, Eric Bezault and others"
 	license:    "Eiffel Forum Freeware License v1 (see forum.txt)"
-	date:       "$Date: 1999/10/02 13:47:47 $"
-	revision:   "$Revision: 1.7 $"
+	date:       "$Date: 2000/02/02 10:28:32 $"
+	revision:   "$Revision: 1.8 $"
 
 class KL_STRING_ROUTINES
 
@@ -46,6 +46,63 @@ feature -- Status report
 			a_string_not_void: a_string /= Void
 		do
 			Result := a_string.is_integer
+		end
+
+feature -- Access
+
+	case_insensitive_hash_code (a_string: STRING): INTEGER is
+			-- Hash code value of `a_string' which doesn't
+			-- take case sensitivity into account
+		require
+			a_string_not_void: a_string /= Void
+		local
+			i, nb: INTEGER
+		do
+			nb := a_string.count
+			if nb > 5 then
+				Result := nb * a_string.item (nb).to_lower.code
+				i := 5
+			else
+				i := nb
+			end
+			from until i <= 0 loop
+				Result := Result + a_string.item (i).to_lower.code
+				i := i - 1
+			end
+			Result := Result * nb
+		ensure
+			hash_code_positive: Result >= 0
+		end
+
+feature -- Comparison
+
+	same_case_insensitive (s1, s2: STRING): BOOLEAN is
+			-- Are `s1' and `s2' made up of the same
+			-- characters (case insensitive)?
+		require
+			s1_not_void: s1 /= Void
+			s2_not_void: s2 /= Void
+		local
+			c1, c2: CHARACTER
+			i: INTEGER
+		do
+			if s1 = s2 then
+				Result := True
+			elseif s1.count = s2.count then
+				Result := True
+				from i := s1.count until i < 1 loop
+					c1 := s1.item (i)
+					c2 := s2.item (i)
+					if c1 = c2 then
+						i := i - 1
+					elseif c1.to_lower = c2.to_lower then
+						i := i - 1
+					else
+						Result := False
+						i := 0  -- Jump out of the loop
+					end
+				end
+			end
 		end
 
 feature -- Conversion

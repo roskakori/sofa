@@ -8,8 +8,8 @@ indexing
 	author:     "Eric Bezault <ericb@gobosoft.com>"
 	copyright:  "Copyright (c) 1999, Eric Bezault and others"
 	license:    "Eiffel Forum Freeware License v1 (see forum.txt)"
-	date:       "$Date: 1999/10/02 14:01:39 $"
-	revision:   "$Revision: 1.6 $"
+	date:       "$Date: 1999/10/15 09:19:52 $"
+	revision:   "$Revision: 1.7 $"
 
 class PR_STATE
 
@@ -147,7 +147,9 @@ feature -- Comparison
 			i: INTEGER
 			other_positions: like positions
 		do
-			if
+			if other = Current then
+				Result := True
+			elseif
 				same_type (other) and then
 				hash_code = other.hash_code and
 				positions.count = other.positions.count
@@ -221,7 +223,7 @@ feature -- Element change
 					positions.resize (positions.count + Max_nb_positions_increment)
 				end
 				positions.put_last (a_position)
-				hash_code := hash_code + a_position.index
+				hash_code := hash_code + a_position.hash_code
 			end
 		ensure
 			position_added: positions.has (a_position)

@@ -7,16 +7,16 @@
  * - empty lines and "--" lines are removed from loadpath.se
  * - for every se.sh script, a se.amiga script is created
  *
- * $VER: extract_gobo.rexx 1.2 (10.10.99)
+ * $VER: extract_gobo.rexx 1.3 (9.11.99)
  */
 AddLib('rexxsupport.library', 0, -30, 0)
 
-gobo_zip     = 'sofa_archive:gobo15.zip'
+gobo_zip     = 'sofa_archive:gobo16.zip'
 sofa_path    = 'sofa:'
 archive_path = 'sofa:archive/'
 library_path = 'sofa:library/'
 gobo_path    = 'sofa:library/gobo/'
-make_rename  = 'sofa:developer/make_rename_se/make_rename_se'
+make_rename  = 'sofa:library/sofa/example/make_rename_se/make_rename_se'
 
 temp_file = 't:make_gobo_conversion.tmp'
 path_file = 't:make_gobo_conversion.loadpath'
@@ -87,7 +87,7 @@ end
 /* Make rename.se */
 Say 'make rename.se'
 if ~no_rename then do
-   'sofa:developer/make_rename_se/make_rename_se amiga ' || gobo_zip
+   make_rename || ' amiga ' || gobo_zip
 end
 else do
    Say '   skipped'
@@ -159,7 +159,7 @@ if ~no_script then do
          amiga_script = Left(sh_script, Length(sh_script) - 2) || 'amiga'
          Say '   ' || amiga_script
          path = Left(sh_script, LastPos('/', sh_script))
-         'copy quiet clone sofa:settings/sofa.with ' || path || 'SCOPTIONS'
+         /* 'copy quiet clone sofa:settings/sofa.with ' || path || 'SCOPTIONS' */
          if Open('sh', sh_script, 'read') then do
             if Open('amiga', amiga_script, 'write') then do
                last_line = ''
@@ -177,6 +177,10 @@ if ~no_script then do
                      if rest ~= '' then do
                         Parse Var rest variable '=' value
                         line = 'set ' || variable || ' ' || value
+                     end
+                     Parse Var line head '>' tail
+                     if tail ~= '' then do
+                        line = head || ' >' || tail
                      end
                   end
 

@@ -3,7 +3,7 @@
 
 failat 1
 
-sofa_version = '1.1'
+sofa_version = '1.2'
 Parse Var sofa_version version '.' release
 
 list_file      = 't:lha_list_' || Pragma('ID') || '.tmp'

@@ -20,142 +20,72 @@ class CECIL_POOL
 
 inherit GLOBALS;
 
-feature {NONE}
+feature {COMMAND_FLAGS}
 
-   -- User's entry points from cecil file :
-   user_cecil_list: FIXED_ARRAY[RUN_FEATURE];
-   user_cecil_name: FIXED_ARRAY[STRING];
-
-   user_path_h: STRING;
-
+   add_file(path: STRING) is
+	 -- Add `path' as a new -cecil file to be considered.
+      require
+	 path /= Void
+      local
+	 cecil_file: CECIL_FILE;
+      do
+	 !!cecil_file.make(path);
+	 if cecil_files = Void then
+	    !!cecil_files.with_capacity(4);
+	 end;
+	 cecil_files.add_last(cecil_file);
+      end;
+   
 feature {SMALL_EIFFEL}
-
+   
    fill_up is
       local
-         t: TYPE;
-         rta: FIXED_ARRAY[TYPE];
-         fna: FIXED_ARRAY[FEATURE_NAME];
-         fn: FEATURE_NAME;
-         rf: RUN_FEATURE;
-         i: INTEGER;
-         rc: RUN_CLASS;
+	 i: INTEGER;
       do
-         -- For the user :
-         if run_control.cecil_path /= Void then
-            !!user_cecil_list.with_capacity(4);
-            !!user_cecil_name.with_capacity(4);
-            user_path_h := eiffel_parser.connect_to_cecil;
-            from
-               !!rta.with_capacity(4);
-               !!fna.with_capacity(4);
-            until
-               eiffel_parser.end_of_input
-            loop
-               user_cecil_name.add_last(eiffel_parser.parse_c_name);
-               rta.add_last(eiffel_parser.parse_run_type);
-               check
-                  nb_errors = 0
-               end;
-               fna.add_last(eiffel_parser.parse_feature_name);
-               check
-                  nb_errors = 0
-               end;
-            end;
-            eiffel_parser.disconnect;
-            echo.put_string("Loading cecil features.%N");
-            from
-               i := 0;
-            until
-               i > rta.upper
-            loop
-               t := rta.item(i).to_runnable(type_any);
-               fn := fna.item(i);
-               rc := t.run_class;
-               rf := rc.get_feature(fn);
-               if rf = Void then
-                  eh.add_position(fn.start_position);
-                  fatal_error("Error while loading feature of cecil file.");
-               end;
-               if rf.is_deferred then
-               elseif rc.running = Void then
-                  rc.set_at_run_time;
-               end;
-               user_cecil_list.add_last(rf);
-               switch_collection.update_with(rf);
-               i := i + 1;
-            end;
-         end;
+	 if cecil_files /= Void then
+	    from
+	       i := cecil_files.upper;
+	    until
+	       i < cecil_files.lower
+	    loop
+	       cecil_files.item(i).parse;
+	       i := i - 1;
+	    end;
+	 end;
+      end;
+
+   afd_check is
+      local
+	 i: INTEGER;
+      do
+	 if cecil_files /= Void then
+	    from
+	       i := cecil_files.upper;
+	    until
+	       i < cecil_files.lower
+	    loop
+	       cecil_files.item(i).afd_check;
+	       i := i - 1;
+	    end;
+	 end;
       end;
 
 feature {C_PRETTY_PRINTER}
 
    c_define_users is
-      do
-         if user_cecil_list /= Void then
-            echo.put_string("Cecil (for user) :%N");
-            cpp.connect_cecil_out_h(user_path_h);
-            c_define_for_list(user_cecil_list,user_cecil_name);
-            cpp.disconnect_cecil_out_h;
-         end;
-      end;
-
-feature {NONE}
-
-   c_define_for_list(cecil_list: FIXED_ARRAY[RUN_FEATURE];
-                     cecil_name: FIXED_ARRAY[STRING]) is
-      require
-         cecil_name.count = cecil_list.count
       local
-         i: INTEGER;
+	 i: INTEGER;
       do
-         from
-            i := cecil_list.upper;
-         until
-            i < 0
-         loop
-            c_define_for(cecil_name.item(i),cecil_list.item(i));
-            i := i - 1;
-         end;
-      end;
-
-feature {NONE}
-
-   c_define_for(c_name: STRING; rf: RUN_FEATURE) is
-      require
-         not c_name.is_empty;
-         rf /= Void
-      local
-         rfct, rfrt: TYPE;
-         rfargs: FORMAL_ARG_LIST;
-      do
-         rfct := rf.current_type;
-         rfrt := rf.result_type;
-         rfargs := rf.arguments;
-         echo.put_string(rfct.run_time_mark);
-         echo.put_character('.');
-         echo.put_string(rf.name.to_string);
-         echo.put_character('%N');
-         -- (1) ------------------------- Define Cecil heading :
-         tmp_string.clear;
-         if rfrt /= Void then
-            rfrt.c_type_for_external_in(tmp_string);
-         else
-            tmp_string.append(fz_void);
-         end;
-         tmp_string.extend(' ');
-         tmp_string.append(c_name);
-         tmp_string.extend('(');
-         rfct.c_type_for_external_in(tmp_string);
-         tmp_string.extend(' ');
-         tmp_string.extend('C');
-         if rfargs /= Void then
-            tmp_string.extend(',');
-            rfargs.external_prototype_in(tmp_string);
-         end;
-         tmp_string.extend(')');
-         cpp.put_c_heading(tmp_string);
-         cpp.swap_on_c;
-         define_body_of(rf);
+	 if cecil_files /= Void then
+	    from
+	       i := cecil_files.upper;
+	    until
+	       i < cecil_files.lower
+	    loop
+	       cecil_files.item(i).c_define_users;
+	       i := i - 1;
+	    end;
+	 end;
       end;
 
 feature {RUN_FEATURE}
@@ -185,11 +115,11 @@ feature {RUN_FEATURE}
                %se_dst=&ds;%N");
             end;
             if rfrt /= Void then
-               tmp_string.clear;
-               tmp_string.extend('{');
-               rfrt.c_type_for_external_in(tmp_string);
-               tmp_string.append(" R=");
-               cpp.put_string(tmp_string);
+               buffer.clear;
+               buffer.extend('{');
+               rfrt.c_type_for_external_in(buffer);
+               buffer.append(" R=");
+               cpp.put_string(buffer);
             end;
             !!cecil_target.make(rf);
             if rf.arguments /= Void then
@@ -215,12 +145,73 @@ feature {RUN_FEATURE}
          cpp.put_string(fz_12);
       end;
 
+feature {CECIL_FILE}
+
+   echo_for(rf: RUN_FEATURE) is
+      do
+	 if echo.verbose then
+	    echo.put_character('%T');
+	    echo.put_string(rf.current_type.run_time_mark);
+	    echo.put_character('.');
+	    echo.put_string(rf.name.to_string);
+	    echo.put_character('%N');
+	 end;
+      end;
+
+   c_define_for(c_name: STRING; rf: RUN_FEATURE) is
+      require
+         not c_name.is_empty;
+         rf /= Void
+      local
+         rfct, rfrt: TYPE;
+         rfargs: FORMAL_ARG_LIST;
+      do
+         rfct := rf.current_type;
+         rfrt := rf.result_type;
+         rfargs := rf.arguments;
+	 echo_for(rf);
+         -- (1) ------------------------- Define Cecil heading :
+         buffer.clear;
+         if rfrt /= Void then
+            rfrt.c_type_for_external_in(buffer);
+         else
+            buffer.append(fz_void);
+         end;
+         buffer.extend(' ');
+         buffer.append(c_name);
+         buffer.extend('(');
+         rfct.c_type_for_external_in(buffer);
+         buffer.extend(' ');
+         buffer.extend('C');
+         if rfargs /= Void then
+            buffer.extend(',');
+            rfargs.external_prototype_in(buffer);
+         end;
+         buffer.extend(')');
+         cpp.put_c_heading(buffer);
+         cpp.swap_on_c;
+         define_body_of(rf);
+      end;
+
 feature {NONE}
 
-   tmp_string: STRING is
+   cecil_files: FIXED_ARRAY[CECIL_FILE];
+	 -- Non Void if some -cecil option is used.
+
+   buffer: STRING is
+	 -- To prepare C code.
       once
          !!Result.make(256);
       end;
+
+   singleton_memory: CECIL_POOL is
+      once
+	 Result := Current;
+      end;
+
+invariant
+
+   is_real_singleton: Current = singleton_memory
 
 end -- CECIL_POOL
 

@@ -7,8 +7,8 @@ indexing
 	author:     "Eric Bezault <ericb@gobosoft.com>"
 	copyright:  "Copyright (c) 1999, Eric Bezault and others"
 	license:    "Eiffel Forum Freeware License v1 (see forum.txt)"
-	date:       "$Date: 1999/10/02 14:16:58 $"
-	revision:   "$Revision: 1.14 $"
+	date:       "$Date: 1999/10/10 17:50:00 $"
+	revision:   "$Revision: 1.15 $"
 
 class GEPP
 
@@ -31,6 +31,8 @@ feature -- Processing
 	execute is
 			-- Start 'gepp' execution.
 		do
+			if False then resurrect_code end
+
 			Arguments.set_program_name ("gepp")
 			!! error_handler.make_standard
 			!! parser.make (error_handler)
@@ -210,6 +212,17 @@ feature -- Error handling
 					%%T[-Dname ...] [filename | -] [filename | -]")
 		ensure
 			usage_message_not_void: Result /= Void
+		end
+
+feature {NONE} -- Implementation
+
+	resurrect_code is
+			-- Make sure that SmallEiffel does not complain about possible
+			-- "calls on a Void target in the living Eiffel code".
+		local
+			et1: DS_EQUALITY_TESTER [STRING]
+		do
+			!! et1
 		end
 
 invariant

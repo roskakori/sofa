@@ -47,14 +47,14 @@ feature {NONE}
          from
             il := list.upper;
          until
-            il = 0
+            il < list.lower
          loop
             actual_count := actual_count + list.item(il).count;
             il := il - 1;
          end;
          from
             !!flat_list.make(1,actual_count);
-            il := 1;
+            il := list.lower;
          until
             il > list.upper
          loop
@@ -83,7 +83,7 @@ feature
 
    count: INTEGER is
       do
-         Result := flat_list.upper;
+         Result := flat_list.count;
       end;
 
    rank_of(n: STRING): INTEGER is
@@ -100,7 +100,7 @@ feature
          end;
       ensure
          0 <= Result;
-         Result <= count;
+         Result <= count
       end;
 
    name(i: INTEGER): LOCAL_ARGUMENT1 is
@@ -130,7 +130,7 @@ feature {DECLARATION}
          n2: like name;
       do
          from
-            i := 1;
+            i := flat_list.lower;
          until
             flat_list.item(i) = Void
          loop
@@ -182,10 +182,6 @@ feature {RUN_FEATURE}
          end;
       end;
 
-feature {NONE}
-
-   em1: STRING is "Bad declaration.";
-
 feature
 
    frozen is_runnable(ct: TYPE): BOOLEAN is
@@ -196,7 +192,7 @@ feature
       do
          from
             Result := true;
-            i := flat_list.upper;
+            i := count;
          until
             not Result or else i = 0
          loop
@@ -212,7 +208,7 @@ feature
          end;
          if Result then
             from
-               i := flat_list.upper;
+               i := count;
             until
                i = 0
             loop
@@ -235,7 +231,7 @@ feature {DECLARATION_LIST}
          i: INTEGER;
       do
          from
-            i := flat_list.upper;
+            i := count;
          until
             i = 0
          loop
@@ -253,7 +249,7 @@ feature {DECLARATION_LIST}
          from
             i := flat_list.upper;
          until
-            i = 0
+            i < flat_list.lower
          loop
             n1 := flat_list.item(i);
             n2 := n1.to_runnable(ct);
@@ -266,11 +262,13 @@ feature {DECLARATION_LIST}
          end;
       end;
 
+feature {NONE}
+
+   em1: STRING is "Bad declaration.";
+
 invariant
 
    count > 0;
-
-   flat_list.lower = 1;
 
    count = flat_list.count;
 

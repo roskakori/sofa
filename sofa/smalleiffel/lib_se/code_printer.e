@@ -114,7 +114,8 @@ feature {NONE} -- Context stacks :
          -- need some initializing procedure call.
 
    C_expanded_initialize: INTEGER is unique;
-         -- Target is some expanded to initialize.
+         -- Target is some expanded to initialize with the default 
+         -- initialization procedure (ie. without arguments).
 
    C_inline_dca: INTEGER is unique;
          -- Inlining of a direct call applied on attribute of target.
@@ -160,6 +161,11 @@ feature {NONE} -- Context stacks :
          !!Result.make(stack_first_size);
       end;
 
+   stack_string: FIXED_ARRAY[STRING] is
+      once
+         !!Result.make(stack_first_size);
+      end;
+
    stack_first_size: INTEGER is 12;
 
    stack_push(code: INTEGER) is
@@ -176,6 +182,7 @@ feature {NONE} -- Context stacks :
             stack_args.resize(new_size);
             stack_static_rf.resize(new_size);
             stack_cpc.resize(new_size);
+            stack_string.resize(new_size);
             if new_size > 1024 then
                stack_overflow
             end;
@@ -183,7 +190,7 @@ feature {NONE} -- Context stacks :
          stack_code.put(code,top);
       end;
 
-feature {E_PRECURSOR}
+feature {PRECURSOR_CALL}
 
    push_precursor(rf: RUN_FEATURE; args: EFFECTIVE_ARG_LIST) is
       require

@@ -1,4 +1,4 @@
-; $VER: install 1.6 (7.4.2000)
+; $VER: install 1.7 (12.11.2000)
 ;
 ; An Amiga Installer script for Sofa.
 ;
@@ -64,7 +64,19 @@
 
 (set #prompt-ask-sofa-directory
 (cat "Select where to install Sofa.\n"
-	  "A directory named \"sofa\" is created automatically"
+	  "A directory named \"sofa\" is created automatically."
+))
+
+(set #prompt-ask-old-sofa
+(cat "There already seems to another version of Sofa installed "
+     "in \"%s\".\n\n"
+     "Do you want to create a backup?"
+))
+
+(set #help-ask-old-sofa
+(cat "\"Yes\" means to create a backup of your current version.\n\n"
+     "\"No\" means to remove your current version and install the new "
+     "version in the same directory."
 ))
 
 (set #prompt-ask-c-compiler
@@ -80,6 +92,8 @@
      "Refer to the manual for more details and where you can get "
      "freely distributable C compilers."
 ))
+
+(set #promp-remove-old-sofa "Removing old sofa version in\n\"%s\".")
 
 (set #prompt-update-user-startup
 (cat "The following lines are added to the s:User-Startup:\n\n"
@@ -141,6 +155,8 @@
 	  "have to be set. Refer to \"man/system.txt\" in the SmallEiffel "
 	  "directory for more information."
 ))
+
+(set #message-cannot-rename "Cannot rename\n\"%s\"\nto\n\"%s\".")
 
 (set #message-binaries-missing
 (cat "Note that the compiler binaries are available in a different "
@@ -256,7 +272,9 @@
 (
    (debug "check disk space")
 
-   (if (< (/ (getdiskspace #sofa-directory) 1048576) #minimum-disk-space)
+   (set #disk-space-left (/ (getdiskspace #sofa-parent-directory) 1048576))
+   (debug "  #disk-space-left =" #disk-space-left)
+   (if (< #disk-space-left #minimum-disk-space)
       (
          (debug "low diskspace")
          (message #warning-low-disk-space (all))
@@ -300,7 +318,7 @@
 ;----------------------------------------------------------------------------
 (procedure P-ask-sofa-directory
 (
-	(debug "ask-sofa-directory")
+	(debug "P-ask-sofa-directory")
 
 	(if (exists "sofa:" (noreq))
 		(
@@ -322,7 +340,19 @@
 		(help @askdir-help)
 	))
 
+	; Check, if target directory is current directory. If so, no files have
+	; to be copied later on
+	(set #expanded-current (expandpath "/"))
+	(set #expanded-sofa    (expandpath #sofa-directory))
+	(debug "  expanded-current = " #expanded-current)
+	(debug "  expanded-sofa    = " #expanded-sofa)
+
+	(set #already-in-sofa (= #expanded-current #expanded-sofa))
+
+	(debug "  already-in-sofa = " #already-in-sofa)
+
 	; Compute name of Sofa directory
+	(set #sofa-parent-directory (expandpath #sofa-directory))
 	(set #sofa-directory (tackon #sofa-directory "sofa"))
 	(debug "  #sofa-directory =" #sofa-directory)
 
@@ -339,7 +369,41 @@
 	; Set target directory used in standard message during (exit)
 	(set @default-dest #sofa-directory)
 	(debug " @default-dest =" @default-dest)
+))
 
+;----------------------------------------------------------------------------
+; Ask what to do about possible old Sofa
+;----------------------------------------------------------------------------
+(procedure P-ask-old-sofa
+(
+	(debug "P-ask-old-sofa")
+
+   (set #has-old-sofa 0)
+   (set #backup-old-sofa 0)
+	(if (not #already-in-sofa)
+      (
+         (set #has-old-sofa (exists #library-directory (noreq)))
+      	(if #has-old-sofa 
+            (
+               (debug "  old sofa in target drawer")
+               (set #backup-old-sofa
+               	(askbool
+                  	(prompt (#prompt-ask-old-sofa (expandpath (cat #library-directory "//"))))
+         	         (help #help-ask-old-sofa)
+           	   ))
+            )
+            (
+               (debug "  no old sofa")
+            )
+
+         )
+      )
+      (
+         (debug "  already in sofa")
+      )
+   )
+   (debug "  #has-old-sofa =" #has-old-sofa)
+   (debug "  #backup-old-sofa =" #backup-old-sofa)
 ))
 
 ;----------------------------------------------------------------------------
@@ -347,7 +411,7 @@
 ;----------------------------------------------------------------------------
 (procedure P-ask-c-compiler
 (
-	(debug "ask-c-compiler")
+	(debug "P-ask-c-compiler")
 
 	; Figure out default selection of compiler:
 	; if sc: exists use SAS/c
@@ -458,7 +522,7 @@
 (procedure P-update-user-startup
 (
 	; Simply adds a SetEnv and Path command
-	(debug "update user-startup")
+	(debug "P-update-user-startup")
 
 	(working #working-user-startup)
 
@@ -490,7 +554,8 @@
 			(delete #execute-temp)
 		)
 		(
-			(abort ("Error while executing \"%s\" (code %s)\n\nPlease submit the file \"%s\" to Sofa Support" #execute-temp @ioerr #execute-log))
+         (set #ioerr @ioerr) ; to avoid enforcer hit
+			(abort ("Error while executing \"%s\" (code %s)\n\nPlease submit the file \"%s\" to Sofa Support" #execute-temp #ioerr #execute-log))
 		)
 	)
 
@@ -522,7 +587,8 @@
 ;----------------------------------------------------------------------------
 (procedure P-ask-setup-choice
 (
-	(debug "ask-setup-choice")
+	(debug "P-ask-setup-choice")
+
 	(set #setup-choice
 		 (askchoice
 			  (prompt "Select item to setup or change")
@@ -547,7 +613,7 @@
 		(
 			(working #working-set-smalleiffel)
 			(set #command-install
-				  ("\"%s\" >\"%s\" -no_compile -compiler %s"
+				  ("\"%s\" >\"%s\" -skip_c_compilation -cc %s"
 					  (tackon #smalleiffel-directory "install")
 					  #install-se-log
 					  #compiler-se
@@ -613,10 +679,102 @@
 ))
 
 ;----------------------------------------------------------------------------
+; Backup or remove possible old version of sofa
+;----------------------------------------------------------------------------
+(procedure P-handle-old-sofa
+(
+	(debug "P-handle-old-sofa")
+   (if #has-old-sofa
+      (
+         (if #backup-old-sofa
+            (
+               (debug "  backup old sofa")
+               (P-start-backup-path)
+               (until (not (exists #last-backup-path))
+                  (
+                     (debug "  try" #last-backup-path)
+                     (P-forth-backup-path)
+                  )
+               )
+               (debug "  backup to " #last-backup-path)
+               (set #old-name #sofa-directory)
+               (set #new-name #last-backup-path)
+               (set #old-icon-name (cat #old-name ".info"))
+               (set #new-icon-name (cat #new-name ".info"))
+
+               ; rename sofa icon; this has to happen first because `#new-icon-name'
+               ; contains the parent directory of `#old-name', which wouldn't exist after
+               ; renaming `#old-name' to `#new-name'.
+               (debug "    from " #old-name)
+               (debug "    to   " #new-name)
+               (if (exists #old-icon-name)
+                  (
+                     (if (= 0 (rename #old-icon-name #new-icon-name))
+                        (abort (#message-cannot-rename #old-icon-name #new-icon-name))
+                     )
+                  )
+                  (
+                     (debug "  no icon to rename")
+                  )
+               )
+
+               ; rename sofa drawer
+               (debug "    from " #old-name)
+               (debug "    to   " #new-name)
+               (if (= 0 (rename #old-name #new-name))
+                  (abort (#message-cannot-rename #old-name #new-name))
+               )
+            )
+            (
+               (set #remove-name #sofa-directory)
+               (debug ("  remove old sofa in \"%s\"" #remove-name))
+               (working (#promp-remove-old-sofa #remove-name))
+               (delete #remove-name
+                  (prompt (#promp-remove-old-sofa #remove-name))
+                  (all)
+                  (optional "force")
+               )
+               (set #remove-name (cat #remove-name ".info"))
+               (debug ("  remove old icon in \"%s\"" #remove-name))
+               (if (exists #remove-name)
+                  (
+                     (delete #remove-name
+                        (prompt (#promp-remove-old-sofa #remove-name))
+                     )
+                  )
+                  (
+                     (debug "    no icon")
+                  )
+               )
+            )
+         )
+      )
+      (
+         (debug "  no old sofa or already in sofa")
+      )
+   )
+))
+
+
+(procedure P-start-backup-path
+(
+   (set #backup-id 0)
+   (P-forth-backup-path)
+))
+
+(procedure P-forth-backup-path
+(
+   (set #backup-id (+ #backup-id 1))
+   (set #last-backup-path (tackon (expandpath (tackon #sofa-directory "/")) (cat "sofa_backup." #backup-id)))
+))
+
+;----------------------------------------------------------------------------
 ; Create directories
 ;----------------------------------------------------------------------------
 (procedure P-create-directories
 (
+	(debug "P-create-directories")
+
 	; Create Sofa directory and SmallEiffel/bin because they are needed in any case
 	(makedir #sofa-directory            (safe))
 	(copyfiles
@@ -631,30 +789,11 @@
 ))
 
 ;----------------------------------------------------------------------------
-; Check if current directory is target directory
-;----------------------------------------------------------------------------
-(procedure P-check-already-in-sofa
-(
-	(debug "P-check-already-in-sofa")
-
-	; Check, if target directory is current directory. If so, no files have
-	; to be copied later on
-	(set #expanded-current (expandpath ""))
-	(set #expanded-sofa    (expandpath #sofa-directory))
-	(debug "  expanded-current = " #expanded-current)
-	(debug "  expanded-sofa    = " #expanded-sofa)
-
-	(set #already-in-sofa (= #expanded-current #expanded-sofa))
-
-	(debug "  already-in-sofa = " #already-in-sofa)
-))
-
-;----------------------------------------------------------------------------
 ; Create setup script from install script
 ;----------------------------------------------------------------------------
 (procedure P-create-setup
 (
-	(debug "create-setup")
+	(debug "P-create-setup")
 
 	(set #setup-script (tackon #sofa-directory "setup"))
 	(set #setup-script-info (cat #setup-script ".info"))
@@ -714,13 +853,23 @@
 
 		(complete 10) (P-ask-sofa-directory)
                     (P-check-disk-space)
+
+      (complete 15) (P-ask-old-sofa)
 		(complete 20) (P-ask-c-compiler)
 
-		(complete 30) (P-check-already-in-sofa)
+		(if (<> @app-name "debug")
+         (
+            (complete 25) (P-handle-old-sofa)
+         )
+         (
+            (debug "P-handle-old-sofa: skipped")
+         )
+      )
 
 		(if (not #already-in-sofa)
 			(
-				(complete 33) (P-create-directories)
+
+				(complete 30) (P-create-directories)
 
 				(if (<> @app-name "debug")
 					(

@@ -138,8 +138,6 @@ feature -- Deep Comparison :
             Result := true;
          elseif some = Void then
          elseif other = Void then
-         elseif standard_equal(some,other) then
-            Result := true;
          else
             Result := some.is_deep_equal(other);
          end;
@@ -442,16 +440,23 @@ feature -- Access to command-line arguments :
       end;
    
    get_environment_variable(name: STRING): STRING is
-         -- To get the value of a system environment variable
-         -- (like "PATH" on Unix for example).
-         -- Gives Void when system variable `name' is undefined.
+         -- Try to get the value of the `name' system environment 
+         -- variable or some `name' in the system registry. 
+	 -- Gives Void when no information about `name' is available.
+	 -- Under UNIX like system, this is in fact the good way to 
+	 -- know about some system environment variable.
+	 -- Under Windows, this function also look in the system 
+	 -- registery.
       require
          name /= Void
       local
-         p: POINTER;
+         p, null: POINTER;
       do
          p := name.to_external;
-         Result := se_getenv(p);
+	 p := basic_getenv(p);
+	 if p /= null then
+	    !!Result.from_external_copy(p);
+	 end;
       end;
    
 feature -- System calls and crashs :
@@ -642,11 +647,11 @@ feature {NONE} -- Implementation of GENERAL (do not use directly) :
       external "SmallEiffel"
       end;
 
-   se_getenv(environment_variable: POINTER): STRING is
+   basic_getenv(environment_variable: POINTER): POINTER is
          -- To implement `get_environment_variable'.
       external "SmallEiffel"
       end;
-      
+
    se_system(system_command_line: POINTER) is
       external "SmallEiffel"
       end;

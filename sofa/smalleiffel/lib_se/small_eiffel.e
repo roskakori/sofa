@@ -25,21 +25,15 @@ creation make
 
 feature
 
-   copyright: STRING is
-      "-- SmallEiffel The GNU Eiffel Compiler -- Release (- 0.76Beta#1)--%N%
-      %-- Copyright (C), 1994-98 - LORIA - UHP - CRIN - INRIA - FRANCE --%N%
-      %-- Dominique COLNET and Suzanne COLLIN -    colnet@loria.fr     --%N%
-      %--                  http://SmallEiffel.loria.fr/                --%N";
+   copyright: STRING is "SmallEiffel The GNU Eiffel Compiler%N%
+   %Release -0.76 (Saturday 11th november 2000)%N%
+   %Copyright (C), 1994-2000 - LORIA - UHP - CRIN - INRIA - FRANCE%N%
+   %Dominique COLNET and Suzanne COLLIN - colnet@loria.fr%N%
+   %http://SmallEiffel.loria.fr%N";
 
 feature {GC_HANDLER,C_PRETTY_PRINTER}
 
    root_procedure: RUN_FEATURE_3;
-
-feature {NONE}
-
-   make is
-      do
-      end;
 
 feature
 
@@ -363,15 +357,15 @@ feature
       require
          t.run_type = t
       local
-         run_string: STRING;
+         rtm: STRING;
       do
-         run_string := t.run_time_mark;
-         if run_class_dictionary.has(run_string) then
-            Result := run_class_dictionary.at(run_string);
+         rtm := t.run_time_mark;
+         if run_class_dictionary.has(rtm) then
+            Result := run_class_dictionary.at(rtm);
          else
-            !!Result.make(t);
+            !!Result.make(t,rtm);
             check
-               run_class_dictionary.has(run_string);
+               run_class_dictionary.has(rtm);
             end;
          end;
       ensure
@@ -408,63 +402,68 @@ feature
             cpp.swap_on_h;
             gc_flag := not gc_handler.is_off;
             -- ---------------------------------------------------------
-            cpp.put_string("%N/* --- Mangling Table Start ---%N");
             from
-               i := 1;
+	       cpp.put_string("%N/* --- Mangling Table Start ---%N");
+	       update_run_class_map;
+               i := run_class_map.upper;
             until
-               i > run_class_dictionary.count
+               i < 0
             loop
-               rc := run_class_dictionary.item(i);
+               rc := run_class_map.item(i);
                if rc.at_run_time then
                   run_count := run_count + 1;
                end;
                rc.demangling;
-               i := i + 1;
+               i := i - 1;
             end;
             cpp.put_string(" --- Mangling Table End --- */%N");
             -- ---------------------------------------------------------
             from
                cpp.put_comment_line("C Header Pass 1 :");
-               i := 1;
+	       update_run_class_map;
+               i := run_class_map.upper;
             until
-               i > run_class_dictionary.count
+               i < 0
             loop
-               rc := run_class_dictionary.item(i);
+               rc := run_class_map.item(i);
                rc.c_header_pass1;
-               i := i + 1;
+               i := i - 1;
             end;
             -- ---------------------------------------------------------
             from
                cpp.put_comment_line("C Header Pass 2 :");
-               i := 1;
+	       update_run_class_map;
+               i := run_class_map.upper;
             until
-               i > run_class_dictionary.count
+               i < 0
             loop
-               rc := run_class_dictionary.item(i);
+               rc := run_class_map.item(i);
                rc.c_header_pass2;
-               i := i + 1;
+               i := i - 1;
             end;
             -- ---------------------------------------------------------
             from
                cpp.put_comment_line("C Header Pass 3 :");
-               i := 1;
+	       update_run_class_map;
+               i := run_class_map.upper;
             until
-               i > run_class_dictionary.count
+               i < 0
             loop
-               rc := run_class_dictionary.item(i);
+               rc := run_class_map.item(i);
                rc.c_header_pass3;
-               i := i + 1;
+               i := i - 1;
             end;
             -- ---------------------------------------------------------
             from
                cpp.put_comment_line("C Header Pass 4 :");
-               i := 1;
-            until
-               i > run_class_dictionary.count
+	       update_run_class_map;
+               i := run_class_map.upper;
+	    until
+               i < 0
             loop
-               rc := run_class_dictionary.item(i);
+               rc := run_class_map.item(i);
                rc.c_header_pass4;
-               i := i + 1;
+               i := i - 1;
             end;
             -- Force definition of T9 and T7 :
             if not run_class_dictionary.has(as_native_array_character) then
@@ -519,16 +518,17 @@ feature
          if nb_errors = 0 then
             jvm.prepare_output_directory;
             from
-               i := 1;
+	       update_run_class_map;
+               i := run_class_map.upper;
             until
-               i > run_class_dictionary.count
+               i < 0
             loop
-               rc := run_class_dictionary.item(i);
+               rc := run_class_map.item(i);
                if rc.at_run_time then
                   run_count := run_count + 1;
                   rc.compile_to_jvm;
                end;
-               i := i + 1;
+               i := i - 1;
             end;
             echo.print_count("Used Type",run_count);
             jvm.write_jvm_root_class;
@@ -545,7 +545,7 @@ feature {NONE}
          -- When looking for a BASE_CLASS using the name of
          -- base class (ie FOO[BAR] is stored at key "FOO").
       once
-         !!Result.with_capacity(2048);
+         !!Result.with_capacity(1024);
       end;
 
 feature
@@ -564,20 +564,46 @@ feature {RUN_CLASS,RUN_FEATURE,ASSERTION_COLLECTOR,SWITCH_COLLECTION}
          magic_count := magic_count + 1;
       end;
 
-feature {BASE_CLASS,RUN_CLASS,GC_HANDLER}
+feature {GC_HANDLER}
+
+   get_run_class_map: FIXED_ARRAY[RUN_CLASS] is
+      do
+	 check
+	    run_class_map.count = run_class_dictionary.count
+	 end;
+	 Result := run_class_map;
+      end;
+
+feature {RUN_CLASS}
 
    run_class_dictionary: DICTIONARY[RUN_CLASS,STRING] is
       once
          !!Result.with_capacity(2048);
       end;
 
-feature {CALL_PROC_CALL}
+feature {BASE_CLASS,TYPE_BASIC_EIFFEL_EXPANDED}
 
-   run_class_with(run_time_mark: STRING): RUN_CLASS is
+   run_class_for(run_time_mark: STRING): RUN_CLASS is
+	 -- Assume `run_time_mark' is a simple non generic type mark.
+      require
+	 run_time_mark = string_aliaser.item(run_time_mark)
+      local
+	 bc: BASE_CLASS;
+	 type_class: TYPE_CLASS;
       do
          if run_class_dictionary.has(run_time_mark) then
             Result := run_class_dictionary.at(run_time_mark);
-         end;
+	 elseif base_class_dictionary.has(run_time_mark) then
+	    bc := base_class_dictionary.at(run_time_mark);
+	    !!type_class.make(bc.name);
+	    Result := type_class.run_class;
+	 else
+	    eh.append("SMALL_EIFFEL Internal error for: ");
+	    eh.append(run_time_mark);
+	    eh.print_as_fatal_error;
+	 end;
+      ensure
+	 Result /= Void
       end;
 
 feature {RUN_CLASS}
@@ -589,25 +615,21 @@ feature {RUN_CLASS}
          rc.current_type.is_reference;
          run_control.boost
       local
-         i, up: INTEGER;
+         i: INTEGER;
          r: ARRAY[RUN_CLASS];
-         rcd: like run_class_dictionary;
-         rc2: RUN_CLASS;
       do
          from
-            i := 1;
-            rcd := run_class_dictionary;
-            up := rcd.count;
-         until
-            Result or else i > up
+	    update_run_class_map;
+            i := run_class_map.upper;
+	 until
+            Result or else i < 0
          loop
-            rc2 := rcd.item(i);
-            r := rc2.running;
+            r := run_class_map.item(i).running;
             if r = Void then
             elseif r.fast_has(rc) then
                Result := r.count > 1;
             end;
-            i := i + 1;
+            i := i - 1;
          end;
       end;
 
@@ -620,147 +642,47 @@ feature {RUN_CLASS}
          end;
       end;
 
-feature {NONE}
-
-   get_started(root_class_name, procedure_name: STRING) is
-         -- Get started to compile using creation `procedure_name'
-         -- of base class `root_class_name'.
-      require
-         not root_class_name.is_empty;
-         not procedure_name.is_empty
-      local
-         root_proc_name: SIMPLE_FEATURE_NAME;
-         root: BASE_CLASS;
-         root_proc: PROCEDURE;
-         root_type: TYPE;
-         magic: INTEGER;
-      do
-         echo.put_string(copyright);
-         if run_control.no_check then
-            run_control.set_generator_used;
-            run_control.set_generating_type_used;
-         end;
-         echo.put_string("Parsing :%N");
-         root := load_class(root_class_name);
-         if root = Void then
-            eh.append("Cannot load root class ");
-            eh.append(root_class_name);
-            eh.append(fz_dot);
-            eh.print_as_error;
-         else
-            root_proc_name := root.root_procedure_name(procedure_name);
-            root_proc := root.root_procedure(root_proc_name);
-         end;
-         if nb_errors = 0 then
-            if root_proc.arguments /= Void then
-               eh.add_position(root_proc.start_position);
-               eh.append("Creation procedure ");
-               eh.append(procedure_name);
-               eh.append(" must not have arguments.");
-               eh.print_as_error;
-            end;
-         end;
-         if nb_errors = 0 then
-            root_type := root.run_class.current_type;
-         end;
-         if nb_errors = 0 then
-            root_procedure := root_proc.to_run_feature(root_type,root_proc_name);
-         end;
-         if nb_errors = 0 then
-            echo.put_string("Starting Falling Down (");
-            echo.put_integer(magic_count);
-            echo.put_string(em1);
-            from
-               falling_down;
-               cecil_pool.fill_up;
-            until
-               magic = magic_count or else nb_errors > 0
-            loop
-               magic := magic_count;
-               falling_down;
-            end;
-            echo.put_string("End of Falling Down (");
-            echo.put_integer(magic_count);
-            echo.put_string(em1);
-         end;
-         if nb_errors = 0 then
-            echo.put_string("Starting AFD Check (");
-            echo.put_integer(magic_count);
-            echo.put_string(em1);
-            from
-               afd_check;
-            until
-               magic = magic_count or else nb_errors > 0
-            loop
-               magic := magic_count;
-               afd_check;
-            end;
-            check_for_deferred;
-            check_generic_formal_arguments;
-            switch_collection.afd;
-            echo.put_string("Before conversion handling (");
-            echo.put_integer(magic_count);
-            echo.put_string(em1);
-            conversion_handler.finish_falling_down;
-            echo.put_string("After conversion handling (");
-            echo.put_integer(magic_count);
-            echo.put_string(em1);
-            from
-            until
-               magic = magic_count or else nb_errors > 0
-            loop
-               magic := magic_count;
-               falling_down;
-            end;
-            echo.put_string("End of AFD Check (");
-            echo.put_integer(magic_count);
-            echo.put_string(em1);
-         end;
-         if not eh.is_empty then
-            eh.append("Internal Warning #1 (Error Handler Not Empty) : ");
-            eh.print_as_warning;
-         end;
-         if nb_errors = 0 then
-            is_ready := true;
-            echo.print_count("Loaded Classe",base_class_dictionary.count);
-         end;
-      ensure
-         nb_errors = 0 implies root_procedure /= Void
-      end;
-
 feature -- To add more Context for some `to_runnable' :
 
    top_rf: RUN_FEATURE is
       do
-         Result := stack_rf.item(top);
+         Result := run_feature_stack.last;
       end;
 
    push(rf: RUN_FEATURE) is
       do
-         top := top + 1;
-         stack_rf.force(rf,top);
+         run_feature_stack.add_last(rf);
+      ensure
+         run_feature_stack.count = 1 + old (run_feature_stack.count)
       end;
 
    pop is
       do
-         check
-            1 <= top;
-         end;
-         top := top - 1;
+	 run_feature_stack.remove_last;
       ensure
-         old(top) = top + 1
+         run_feature_stack.count = old (run_feature_stack.count) - 1
       end;
 
 feature {NONE}
 
-   stack_rf: ARRAY[RUN_FEATURE] is
+   run_feature_stack: FIXED_ARRAY[RUN_FEATURE] is
+	 -- The top-most one gives the current analysis context.
       once
-         !!Result.make(1,50);
+         !!Result.with_capacity(50);
       end;
 
-   top: INTEGER;
+   run_class_map: FIXED_ARRAY[RUN_CLASS] is
+      once
+	 !!Result.with_capacity(2048);
+      end;
 
-feature {NONE}
+   update_run_class_map is
+      do
+	 if run_class_map.count /= run_class_dictionary.count then
+	    run_class_map.clear;
+	    run_class_dictionary.item_map_in(run_class_map);
+	 end;
+      end;
 
    falling_down is
       local
@@ -773,13 +695,14 @@ feature {NONE}
          manifest_string_pool.falling_down;
          address_of_pool.falling_down;
          from
-            i := 1;
+	    update_run_class_map;
+            i := run_class_map.upper;
          until
-            i > run_class_dictionary.count
+            i < 0 
          loop
-            rc := run_class_dictionary.item(i);
+            rc := run_class_map.item(i);
             rc.falling_down;
-            i := i + 1;
+            i := i - 1;
          end;
       end;
 
@@ -789,14 +712,16 @@ feature {NONE}
          i: INTEGER;
       do
          from
-            i := 1;
+	    update_run_class_map;
+            i := run_class_map.upper;
          until
-            i > run_class_dictionary.count
+            i < 0
          loop
-            rc := run_class_dictionary.item(i);
+            rc := run_class_map.item(i);
             rc.afd_check;
-            i := i + 1;
+            i := i - 1;
          end;
+	 cecil_pool.afd_check;
       end;
 
 feature {RUN_FEATURE_9}
@@ -912,31 +837,34 @@ feature {C_PRETTY_PRINTER}
          run_control.no_check;
          cpp.on_c;
       local
-         i: INTEGER;
+         i, id: INTEGER;
          bc: BASE_CLASS;
          rc: RUN_CLASS;
       do
          from
-            -- *** Add the current path for Jacob Navia. ***
             cpp.put_string("p[0]=%"???%";%N");
             i := 1;
          until
             i > base_class_dictionary.count
          loop
             bc := base_class_dictionary.item(i);
-            cpp.put_string("p[");
-            cpp.put_integer(bc.id);
-            cpp.put_string("]=");
-            cpp.put_string_c(bc.path);
-            cpp.put_string(fz_00);
+	    id := bc.id;
+	    if id > 0 then
+	       cpp.put_string("p[");
+	       cpp.put_integer(id);
+	       cpp.put_string("]=");
+	       cpp.put_string_c(bc.path);
+	       cpp.put_string(fz_00);
+	    end;
             i := i + 1;
          end;
          from
-            i := 1;
+	    update_run_class_map;
+            i := run_class_map.upper;
          until
-            i > run_class_dictionary.count
+            i < 0
          loop
-            rc := run_class_dictionary.item(i);
+            rc := run_class_map.item(i);
             if rc.at_run_time then
                cpp.put_string("se_prinT[");
                cpp.put_integer(rc.id);
@@ -951,7 +879,7 @@ feature {C_PRETTY_PRINTER}
                   cpp.put_string("];%N");
                end;
             end;
-            i := i + 1;
+            i := i - 1;
          end;
       ensure
          cpp.on_c;
@@ -961,7 +889,7 @@ feature {C_PRETTY_PRINTER}
       require
          cpp.on_c
       local
-         i: INTEGER;
+         i, id: INTEGER;
          bc: BASE_CLASS;
          rc: RUN_CLASS;
       do
@@ -971,18 +899,22 @@ feature {C_PRETTY_PRINTER}
             i > base_class_dictionary.count
          loop
             bc := base_class_dictionary.item(i);
-            cpp.put_array1('g',bc.id);
-            cpp.put_character('=');
-            cpp.put_se_string_from_external_copy(bc.name.to_string);
-            cpp.put_string(fz_00);
+	    id := bc.id;
+	    if id >= 0 then
+	       cpp.put_array1('g',id);
+	       cpp.put_character('=');
+	       cpp.put_se_string(bc.name.to_string);
+	       cpp.put_string(fz_00);
+	    end;
             i := i + 1;
          end;
          from
-            i := 1;
+	    update_run_class_map;
+            i := run_class_map.upper;
          until
-            i > run_class_dictionary.count
+            i < 0
          loop
-            rc := run_class_dictionary.item(i);
+            rc := run_class_map.item(i);
             if rc.at_run_time then
                bc := rc.base_class;
                if bc.name.to_string /= rc.current_type.run_time_mark then
@@ -992,7 +924,7 @@ feature {C_PRETTY_PRINTER}
                   cpp.put_string(fz_00);
                end;
             end;
-            i := i + 1;
+            i := i - 1;
          end;
       ensure
          cpp.on_c;
@@ -1008,176 +940,28 @@ feature {C_PRETTY_PRINTER}
          rtm: STRING;
       do
          from
-            i := 1;
+	    update_run_class_map;
+            i := run_class_map.upper;
          until
-            i > run_class_dictionary.count
+            i < 0
          loop
-            rc := run_class_dictionary.item(i);
+            rc := run_class_map.item(i);
             if rc.at_run_time then
                cpp.put_array1('t',rc.id);
                cpp.put_character('=');
                bc := rc.base_class;
                rtm := rc.current_type.run_time_mark
                if bc.name.to_string /= rtm then
-                  cpp.put_se_string_from_external_copy(rtm);
+                  cpp.put_se_string(rtm);
                else
                   cpp.put_array1('g',rc.id);
                end;
                cpp.put_string(fz_00);
             end;
-            i := i + 1;
+            i := i - 1;
          end;
       ensure
          cpp.on_c;
-      end;
-
-feature {NONE}
-
-   compile_routines is
-         -- Try to give the best order to the C output.
-      local
-         rc, rc_string: RUN_CLASS;
-         ct: TYPE;
-         deep, i: INTEGER;
-         stop: BOOLEAN;
-         bcn: STRING;
-      do
-         echo.put_string("Compiling/Sorting routines for ");
-         echo.put_integer(run_class_dictionary.count);
-         echo.put_string(" run classes :%N");
-         cpp.swap_on_c;
-         from
-            i := 1;
-         until
-            i > run_class_dictionary.count
-         loop
-            rc := run_class_dictionary.item(i);
-            ct := rc.current_type;
-            if ct.is_basic_eiffel_expanded then
-               rc.compile_to_c(0);
-            elseif ct.is_string then
-               rc_string := rc;
-            end;
-            i := i + 1;
-         end;
-         from
-            i := 1;
-         until
-            i > run_class_dictionary.count
-         loop
-            rc := run_class_dictionary.item(i);
-            ct := rc.current_type;
-            if ct.is_bit then
-               rc.compile_to_c(0);
-            end;
-            i := i + 1;
-         end;
-         from
-            i := 1;
-         until
-            i > run_class_dictionary.count
-         loop
-            rc := run_class_dictionary.item(i);
-            bcn := rc.base_class_name.to_string;
-            if as_native_array = bcn then
-               rc.compile_to_c(0);
-            end;
-            i := i + 1;
-         end;
-         if rc_string /= Void then
-            rc_string.compile_to_c(0);
-         end;
-         from
-            i := 1;
-         until
-            i > run_class_dictionary.count
-         loop
-            rc := run_class_dictionary.item(i);
-            ct := rc.current_type;
-            bcn := ct.base_class_name.to_string;
-            if as_array = bcn or else as_fixed_array = bcn then
-               rc.compile_to_c(0);
-            end;
-            i := i + 1;
-         end;
-         from
-            i := 1;
-         until
-            i > run_class_dictionary.count
-         loop
-            rc := run_class_dictionary.item(i);
-            ct := rc.current_type;
-            if ct.is_generic then
-               rc.compile_to_c(0);
-            end;
-            i := i + 1;
-         end;
-         from -- General sorting :
-            deep := 6;
-         until
-            stop
-         loop
-            from
-               stop := true;
-               i := 1;
-            until
-               i > run_class_dictionary.count
-            loop
-               rc := run_class_dictionary.item(i);
-               if not rc.compile_to_c_done then
-                  stop := false;
-                  rc.compile_to_c(deep);
-               end;
-               i := i + 1;
-            end;
-            deep := deep - 1;
-         end;
-      end;
-
-feature {NONE}
-
-   tmp_tail: STRING is
-      once
-         !!Result.make(128);
-      end;
-
-feature {NONE}
-
-   em1: STRING is " items).%N";
-
-feature {NONE}
-
-   append_loading_path_in(str: STRING) is
-      do
-         system_tools.append_lp_in(str,loading_path);
-      end;
-
-feature {NONE}
-
-   c_code: STRING is
-      once
-         !!Result.make(128);
-      end;
-
-feature {NONE}
-
-   registered_for_c_define: FIXED_ARRAY[RUN_FEATURE_3] is
-      once
-         !!Result.with_capacity(512);
-      end;
-
-   compile_registered_for_c_define is
-      local
-         i: INTEGER;
-      do
-         from
-            i := registered_for_c_define.upper;
-         until
-            i < 0
-         loop
-            registered_for_c_define.item(i).c_define;
-            i := i - 1;
-         end;
       end;
 
 feature {RUN_FEATURE_3}
@@ -1224,11 +1008,12 @@ feature {CONVERSION_HANDLER}
          type: TYPE;
       do
          from
-            i := 1;
+	    update_run_class_map;
+            i := run_class_map.upper;
          until
-            i > run_class_dictionary.count
+            i < 0
          loop
-            rc := run_class_dictionary.item(i);
+            rc := run_class_map.item(i);
             type := rc.current_type;
             if type.is_expanded then
                if type.is_a(source_type) then
@@ -1242,11 +1027,15 @@ feature {CONVERSION_HANDLER}
                   eh.cancel;
                end;
             end;
-            i := i + 1;
+            i := i - 1;
          end;
       end;
 
 feature {NONE}
+
+   make is
+      do
+      end;
 
    basic_sys_runtime: FIXED_ARRAY[STRING] is
          -- Actually used packages of SmallEiffel/sys/runtime.
@@ -1264,6 +1053,255 @@ feature {NONE}
          if run_class_dictionary.has(as_string) then
             rc := run_class_dictionary.at(as_string);
             Result := rc.at_run_time;
+         end;
+      end;
+
+   get_started(root_class_name, procedure_name: STRING) is
+         -- Get started to compile using creation `procedure_name'
+         -- of base class `root_class_name'.
+      require
+         not root_class_name.is_empty;
+         not procedure_name.is_empty
+      local
+         root_proc_name: SIMPLE_FEATURE_NAME;
+         root: BASE_CLASS;
+         root_proc: PROCEDURE;
+         root_type: TYPE;
+         magic: INTEGER;
+      do
+         echo.put_string(copyright);
+         if run_control.no_check then
+            run_control.set_generator_used;
+            run_control.set_generating_type_used;
+         end;
+         echo.put_string("Parsing :%N");
+         root := load_class(root_class_name);
+         if root = Void then
+            eh.append("Cannot load root class ");
+            eh.append(root_class_name);
+            eh.append(fz_dot);
+            eh.print_as_error;
+         else
+            root_proc_name := root.root_procedure_name(procedure_name);
+            root_proc := root.root_procedure(root_proc_name);
+         end;
+         if nb_errors = 0 then
+            if root_proc.arguments /= Void then
+               eh.add_position(root_proc.start_position);
+               eh.append("Creation procedure ");
+               eh.append(procedure_name);
+               eh.append(" must not have arguments.");
+               eh.print_as_error;
+            end;
+         end;
+         if nb_errors = 0 then
+	    root_type := run_class_for(root.name.to_string).current_type;
+         end;
+         if nb_errors = 0 then
+            root_procedure := root_proc.to_run_feature(root_type,root_proc_name);
+         end;
+         if nb_errors = 0 then
+	    cecil_pool.fill_up;
+            echo.put_string("Starting Falling Down (");
+            echo.put_integer(magic_count);
+            echo.put_string(em1);
+            from
+               falling_down;
+            until
+               magic = magic_count or else nb_errors > 0
+            loop
+               magic := magic_count;
+               falling_down;
+            end;
+            echo.put_string("End of Falling Down (");
+            echo.put_integer(magic_count);
+            echo.put_string(em1);
+         end;
+         if nb_errors = 0 then
+            echo.put_string("Starting AFD Check (");
+            echo.put_integer(magic_count);
+            echo.put_string(em1);
+            from
+               afd_check;
+            until
+               magic = magic_count or else nb_errors > 0
+            loop
+               magic := magic_count;
+               afd_check;
+            end;
+            check_for_deferred;
+            check_generic_formal_arguments;
+            switch_collection.afd;
+            echo.put_string("Before conversion handling (");
+            echo.put_integer(magic_count);
+            echo.put_string(em1);
+            conversion_handler.finish_falling_down;
+            echo.put_string("After conversion handling (");
+            echo.put_integer(magic_count);
+            echo.put_string(em1);
+            from
+            until
+               magic = magic_count or else nb_errors > 0
+            loop
+               magic := magic_count;
+               falling_down;
+            end;
+            echo.put_string("End of AFD Check (");
+            echo.put_integer(magic_count);
+            echo.put_string(em1);
+         end;
+         if not eh.is_empty then
+            eh.append("Internal Warning #1 (Error Handler Not Empty) : ");
+            eh.print_as_warning;
+         end;
+         if nb_errors = 0 then
+            is_ready := true;
+            echo.print_count("Loaded Classe",base_class_dictionary.count);
+         end;
+      ensure
+         nb_errors = 0 implies root_procedure /= Void
+      end;
+
+   em1: STRING is " items).%N";
+
+   compile_routines is
+         -- Try to give the best order to the C output.
+      local
+         rc, rc_string: RUN_CLASS;
+         ct: TYPE;
+         deep, i: INTEGER;
+         stop: BOOLEAN;
+         bcn: STRING;
+      do
+         echo.put_string("Compiling/Sorting routines for ");
+         echo.put_integer(run_class_dictionary.count);
+         echo.put_string(" run classes :%N");
+         cpp.swap_on_c;
+         from
+	    update_run_class_map;
+            i := run_class_map.upper;
+         until
+            i < 0
+         loop
+            rc := run_class_map.item(i);
+            ct := rc.current_type;
+            if ct.is_basic_eiffel_expanded then
+               rc.compile_to_c(0);
+            elseif ct.is_string then
+               rc_string := rc;
+            end;
+            i := i - 1;
+         end;
+         from
+	    update_run_class_map;
+            i := run_class_map.upper;
+         until
+            i < 0
+         loop
+            rc := run_class_map.item(i);
+            ct := rc.current_type;
+            if ct.is_bit then
+               rc.compile_to_c(0);
+            end;
+            i := i - 1;
+         end;
+         from
+	    update_run_class_map;
+            i := run_class_map.upper;
+         until
+            i < 0
+         loop
+            rc := run_class_map.item(i);
+            bcn := rc.base_class_name.to_string;
+            if as_native_array = bcn then
+               rc.compile_to_c(0);
+            end;
+            i := i - 1;
+         end;
+         if rc_string /= Void then
+            rc_string.compile_to_c(0);
+         end;
+         from
+	    update_run_class_map;
+            i := run_class_map.upper;
+         until
+            i < 0
+         loop
+            rc := run_class_map.item(i);
+            ct := rc.current_type;
+            bcn := ct.base_class_name.to_string;
+            if as_array = bcn or else as_fixed_array = bcn then
+               rc.compile_to_c(0);
+            end;
+            i := i - 1;
+         end;
+         from
+	    update_run_class_map;
+            i := run_class_map.upper;
+         until
+            i < 0
+         loop
+            rc := run_class_map.item(i);
+            ct := rc.current_type;
+            if ct.is_generic then
+               rc.compile_to_c(0);
+            end;
+            i := i - 1;
+         end;
+         from -- General sorting :
+            deep := 6;
+         until
+            stop
+         loop
+            from
+               stop := true;
+	       update_run_class_map;
+	       i := run_class_map.upper;
+            until
+               i < 0
+            loop
+               rc := run_class_map.item(i);
+               if not rc.compile_to_c_done then
+                  stop := false;
+                  rc.compile_to_c(deep);
+               end;
+               i := i - 1;
+            end;
+            deep := deep - 1;
+         end;
+      end;
+
+   tmp_tail: STRING is
+      once
+         !!Result.make(128);
+      end;
+
+   append_loading_path_in(str: STRING) is
+      do
+         system_tools.append_lp_in(str,loading_path);
+      end;
+
+   c_code: STRING is
+      once
+         !!Result.make(128);
+      end;
+
+   registered_for_c_define: FIXED_ARRAY[RUN_FEATURE_3] is
+      once
+         !!Result.with_capacity(512);
+      end;
+
+   compile_registered_for_c_define is
+      local
+         i: INTEGER;
+      do
+         from
+            i := registered_for_c_define.upper;
+         until
+            i < 0
+         loop
+            registered_for_c_define.item(i).c_define;
+            i := i - 1;
          end;
       end;
 

@@ -136,7 +136,7 @@ feature {SWITCH, FORMAL_ARG_LIST, E_STRIP}
          end;
       end;
 
-feature {IMPLICIT_CAST,C_PRETTY_PRINTER,E_STRIP}
+feature {IMPLICIT_CAST,C_PRETTY_PRINTER,E_STRIP,SWITCH}
 
    c_function_call(source_type, destination_type: TYPE) is
       do

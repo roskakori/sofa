@@ -1,4 +1,3 @@
-/*
 -- This file is  free  software, which  comes  along  with  SmallEiffel. This
 -- software  is  distributed  in the hope that it will be useful, but WITHOUT
 -- ANY  WARRANTY;  without  even  the  implied warranty of MERCHANTABILITY or
@@ -12,20 +11,22 @@
 --
 */
 /*
-   BeOS_x86 Hazardous Garbage Collector marking code.
-   This is only C code (no machine code) assuming that all reachable
-   objects are stored in the stack or in the jmpbuf of setjmp().
+   Stack and Registers traversal for BeOS_x86.
+   Addresses decrease as the stack grows.
+   Registers are saved using SETJMP().
+
+   I have tested this with BeOS and it appears to work correctly,
+   if you have trouble please e-mail me at sedwards@xmission.com.
 */
 
-void mark_stack_and_registers(void){
-  void**stack_pointer;
-  jmp_buf stack_top;
-  (void)setjmp(stack_top);
-  stack_pointer=((void**)(&stack_top));
+void mark_stack_and_registers(void) {
+  void** max = stack_bottom;
+  void** stack_pointer;
+  jmp_buf registers;
 
-  /* Addresses increase as the stack grows. */
-  stack_pointer+=((sizeof(jmp_buf)/sizeof(void*))-1);
-  for(; stack_pointer >= stack_bottom; stack_pointer--)
-    gc_mark(*stack_pointer);
+  (void)setjmp(registers);
+  stack_pointer=((void**)(&registers));
+  while(stack_pointer < max) {
+    gc_mark(*(stack_pointer++));
+  }
 }
-

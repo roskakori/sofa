@@ -10,8 +10,8 @@ indexing
 	author:     "Eric Bezault <ericb@gobosoft.com>"
 	copyright:  "Copyright (c) 1999, Eric Bezault and others"
 	license:    "Eiffel Forum Freeware License v1 (see forum.txt)"
-	date:       "$Date: 1999/10/02 13:45:32 $"
-	revision:   "$Revision: 1.3 $"
+	date:       "$Date: 2000/02/02 10:24:01 $"
+	revision:   "$Revision: 1.4 $"
 
 class KL_FIXED_ARRAY_ROUTINES [G]
 
@@ -26,7 +26,7 @@ feature -- Initialization
 		require
 			non_negative_n: n >= 0
 		do
-			!! Result.make (0, n - 1)
+			!! Result.make (n)
 		ensure
 			fixed_array_not_void: Result /= Void
 			valid_fixed_array: valid_fixed_array (Result)
@@ -37,11 +37,8 @@ feature -- Initialization
 			-- Create a new fixed array with items from `an_array'.
 		require
 			an_array_not_void: an_array /= Void
-		local
-			array_routines: KL_ARRAY_ROUTINES [G]
 		do
-			!! array_routines
-			Result := array_routines.make_from_array (an_array, 0)
+			!! Result.from_collection (an_array)
 		ensure
 			fixed_array_not_void: Result /= Void
 			valid_fixed_array: valid_fixed_array (Result)
@@ -59,11 +56,7 @@ feature -- Conversion
 		require
 			an_array_not_void: an_array /= Void
 		do
-			if an_array.lower = 0 then
-				Result := an_array
-			else
-				Result := make_from_array (an_array)
-			end
+			Result := make_from_array (an_array)
 		ensure
 			fixed_array_not_void: Result /= Void
 			valid_fixed_array: valid_fixed_array (Result)
@@ -74,12 +67,29 @@ feature -- Conversion
 
 feature -- Status report
 
+	has (an_array: like FIXED_ARRAY_TYPE; v: G): BOOLEAN is
+			-- Does `v' appear in `an_array'?
+		require
+			an_array_not_void: an_array /= Void
+		local
+			i: INTEGER
+		do
+			from
+				i := an_array.count - 1
+			until
+				Result or i < 0
+			loop
+				Result := an_array.item (i) = v
+				i := i - 1
+			end
+		end
+
 	valid_fixed_array (an_array: like FIXED_ARRAY_TYPE): BOOLEAN is
 			-- Make sure that the lower bound of `an_array' is zero.
 		require
 			an_array_not_void: an_array /= Void
 		do
-			Result := an_array.lower = 0
+			Result := True
 		end
 
 feature -- Resizing
@@ -96,7 +106,7 @@ feature -- Resizing
 			n_large_enough: n >= an_array.count
 		do
 			Result := an_array
-			Result.resize (0, n - 1)
+			Result.resize (n)
 		ensure
 			fixed_array_not_void: Result /= Void
 			valid_fixed_array: valid_fixed_array (Result)
@@ -111,14 +121,9 @@ feature -- Removal
 			an_array_not_void: an_array /= Void
 			valid_fixed_array: valid_fixed_array (an_array)
 		local
-			i, nb: INTEGER
 			v: G
 		do
-			nb := an_array.upper
-			from until i > nb loop
-				an_array.put (v, i)
-				i := i + 1
-			end
+			an_array.set_all_with (v)
 		ensure
 			-- all_cleared: forall i in 0..(an_array.count - 1),
 			--		an_array.item (i) = Void or else

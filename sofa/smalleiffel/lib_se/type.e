@@ -34,6 +34,7 @@ deferred class TYPE
 --      NATIVE_ARRAY[BAR] |       TYPE_NATIVE_ARRAY
 --      BIT 45            |              TYPE_BIT_1
 --      BIT Foo           |              TYPE_BIT_2
+--      TUPLE ...         |              TYPE_TUPLE
 --
 -- Handling of other classes :
 --
@@ -65,6 +66,14 @@ deferred class TYPE
 
 inherit GLOBALS;
 
+feature {NONE}
+
+   base_class_memory: BASE_CLASS;
+	 -- Memory cache for `base_class'.
+
+   run_class_memory: RUN_CLASS;
+	 -- Memory cache for `run_class'.
+
 feature
 
    written_mark: STRING is
@@ -81,7 +90,7 @@ feature
 
    frozen written_in: CLASS_NAME is
       do
-         if start_position /= Void then
+         if not start_position.is_unknown then
             Result := start_position.base_class_name;
          end;
       end;
@@ -356,22 +365,27 @@ feature
          no_errors implies Result.run_type = Result.run_type.run_type
       end;
 
-   base_class: BASE_CLASS is
+   frozen base_class: BASE_CLASS is
       local
          bcn: CLASS_NAME;
       do
-         bcn := base_class_name;
-         if bcn /= Void then
-            Result := bcn.base_class;
-         else
-            eh.append("Cannot find Base Class for ");
-            eh.add_type(Current,fz_dot);
-            eh.print_as_fatal_error;
-         end;
+	 if base_class_memory /= Void then
+	    Result := base_class_memory;
+	 else
+	    bcn := base_class_name;
+	    if bcn /= Void then
+	       base_class_memory := bcn.base_class;
+	       Result := base_class_memory;
+	    else
+	       eh.append("Cannot find Base Class for ");
+	       eh.add_type(Current,fz_dot);
+	       eh.print_as_fatal_error;
+	    end;
+	 end;
       end;
    
    frozen path: STRING is
-      -- Of the corresponding `base_class'.
+	 -- Of the corresponding `base_class'.
       do
          Result := base_class.path;
       end;
@@ -440,19 +454,18 @@ feature
          other.is_a(Result)
       end;
 
-   run_class: RUN_CLASS is
-      require
-         is_run_type
-      deferred
-      ensure
-         Result /= Void
-      end;
-
-   frozen at_run_time: BOOLEAN is
+   frozen run_class: RUN_CLASS is
       require
          is_run_type
       do
-         Result := run_type.run_class.at_run_time;
+	 if run_class_memory /= Void then
+	    Result := run_class_memory;
+	 elseif is_run_type then
+	    run_class_memory := small_eiffel.run_class(run_type);
+	    Result := run_class_memory;
+	 end;
+      ensure
+         Result /= Void
       end;
 
    expanded_initializer: RUN_FEATURE_3 is
@@ -574,31 +587,16 @@ feature
 
    frozen mapping_cast is
          -- Produce a C cast for conversion into current C type.
+	 -- For example: (T27*)
       require
          is_run_type;
          run_type.run_class.at_run_time
       do
-         mapping_cast_memory.clear;
-         mapping_cast_memory.extend('(');
-         c_type_for_target_in(mapping_cast_memory);
-         mapping_cast_memory.extend(')');
-         cpp.put_string(mapping_cast_memory);
-      end;
-
-feature {NONE}
-
-   mapping_cast_memory: STRING is "................";
-
-feature
-
-   cast_to_ref is
-         -- Produce the good C cast to use INTEGER_REF, BOOLEAN_REF,
-         -- CHARACTER_REF, REAL_REF or DOUBLE_REF.
-      require
-         is_run_type;
-         is_basic_eiffel_expanded
-      do
-         run_type.cast_to_ref;
+         mapping_cast_buffer.clear;
+         mapping_cast_buffer.extend('(');
+         c_type_for_target_in(mapping_cast_buffer);
+         mapping_cast_buffer.extend(')');
+         cpp.put_string(mapping_cast_buffer);
       end;
 
    need_c_struct: BOOLEAN is
@@ -619,7 +617,7 @@ feature
 
    c_initialize is
          -- Produce C code for initialisation of local variables
-         -- or attributes.
+         -- or attributes  (see also `c_initialize_in').
       require
          is_run_type;
          small_eiffel.is_ready
@@ -627,8 +625,8 @@ feature
       end;
 
    c_initialize_in(str: STRING) is
-         -- In order to initialize local variables or attributes
-         -- with the default simple value (0, NULL, 0.0, etc.).
+         -- Append in `str' C code for initialisation of local variables
+         -- or attributes (see also `c_initialize').
       require
          is_run_type;
          small_eiffel.is_ready
@@ -884,19 +882,6 @@ feature {NONE}
          end;
       end;
 
-feature {PARENT,TYPE}
-
-   frozen look_up_for(rc: RUN_CLASS; fn: FEATURE_NAME): E_FEATURE is
-      -- Look for the good one to compute `rc' X `fn'.
-      require
-         rc /= Void;
-         fn /= Void;
-         not is_anchored;
-         not is_formal_generic;
-      do
-         Result := base_class.look_up_for(rc,fn);
-      end;
-
 feature {RUN_CLASS}
 
    frozen id_extra_information(sfw: STD_FILE_WRITE) is
@@ -920,19 +905,6 @@ feature {RUN_CLASS}
          str.append(run_time_mark);
       end;
 
-feature {NONE}
-
-   tmp_string: STRING is "................................................................%
-                         %................................................................";
-
-   header: STRING is "................................................................%
-                     %................................................................";
-
-   body: STRING is "................................................................%
-                   %................................................................%
-                   %................................................................%
-                   %................................................................";
-
 feature {TYPE}
 
    short_hook is
@@ -940,6 +912,21 @@ feature {TYPE}
       end;
 
 feature {NONE}
+
+   tmp_string: STRING is
+      once
+	 !!Result.make(256);
+      end;
+
+   header: STRING is
+      once
+	 !!Result.make(256);
+      end;
+
+   body: STRING is 
+      once
+	 !!Result.make(512);
+      end;
 
    fatal_error_generic_list is
       do
@@ -949,8 +936,6 @@ feature {NONE}
          eh.add_type(Current," is (not) generic ?");
          eh.print_as_fatal_error;
       end;
-
-feature {NONE}
 
    frozen standard_gc_info_in(str: STRING) is
       do
@@ -1190,29 +1175,11 @@ feature {NONE}
          gc_store_chunk_in(body);
          body.append("=fsocfl;%N%
                      %fsocfl=fsocfl->next;%N");
-	 --++++++++++++++++++++++++++++++++++
 	 gc_initialize_chunk(rcid,body);
---         body.extend('*');
---         gc_store_chunk_in(body);
---         body.append(fz_eq_h);
---         rcid.append_in(body);
---         body.append(fz_00);
---         gc_store_in(body);
---         body.append("=(void*)(&(");
---         gc_store_chunk_in(body);
---         body.append("->first_object));%N");
---         gc_store_left_in(body);
---         body.append(fz_eq_h);
---         rcid.append_in(body);
---         body.append(".count_minus_one;%N%
---                     %n=");
---         gc_store_in(body);
---         body.append("++;%N}%N");
-	 -------------------------------------
          body.append("else if(fsoc_count_ceil>fsoc_count) {%N");
          gc_store_chunk_in(body);
          body.append(
-            "=((fsoc*)malloc(FSOC_SIZE));%N%
+            "=((fsoc*)se_malloc(FSOC_SIZE));%N%
             %fsoc_count++;%N%
             %{mch**p;%N%
             %if(gcmt_used==gcmt_max){%N%
@@ -1225,25 +1192,7 @@ feature {NONE}
                      %*(p+1)=(mch*)");
          gc_store_chunk_in(body);
          body.append(";%N}%N");
-	 --++++++++++++++++++++++++++++++++++
 	 gc_initialize_chunk(rcid,body);
---         body.extend('*');
---         gc_store_chunk_in(body);
---         body.append(fz_eq_h);
---         rcid.append_in(body);
---         body.append(fz_00);
---         gc_store_in(body);
---         body.append("=(void*)(&(");
---         gc_store_chunk_in(body);
---         body.append("->first_object));%N");
---         gc_store_left_in(body);
---         body.append(fz_eq_h);
---         rcid.append_in(body);
---         body.append(".count_minus_one;%N%
---                     %n=");
---         gc_store_in(body);
---         body.append("++;%N}%N");
-	 -------------------------------------
          body.append("else{%N%
                      %gc_start();%N%
                      %if(NULL!=");
@@ -1256,25 +1205,7 @@ feature {NONE}
          body.append("=n->header.next;%N}%Nelse{%N");
          gc_store_chunk_in(body);
          body.append("=new_fsoc();%N");
-	 --++++++++++++++++++++++++++++++++++
 	 gc_initialize_chunk(rcid,body);
---         body.extend('*');
---         gc_store_chunk_in(body);
---         body.append(fz_eq_h);
---         rcid.append_in(body);
---         body.append(fz_00);
---         gc_store_in(body);
---         body.append("=(void*)(&(");
---         gc_store_chunk_in(body);
---         body.append("->first_object));%N");
---         gc_store_left_in(body);
---         body.append(fz_eq_h);
---         rcid.append_in(body);
---         body.append(".count_minus_one;%N%
---                     %n=");
---         gc_store_in(body);
---         body.append("++;%N}%N");
-	 -------------------------------------
          body.append("}%N%
                      %n->header.flag=FSOH_UNMARKED;%N");
          if need_c_struct then
@@ -1527,7 +1458,7 @@ feature {NONE}
          Result := p.object_size;
       end;
 
-    frozen standard_stupid_switch(r: ARRAY[RUN_CLASS]): BOOLEAN is
+   frozen standard_stupid_switch(r: ARRAY[RUN_CLASS]): BOOLEAN is
       local
          rc: RUN_CLASS;
          ct, dyn_t: TYPE;
@@ -1565,7 +1496,12 @@ feature {NONE}
             end;
          end;
       end;
-   
+
+   mapping_cast_buffer: STRING is
+      once
+         !!Result.make(16);
+      end;
+
 invariant
 
    written_mark = string_aliaser.item(written_mark)

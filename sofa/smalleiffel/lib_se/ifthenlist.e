@@ -19,22 +19,6 @@ inherit IF_GLOBALS;
 
 creation make
 
-feature {NONE}
-
-   list: ARRAY[IFTHEN];
-
-   current_type: TYPE;
-
-   make(first: IFTHEN) is
-      require
-         first /= Void
-      do
-         !!list.with_capacity(4,1);
-	 list.add_last(first);
-      ensure
-         list.first = first
-      end;
-
 feature
 
    pretty_print is
@@ -42,7 +26,7 @@ feature
          i: INTEGER;
       do
          from
-            i := 1;
+            i := list.lower;
          until
             i > list.upper
          loop
@@ -62,7 +46,7 @@ feature
          from
             i := list.upper;
          until
-            i = 0
+            i < list.lower
          loop
             list.item(i).afd_check;
             i := i - 1;
@@ -76,7 +60,7 @@ feature
          from
             i := list.upper;
          until
-            i = 0
+            i < list.lower
          loop
             list.item(i).collect_c_tmp;
             i := i - 1;
@@ -91,7 +75,7 @@ feature
          state, previous, i: INTEGER;
       do
          from
-            i := 1;
+            i := list.lower;
          until
             state = 2
          loop
@@ -146,8 +130,8 @@ feature
          i: INTEGER;
       do
          from
-            Result := list.item(1).compile_to_jvm;
-            i := 2;
+            Result := list.first.compile_to_jvm;
+            i := list.lower + 1;
          until
             Result = static_true or else i > list.upper
          loop
@@ -174,12 +158,12 @@ feature
          i: INTEGER;
       do
          from
-            i := 1;
+            i := list.upper;
          until
-            i > list.upper or else Result
+            i < list.lower or else Result
          loop
             Result := list.item(i).use_current;
-            i := i + 1;
+            i := i - 1;
          end;
       end;
 
@@ -189,18 +173,18 @@ feature
       do
          from
             Result := true;
-            i := 1;
+            i := list.upper;
          until
-            not Result or else i > list.upper
+            not Result or else i < list.lower
          loop
             Result := list.item(i).stupid_switch(r);
-            i := i + 1;
+            i := i - 1;
          end;
       end;
 
    count: INTEGER is
       do
-         Result := list.upper;
+         Result := list.count;
       end;
 
    to_runnable(ct: TYPE): like Current is
@@ -212,7 +196,7 @@ feature
          if current_type /= Void then
 	    from
 	       !!Result.make(list.first);
-	       i := 2;
+	       i := list.lower + 1;
 	    until
 	       i > list.upper
 	    loop
@@ -223,7 +207,7 @@ feature
          else
             current_type := ct;
             from
-               i := 1;
+               i := list.lower;
             until
                i > list.upper or else nb_errors > 0
             loop
@@ -259,7 +243,7 @@ feature {IFTHENELSE}
          i, static: INTEGER;
       do
          from
-            i := 1;
+            i := list.lower;
             static := non_static;
          until
             static = static_true or else i > list.upper
@@ -269,11 +253,25 @@ feature {IFTHENELSE}
          end;
       end;
 
+feature {NONE}
+
+   list: FIXED_ARRAY[IFTHEN];
+
+   current_type: TYPE;
+
+   make(first: IFTHEN) is
+      require
+         first /= Void
+      do
+         !!list.with_capacity(4);
+	 list.add_last(first);
+      ensure
+         list.first = first
+      end;
+
 invariant
 
-   list.lower = 1;
-
-   count >= 1;
+   list.count >= 1;
 
 end -- IFTHENLIST
 

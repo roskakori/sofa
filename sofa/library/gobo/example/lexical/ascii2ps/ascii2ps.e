@@ -7,8 +7,8 @@ indexing
 	author:     "Eric Bezault <ericb@gobosoft.com>"
 	copyright:  "Copyright (c) 1999, Eric Bezault and others"
 	license:    "Eiffel Forum Freeware License v1 (see forum.txt)"
-	date:       "$Date: 1999/10/02 12:43:12 $"
-	revision:   "$Revision: 1.16 $"
+	date:       "$Date: 2000/02/09 18:30:41 $"
+	revision:   "$Revision: 1.18 $"
 
 class ASCII2PS
 
@@ -232,6 +232,12 @@ feature {NONE} -- Constants
 	yyEnd_of_buffer: INTEGER is 8
 			-- End of buffer rule code
 
+	yyLine_used: BOOLEAN is false
+			-- Are line and column numbers used?
+
+	yyPosition_used: BOOLEAN is false
+			-- Is `position' used?
+
 	INITIAL: INTEGER is 0
 			-- Start condition codes
 
@@ -341,6 +347,7 @@ feature {NONE} -- Initialization
 				end
 			end
 			if out_file /= Void and then not OUTPUT_STREAM_.is_closed (out_file) then
+				output_file := std.output
 				OUTPUT_STREAM_.close (out_file)
 			end
 		rescue

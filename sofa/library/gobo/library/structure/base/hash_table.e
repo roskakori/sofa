@@ -8,8 +8,8 @@ indexing
 	author:     "Eric Bezault <ericb@gobosoft.com>"
 	copyright:  "Copyright (c) 1999, Eric Bezault and others"
 	license:    "Eiffel Forum Freeware License v1 (see forum.txt)"
-	date:       "$Date: 1999/09/01 12:25:38 $"
-	revision:   "$Revision: 1.1 $"
+	date:       "$Date: 2000/04/16 13:04:55 $"
+	revision:   "$Revision: 1.3 $"
 
 class HASH_TABLE [G, H -> HASHABLE]
 
@@ -39,6 +39,9 @@ inherit
 			make as ds_make,
 			item as ds_item,
 			infix "@" as ds_item_at
+		redefine
+			unset_found_item, search,
+			found_item, replace_found_item
 		end
 
 creation
@@ -72,17 +75,17 @@ feature -- Initialization
 feature -- Access
 
 	infix "@", item (k: H): G is
-			-- Item associated with `key', if present
+			-- Item associated with `k', if present
 			-- otherwise default value of type `G'
-		local
-			a_cell: like dead_cell
 		do
 			search_position (k)
-			a_cell := storage.item (position)
-			if valid_cell (a_cell) then
-				Result := a_cell.first
+			if position /= No_position then
+				Result := items.item (position)
 			end
 		end
+
+	found_item: G
+			-- Item found by last call to `search'
 
 	cursor: CURSOR is
 			-- Current cursor position
@@ -94,21 +97,18 @@ feature -- Access
 			-- New array containing actually used keys, from 1 to `count'
 		local
 			i, j, nb: INTEGER
-			a_cell: like dead_cell
 		do
 			-- j := 0
 			nb := count
 			!! Result.make (1, nb)
 			from i := 1 until i > nb loop
 				from
-					a_cell := storage.item (j)
 				until
-					valid_cell (a_cell)
+					clashes.item (j) > Free_watermark
 				loop
 					j := j + 1
-					a_cell := storage.item (j)
 				end
-				Result.put (a_cell.second, i)
+				Result.put (keys.item (j), i)
 				i := i + 1
 				j := j + 1
 			end
@@ -155,6 +155,21 @@ feature -- Status report
 			end
 		end
 
+feature -- Search
+
+	search (k: H) is
+			-- Search for item at key `k'.
+			-- If found, set `found' to true, and set
+			-- `found_item' to item associated with `k'.
+		do
+			search_position (k)
+			if position = No_position then
+				unset_found_item
+			else
+				set_found_item (items.item (position), position)
+			end
+		end
+
 feature -- Cursor movement
 
 	go_to (p: CURSOR) is
@@ -168,118 +183,130 @@ feature -- Cursor movement
 
 feature -- Element change
 
-	put (new: G; key: H) is
-			-- Insert `new' with `key' if there is no other item
+	put (new: G; a_key: H) is
+			-- Insert `new' with `a_key' if there is no other item
 			-- associated with the same key.
 			-- Set `inserted' if and only if an insertion has
-			-- been made (i.e. `key' was not present).
+			-- been made (i.e. `a_key' was not present).
 			-- If not, set `conflict'.
 			-- In either case, set `found_item' to the item
-			-- now associated with `key' (previous item if
+			-- now associated with `a_key' (previous item if
 			-- there was one, `new' otherwise).
 		require
-			valid_key: valid_key (key)
+			valid_key: valid_key (a_key)
 		local
-			current_cell: like dead_cell
+			i, h: INTEGER
 		do
-			if count = capacity then
-				resize (new_capacity (count + 1))
-			end
-			search_position (key)
-			current_cell := storage.item (position)
-			if not valid_cell (current_cell) then
-				!! current_cell.make (new, key)
-				storage.put (current_cell, position)
+			search_position (a_key)
+			if position = No_position then
+				if count = capacity then
+					resize (new_capacity (count + 1))
+					h := hash_position (a_key)
+				else
+					h := slots_position
+				end
+				i := free_slot
+				free_slot := Free_offset - clashes.item (i)
+				clashes.put (slots.item (h), i)
+				slots.put (i, h)
+				items.put (new, i)
+				keys.put (a_key, i)
 				count := count + 1
 				control := Inserted_constant
-				set_found_item (new)
+				set_found_item (new, i)
 			else
 				control := Conflict_constant
-				set_found_item (current_cell.first)
+				set_found_item (items.item (position), position)
 			end
 		ensure
-			insertion_done: (not old has (key)) implies item (key) = new
-			now_present: has (key)
-			one_more_if_inserted: (not old has (key)) implies (count = old count + 1)
-			unchanged_if_conflict: (old has (key)) implies (count = old count)
+			insertion_done: (not old has (a_key)) implies item (a_key) = new
+			now_present: has (a_key)
+			one_more_if_inserted: (not old has (a_key)) implies (count = old count + 1)
+			unchanged_if_conflict: (old has (a_key)) implies (count = old count)
 		end
 
-	force (new: G; key: H) is
+	force (new: G; a_key: H) is
 			-- Update table so that `new' will be the item associated
-			-- with `key'.
+			-- with `a_key'.
 			-- If there was an item for that key, set `found'
 			-- and set `found_item' to that item.
 			-- If there was none, set `found' to False.
 		local
-			current_cell: like dead_cell
+			i, h: INTEGER
 		do
-			if count = capacity then
-				resize (new_capacity (count + 1))
-			end
-			search_position (key)
-			current_cell := storage.item (position)
-			if not valid_cell (current_cell) then
-				!! current_cell.make (new, key)
-				storage.put (current_cell, position)
+			search_position (a_key)
+			if position = No_position then
+				if count = capacity then
+					resize (new_capacity (count + 1))
+					h := hash_position (a_key)
+				else
+					h := slots_position
+				end
+				i := free_slot
+				free_slot := Free_offset - clashes.item (i)
+				clashes.put (slots.item (h), i)
+				slots.put (i, h)
+				items.put (new, i)
+				keys.put (a_key, i)
 				count := count + 1
 				unset_found_item
 			else
-				set_found_item (current_cell.first)
-				current_cell.put_first (new)
+				set_found_item (items.item (position), position)
+				items.put (new, position)
 			end
 			control := Inserted_constant
 		ensure
-			insertion_done: item (key) = new
-			now_present: has (key)
-			found_item_is_old_item: found implies (found_item = old (item (key)))
+			insertion_done: item (a_key) = new
+			now_present: has (a_key)
+			found_item_is_old_item: found implies (found_item = old (item (a_key)))
 		end
 
-	extend (new: G; key: H) is
-			-- Assuming there is no item of key `key',
-			-- insert `new' with `key'.
+	extend (new: G; a_key: H) is
+			-- Assuming there is no item of key `a_key',
+			-- insert `new' with `a_key'.
 			-- Set `inserted'.
 		require
-			not_present: not has (key)
+			not_present: not has (a_key)
 		local
-			current_cell: like dead_cell
+			i, h: INTEGER
 		do
 			if count = capacity then
 				resize (new_capacity (count + 1))
 			end
-			search_position (key)
-			check not_has: not valid_cell (storage.item (position)) end
-			!! current_cell.make (new, key)
-			storage.put (current_cell, position)
+			i := free_slot
+			free_slot := Free_offset - clashes.item (i)
+			h := hash_position (a_key)
+			clashes.put (slots.item (h), i)
+			slots.put (i, h)
+			items.put (new, i)
+			keys.put (a_key, i)
 			count := count + 1
 			unset_found_item
 			control := Inserted_constant
 		ensure
-			insertion_done: item (key) = new
+			insertion_done: item (a_key) = new
 			one_more: count = old count + 1
 		end
 
-	replace (new: G; key: H) is
-			-- Replace item at `key', if present,
+	replace (new: G; a_key: H) is
+			-- Replace item at `a_key', if present,
 			-- with `new'; do not change associated key.
 			-- Set `replaced' if and only if a replacement has been made
-			-- (i.e. `key' was present); otherwise set `found' to false.
+			-- (i.e. `a_key' was present); otherwise set `found' to false.
 			-- Set `found_item' to the item previously associated
-			-- with `key'.
-		local
-			current_cell: like dead_cell
+			-- with `a_key'.
 		do
-			search_position (key)
-			current_cell := storage.item (position)
-			if not valid_cell (current_cell) then
+			search_position (a_key)
+			if position = No_position then
 				control := Unknown_constant
 				unset_found_item
 			else
-				set_found_item (current_cell.first)
-				current_cell.put_first (new)
+				set_found_item (items.item (position), position)
+				items.put (new, position)
 				control := Replaced_constant
 			end
 		ensure
-			insertion_done: (old has (key)) implies item (key) = new
+			insertion_done: (old has (a_key)) implies item (a_key) = new
 		end
 
 	replace_key (new_key: H; old_key: H) is
@@ -291,20 +318,30 @@ feature -- Element change
 			-- If `conflict', set `found_item' to the item previously
 			-- associated with `new_key'.
 		local
-			current_cell: like dead_cell
 			old_position: INTEGER
+			old_slots_position: INTEGER
+			old_clashes_previous_position: INTEGER
+			h: INTEGER
 		do
 			move_all_cursors_after
 			search_position (old_key)
-			current_cell := storage.item (position)
-			if valid_cell (current_cell) then
+			if position /= No_position then
 				old_position := position
-				set_found_item (current_cell.first)
+				old_slots_position := slots_position
+				old_clashes_previous_position := clashes_previous_position
+				set_found_item (items.item (old_position), old_position)
 				search_position (new_key)
-				if not valid_cell (storage.item (position)) then
-					storage.put (dead_cell, old_position)
-					!! current_cell.make (found_item, new_key)
-					storage.put (current_cell, position)
+				if position = No_position then
+						-- Remove old key:
+					if old_clashes_previous_position = No_position then
+						slots.put (clashes.item (old_position), old_slots_position)
+					else
+						clashes.put (clashes.item (old_position), old_clashes_previous_position)
+					end
+						-- Add new key:
+					h := slots_position
+					clashes.put (slots.item (h), old_position)
+					slots.put (old_position, h)
 					control := Replaced_constant
 				else
 					control := Conflict_constant
@@ -320,20 +357,36 @@ feature -- Element change
 			not_inserted_if_conflict: (old has (new_key)) implies (item (new_key) = old (item (new_key)))
 		end
 
+	replace_found_item (v: G) is
+			-- Replace `found_item' by `v'.
+		do
+			found_item := v
+			items.put (v, found_position)
+		end
+
 feature -- Removal
 
-	remove (key: H) is
-			-- Remove item associated with `key', if present.
+	remove (a_key: H) is
+			-- Remove item associated with `a_key', if present.
 			-- Set `removed' if and only if an item has been
-			-- removed (i.e. `key' was present);
+			-- removed (i.e. `a_key' was present);
 			-- If not, set `found' to false.
 		local
-			i: INTEGER
+			dead_item: G
+			dead_key: H
 		do
-			search_position (key)
-			if valid_slot (position) then
+			search_position (a_key)
+			if position /= No_position then
 				move_cursors_forth (position)
-				storage.put (dead_cell, position)
+				if clashes_previous_position = No_position then
+					slots.put (clashes.item (position), slots_position)
+				else
+					clashes.put (clashes.item (position), clashes_previous_position)
+				end
+				clashes.put (Free_offset - free_slot, position)
+				items.put (dead_item, position)
+				keys.put (dead_key, position)
+				free_slot := position
 				count := count - 1
 				control := Removed_constant
 			else
@@ -341,8 +394,8 @@ feature -- Removal
 			end
 			unset_found_item
 		ensure
-			not_present: not has (key)
-			one_less: (old has (key)) implies (count = old count - 1)
+			not_present: not has (a_key)
+			one_less: (old has (a_key)) implies (count = old count - 1)
 		end
 
 feature -- Status setting
@@ -369,27 +422,44 @@ feature -- Conversion
 			-- Representation as a linear structure
 		local
 			i, j, nb: INTEGER
-			a_cell: like dead_cell
 		do
 			-- j := 0
 			nb := count
 			!! Result.make (nb)
 			from i := 1 until i > nb loop
 				from
-					a_cell := storage.item (j)
 				until
-					valid_cell (a_cell)
+					clashes.item (j) > Free_watermark
 				loop
 					j := j + 1
-					a_cell := storage.item (j)
 				end
-				Result.put_last (a_cell.first)
+				Result.put_last (items.item (j))
 				i := i + 1
 				j := j + 1
 			end
 		end
 
 feature {NONE} -- Implementation
+
+	set_found_item (v: G; pos: INTEGER) is
+			-- Set `found_item' to `v'.
+		do
+			found_item := v
+			found_position := pos
+		ensure
+			found: found
+			found_item_set: found_item = v
+			found_position_set: found_position = pos
+		end
+
+	unset_found_item is
+			-- Get rig of `found_item'.
+		local
+			default_item: G
+		do
+			found_position := No_position
+			found_item := default_item
+		end
 
 	add_space is
 			-- Increase capacity.

@@ -89,36 +89,39 @@ you're using.
 </TABLE>
 
 <DL COMPACT>
-<DT><I>
--plain</I>:<BR><DD>
-The default output format. No special character added.
+
+<DT><I>-plain</I>:<BR><DD>
+The default compact output format. No special character added.
 <BR><BR>
 
-<DT><I>
--tex1</I>:<BR><DD>
+<DT><I>-pretty</I>:<BR><DD>
+Basically, it is similar to <I>-plain</I> except that there are a
+couple of additional linefeeds (e.g. between features) that make the
+structure of the output easier to read. (It sort of appears like the
+"pretty" printer would have done it, that's why "-pretty").
+<BR><BR>
+
+<DT><I>-tex1</I>:<BR><DD>
 Simple output mode for TeX.
 Encloses the interface in a simple <code>verbatim</code>
 TeX environment.
 <BR><BR>
 
-<DT><I>
--tex2</I>:<BR><DD>
+<DT><I>-tex2</I>:<BR><DD>
 Output mode for TeX.
 Uses a TeX <code>alltt</code> environment with a <code>\bf</code>
 font for keywords, <code>\it</code> font for comments and
 <code>\tt</code> font for identifiers.
 <BR><BR>
 
-<DT><I>
--tex3</I>:<BR><DD>
+<DT><I>-tex3</I>:<BR><DD>
 Output mode for TeX.
 Follows style guidelines given in ETL apendix A.
 As the previous mode, this mode also uses a TeX
 <code>alltt</code> environment.
 <BR><BR>
 
-<DT><I>
--html1</I>:<BR><DD>
+<DT><I>-html1</I>:<BR><DD>
 HTML output. Written by Matthias Klose.
 <BR><BR>
 
@@ -171,7 +174,7 @@ Here is the current list of hook files.
 <BR><BR>
 <FONT COLOR="#50a050"><B>"hook016"</B></FONT> - If this hook file exists, and if an heading comment is
    present, the contents of this file is printed to replace the default
-   string "   -- " at the beginning of each comment line.
+   string "   --" at the beginning of each comment line.
 <BR><BR>
 <FONT COLOR="#50a050"><B>"hook017"</B></FONT> - If this hook file exists, and if an heading comment is
    present, the contents of this file is printed to replace the default
@@ -218,7 +221,7 @@ Here is the current list of hook files.
    "hook204" to replace the default string "%N".
 <BR><BR>
 <FONT COLOR="#50a050"><B>"hook206"</B></FONT> - If exists, printed before each line of the feature list
-   comment to replace the default string "   -- ".
+   comment to replace the default string "   --".
 <BR><BR>
 <FONT COLOR="#50a050"><B>"hook207"</B></FONT> - If exists, printed after each line of the feature list
    comment to replace the default string "%N".
@@ -276,7 +279,7 @@ Here is the current list of hook files.
 <BR><BR>
 <FONT COLOR="#50a050"><B>"hook311"</B></FONT> - If this hook file exists, and if a feature has a heading
    comment, the contents of this file is printed to replace the
-   default string "      -- " at the beginning of each comment line.
+   default string "      --" at the beginning of each comment line.
 <BR><BR>
 <FONT COLOR="#50a050"><B>"hook312"</B></FONT> - If this hook file exists, and if a feature has a heading
    comment, the contents of this file is printed to replace the default
@@ -319,7 +322,7 @@ Here is the current list of hook files.
    comment to replace the default empty string "".
 <BR><BR>
 <FONT COLOR="#50a050"><B>"hook414"</B></FONT> - If exists, printed before each line of the heading comment to
-   replace the default string "         -- ".
+   replace the default string "         --".
 <BR><BR>
 <FONT COLOR="#50a050"><B>"hook415"</B></FONT> - If exists, printed after each line of the heading comment to
    replace the default string "%N".
@@ -370,7 +373,7 @@ Here is the current list of hook files.
    replace the default empty string "".
 <BR><BR>
 <FONT COLOR="#50a050"><B>"hook428"</B></FONT> - If exists, printed before each line of the expression comment
-   to replace the default string " -- ".
+   to replace the default string " --".
 <BR><BR>
 <FONT COLOR="#50a050"><B>"hook429"</B></FONT> - If exists, printed after each line of the expression comment to
    replace the default string "%N".
@@ -410,7 +413,7 @@ becomes :
    comment to replace the default empty string "".
 <BR><BR>
 <FONT COLOR="#50a050"><B>"hook514"</B></FONT> - If exists, printed before each line of the heading comment to
-   replace the default string "         -- ".
+   replace the default string "         --".
 <BR><BR>
 <FONT COLOR="#50a050"><B>"hook555"</B></FONT> - If exists, printed after each line of the heading comment to
    replace the default string "%N".
@@ -461,7 +464,7 @@ becomes :
    replace the default empty string "".
 <BR><BR>
 <FONT COLOR="#50a050"><B>"hook528"</B></FONT> - If exists, printed before each line of the expression comment
-   to replace the default string " -- ".
+   to replace the default string " --".
 <BR><BR>
 <FONT COLOR="#50a050"><B>"hook529"</B></FONT> - If exists, printed after each line of the expression comment
    to replace the default string "%N".
@@ -507,7 +510,7 @@ becomes :
    replace the default empty string "".
 <BR><BR>
 <FONT COLOR="#50a050"><B>"hook814"</B></FONT> - If exists, printed before each line of the heading comment to
-   replace the default string "   -- ".
+   replace the default string "   --".
 <BR><BR>
 <FONT COLOR="#50a050"><B>"hook855"</B></FONT> - If exists, printed after each line of the heading comment to
    replace the default string "%N".
@@ -557,7 +560,7 @@ becomes :
    replace the default empty string "".
 <BR><BR>
 <FONT COLOR="#50a050"><B>"hook828"</B></FONT> - If exists, printed before each line of the expression comment
-   to replace the default string " -- ".
+   to replace the default string " --".
 <BR><BR>
 <FONT COLOR="#50a050"><B>"hook829"</B></FONT> - If exists, printed after each line of the expression comment
    to replace the default string "%N".
@@ -725,7 +728,7 @@ of this hook file.
 <DL COMPACT><DT><DD>
 <FONT COLOR="#50a050"><B>"BECL"</B></FONT> - Before Each Comment Line. This hook is applied to all comments
    whatever the kind of comment. If exists, printed before the contents
-   of each line of each comment (usually after the default string "-- ").
+   of each line of each comment (usually after the default string "--").
 <BR><BR>
 <FONT COLOR="#50a050"><B>"AECL"</B></FONT> - After Each Comment Line. This hook is applied to all comments
    whatever the kind of comment. If exits, printed after the contents
@@ -773,7 +776,7 @@ of this hook file.
 Copyright &copy; Dominique COLNET and Suzanne COLLIN -
 <A HREF="mailto:colnet@loria.fr">&lt;colnet@loria.fr&gt;</A>
 <BR>
-Last update: 05 June 1999, by DC & OZ.
+Last update: 18 April 2000, by DC.
 </I></FONT>
 <BR>
 </CENTER>

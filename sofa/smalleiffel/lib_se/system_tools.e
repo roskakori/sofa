@@ -32,47 +32,64 @@ creation make, install
 feature {NONE}
 
    -- Currently handled system list :
-   amiga_system:       STRING is "Amiga";
-   beos_system:        STRING is "BeOS";
-   dos_system:         STRING is "DOS";
-   macintosh_system:   STRING is "Macintosh";
-   os2_system:         STRING is "OS2";
    unix_system:        STRING is "UNIX";
-   vms_system:         STRING is "VMS";
    windows_system:     STRING is "Windows";
+   beos_system:        STRING is "BeOS";
+   macintosh_system:   STRING is "Macintosh";
+   amiga_system:       STRING is "Amiga";
+   dos_system:         STRING is "DOS";
+   os2_system:         STRING is "OS2";
+   vms_system:         STRING is "VMS";
+   elate_system:       STRING is "Elate";
 
    -- Currently handled C compiler list :
    gcc:                STRING is "gcc";
+   gpp:                STRING is "g++";
    lcc_win32:          STRING is "lcc-win32";
    cc:                 STRING is "cc";
    wcl386:             STRING is "wcl386";
    bcc32:              STRING is "bcc32";
-   bcc32i:             STRING is "bcc32i"; -- Is this one used ?
+   bcc32i:             STRING is "bcc32i"; -- Is this one really used ?
    cl:                 STRING is "cl";
    sas_c:              STRING is "sc";
    dice:               STRING is "dice";
    vbcc:               STRING is "vbcc";
    ccc:                STRING is "ccc";
+   vpcc:               STRING is "vpcc";
 
 feature {INSTALL}
 
    system_list: ARRAY[STRING] is
       once
-         Result := << amiga_system,
-                      beos_system,
-                      dos_system,
-                      macintosh_system,
-                      os2_system,
-                      unix_system,
-                      vms_system,
-                      windows_system
-                      >>;
+         Result := << 
+		     unix_system,
+		     windows_system
+		     beos_system,
+		     macintosh_system,
+		     amiga_system,
+		     dos_system,
+		     os2_system,
+		     vms_system,
+		     elate_system
+		     >>;
       end;
 
    compiler_list: ARRAY[STRING] is
       once
-	 Result := <<gcc, lcc_win32, cc, wcl386, bcc32, bcc32i,
-		     cl, sas_c, dice, vbcc, ccc>>;
+	 Result := <<
+		     gcc,
+		     lcc_win32,
+		     cc, 
+		     wcl386, 
+		     bcc32, 
+		     bcc32i,
+		     cl,
+		     sas_c,
+		     dice,
+		     vbcc,
+		     ccc,
+		     vpcc
+		     >>;
       end;
 
    add_x_suffix(cmd: STRING) is
@@ -238,6 +255,10 @@ feature {INSTALL}
 	    if not c_compiler_options.has('O') then
 	       append_token(c_compiler_options,"-O2");
 	    end;
+         elseif c_compiler = vpcc then
+	    if not c_compiler_options.has('O') then
+	       append_token(c_compiler_options,"-O2");
+	    end;
          end;
       end;
 
@@ -365,7 +386,8 @@ feature {GC_HANDLER}
                "Assembly Code for Garbage Collector not selected in %"");
             eh.append(tmp_path);
             eh.append(
-               "%". Default generic (hazardous) C code is provided.");
+               "%". Default generic (hazardous) C code is provided. %
+	        % Have a look in the SmallEiffel FAQ.");
             eh.print_as_warning;
             architecture := "generic.c";
          end;
@@ -462,6 +484,8 @@ feature
             Result := ".COM";
          elseif os2_system = system_name then
             Result := ".CMD";
+         elseif elate_system = system_name then
+            Result := ".scf";
          else
             Result := ".make";
          end;
@@ -480,6 +504,8 @@ feature
             Result := exe_suffix;
          elseif windows_system = system_name then
             Result := exe_suffix;
+         elseif elate_system = system_name then
+            Result := ".00";
          else
             Result := "";
          end;
@@ -517,6 +543,8 @@ feature
 	    Result := o_suffix;
 	 elseif c_compiler = ccc then
 	    Result := o_suffix;
+	 elseif c_compiler = vpcc then
+	    Result := o_suffix;
          end;
       end;
 
@@ -526,26 +554,27 @@ feature {NATIVE_SMALL_EIFFEL}
       once
          if beos_system = system_name then
          elseif c_compiler = gcc then
-            append_token(external_lib,libm);
+            add_external_lib(libm);
          elseif c_compiler = bcc32 then
-            append_token(external_lib,libm);
+            add_external_lib(libm);
          elseif c_compiler = bcc32i then
-            append_token(external_lib,libm);
+            add_external_lib(libm);
          elseif c_compiler = cl then
          elseif c_compiler = sas_c then
 	    -- math library is included automatically if
 	    -- "Math=..." was specified (as it is in
 	    -- default `sas_c_compiler_options')
 	 elseif c_compiler = dice then
-	    append_token(external_lib,libm);
+	    add_external_lib(libm);
 	 elseif c_compiler = vbcc then
 	    if amiga_system = system_name then
-	       append_token(external_lib,"-lmieee");
+	       add_external_lib("-lmieee");
 	    else
-	       append_token(external_lib,libm);
+	       add_external_lib(libm);
 	    end;
 	 elseif c_compiler = ccc then
-	    append_token(external_lib,libcpml);
+	    add_external_lib(libcpml);
+         elseif c_compiler = vpcc then
          end;
       end;
 
@@ -567,14 +596,14 @@ feature {COMPILE,COMPILE_TO_C}
                append_token(external_c_plus_plus_files,arg);
                Result := argi + 1;
             elseif arg.has_suffix(".a") then
-               append_token(external_lib,arg);
+               add_external_lib(arg);
                Result := argi + 1;
             elseif arg.has_suffix(".lib") then
-               append_token(external_lib,arg);
+               add_external_lib(arg);
                Result := argi + 1;
             elseif arg.has_suffix(".res") then 
                -- For lcc-win32 resource files :
-               append_token(external_lib,arg);
+               add_external_lib(arg);
                Result := argi + 1;
             elseif run_control.root_class = Void then
                run_control.compute_root_class(arg);
@@ -595,7 +624,7 @@ feature {COMPILE,COMPILE_TO_C}
                Result := argi + 1;
             end;
          elseif arg.has_prefix("-l") then
-            append_token(external_lib,arg);
+            add_external_lib(arg);
             Result := argi + 1;
          elseif arg.has_prefix("-L") then
             append_token(external_lib_path,arg);
@@ -611,6 +640,14 @@ feature {COMPILE,COMPILE_TO_C}
             append_token(linker_options,arg);
             if next_arg /= Void then
                append_token(linker_options,next_arg);
+               Result := argi + 2;
+            else
+               Result := argi + 1;
+            end;
+         elseif ("-include").is_equal(arg) then
+            if next_arg /= Void then
+	       append_token(c_compiler_options,arg);
+               append_token(c_compiler_options,next_arg);
                Result := argi + 2;
             else
                Result := argi + 1;
@@ -709,6 +746,8 @@ feature {COMPILE,COMPILE_TO_C,CLEAN,INSTALL}
 		  end;
 	       elseif ccc = c_compiler then
 		  c_compiler_options.copy("-O2");
+               elseif vpcc = c_compiler then
+                  c_compiler_options.copy("-O2");
                else
                   check false end;
                end;
@@ -812,13 +851,25 @@ feature {C_PRETTY_PRINTER}
          is_c_plus_plus_file_path(f) 
       do
          append_token(external_c_plus_plus_files,f);
-	 if c_compiler = gcc then
-	    if gcc.item(2) = 'c' then
-	       -- Switch "gcc" to "g++" :
-	       c_compiler.put('+',2);
-	       c_compiler.put('+',3);
-	    end;
+      end;
+
+   is_linking_mandatory: BOOLEAN is
+	 -- Is is mandatory to link again this executable even when 
+	 -- nothing has changed in the generated C code ? 
+      do
+	 Result := not external_object_files.is_empty;
+	 if not Result then
+	    Result := not external_c_files.is_empty;
 	 end;
+	 if not Result then
+	    Result := not external_c_plus_plus_files.is_empty;
+	 end;
+      end;
+
+   add_lib_basic_gui is
+      once
+	 add_external_lib_path("-L/usr/X11R6/lib");
+	 add_external_lib("-lX11");
       end;
 
 feature {C_PRETTY_PRINTER,INSTALL}
@@ -828,7 +879,11 @@ feature {C_PRETTY_PRINTER,INSTALL}
       do
          cmd.clear;
          if c_compiler = gcc then
-            cmd.append(gcc);
+ 	    if is_c_plus_plus_file_path(c_file_name) then
+	       cmd.append(gpp);
+ 	    else
+	       cmd.append(gcc);
+ 	    end
             append_token(cmd,c_compiler_options);
             append_token(cmd,c_flag);
             append_token(cmd,c_file_name);
@@ -880,6 +935,11 @@ feature {C_PRETTY_PRINTER,INSTALL}
             append_token(cmd,c_compiler_options);
             append_token(cmd,c_flag);
             append_token(cmd,c_file_name);
+         elseif c_compiler = vpcc then
+            cmd.append(vpcc);
+            append_token(cmd,c_compiler_options);
+            append_token(cmd,c_flag);
+            append_token(cmd,c_file_name);
          end;
       end;
 
@@ -888,7 +948,11 @@ feature {C_PRETTY_PRINTER,INSTALL}
       do
          cmd.clear;
          if c_compiler = gcc then
-            cmd.append(gcc);
+ 	    if external_c_plus_plus_files.is_empty then
+	       cmd.append(gcc);
+	    else
+	       cmd.append(gpp);
+	    end
             append_token(cmd,c_compiler_options);
             append_token(cmd,linker_options);
             append_token(cmd,external_lib_path);
@@ -917,6 +981,7 @@ feature {C_PRETTY_PRINTER,INSTALL}
             add_output_name(cmd);
             add_objects(cmd,c_name,max);
             append_token(cmd,external_c_files);
+            append_token(cmd,external_c_plus_plus_files);
             append_token(cmd,external_object_files);
             append_token(cmd,external_lib);
          elseif c_compiler = wcl386 then
@@ -927,6 +992,7 @@ feature {C_PRETTY_PRINTER,INSTALL}
             add_output_name(cmd);
             add_objects(cmd,c_name,max);
             append_token(cmd,external_c_files);
+            append_token(cmd,external_c_plus_plus_files);
             append_token(cmd,external_object_files);
             append_token(cmd,external_lib);
          elseif c_compiler = bcc32 then
@@ -937,6 +1003,7 @@ feature {C_PRETTY_PRINTER,INSTALL}
             add_output_name(cmd);
             add_objects(cmd,c_name,max);
             append_token(cmd,external_c_files);
+            append_token(cmd,external_c_plus_plus_files);
             append_token(cmd,external_object_files);
             append_token(cmd,external_lib);
             add_lib_math;
@@ -948,6 +1015,7 @@ feature {C_PRETTY_PRINTER,INSTALL}
             add_output_name(cmd);
             add_objects(cmd,c_name,max);
             append_token(cmd,external_c_files);
+            append_token(cmd,external_c_plus_plus_files);
             append_token(cmd,external_object_files);
             append_token(cmd,external_lib);
             add_lib_math;
@@ -959,6 +1027,7 @@ feature {C_PRETTY_PRINTER,INSTALL}
             add_output_name(cmd);
             add_objects(cmd,c_name,max);
             append_token(cmd,external_c_files);
+            append_token(cmd,external_c_plus_plus_files);
             append_token(cmd,external_object_files);
             append_token(cmd,external_lib);
             add_lib_math;
@@ -970,6 +1039,7 @@ feature {C_PRETTY_PRINTER,INSTALL}
             append_token(cmd,c_name);
             cmd.append("#1#2#3#4#5#6#7#8#9#?.o");
             append_token(cmd,external_c_files);
+            append_token(cmd,external_c_plus_plus_files);
             append_token(cmd,external_object_files);
             append_token(cmd,external_lib);
             add_output_name(cmd);
@@ -984,6 +1054,7 @@ feature {C_PRETTY_PRINTER,INSTALL}
 	    add_output_name(cmd);
 	    add_objects(cmd,c_name,max);
 	    append_token(cmd,external_c_files);
+	    append_token(cmd,external_c_plus_plus_files);
 	    append_token(cmd,external_object_files);
 	    append_token(cmd,external_lib);
 	    if no_strip then
@@ -1001,10 +1072,22 @@ feature {C_PRETTY_PRINTER,INSTALL}
 	    add_lib_math;
 	    add_objects(cmd,c_name,max);
 	    append_token(cmd,external_c_files);
+	    append_token(cmd,external_c_plus_plus_files);
 	    append_token(cmd,external_object_files);
 	    append_token(cmd,external_lib);
          elseif c_compiler = ccc then
             cmd.append(ccc);
+            append_token(cmd,c_compiler_options);
+            append_token(cmd,linker_options);
+            append_token(cmd,external_lib_path);
+            add_output_name(cmd);
+            add_objects(cmd,c_name,max);
+            append_token(cmd,external_c_files);
+            append_token(cmd,external_c_plus_plus_files);
+            append_token(cmd,external_object_files);
+            append_token(cmd,external_lib);
+         elseif c_compiler = vpcc then
+            cmd.append(vpcc);
             append_token(cmd,c_compiler_options);
             append_token(cmd,linker_options);
             append_token(cmd,external_lib_path);
@@ -1023,7 +1106,11 @@ feature {C_PRETTY_PRINTER,INSTALL}
       do
          cmd.clear;
          if c_compiler = gcc then
-            cmd.append(gcc);
+	    if external_c_plus_plus_files.is_empty then
+	       cmd.append(gcc);
+	    else
+	       cmd.append(gpp);
+	    end
             append_token(cmd,c_compiler_options);
             append_token(cmd,linker_options);
             append_token(cmd,external_lib_path);
@@ -1058,6 +1145,7 @@ feature {C_PRETTY_PRINTER,INSTALL}
             add_output_name(cmd);
             append_token(cmd,c_file_name);
             append_token(cmd,external_c_files);
+            append_token(cmd,external_c_plus_plus_files);
             append_token(cmd,external_object_files);
             append_token(cmd,external_lib);
          elseif c_compiler = wcl386 then
@@ -1068,6 +1156,7 @@ feature {C_PRETTY_PRINTER,INSTALL}
             add_output_name(cmd);
             append_token(cmd,c_file_name);
             append_token(cmd,external_c_files);
+            append_token(cmd,external_c_plus_plus_files);
             append_token(cmd,external_object_files);
             append_token(cmd,external_lib);
          elseif c_compiler = bcc32 then
@@ -1078,6 +1167,7 @@ feature {C_PRETTY_PRINTER,INSTALL}
             add_output_name(cmd);
             append_token(cmd,c_file_name);
             append_token(cmd,external_c_files);
+            append_token(cmd,external_c_plus_plus_files);
             append_token(cmd,external_object_files);
             append_token(cmd,external_lib);
             add_lib_math;
@@ -1089,6 +1179,7 @@ feature {C_PRETTY_PRINTER,INSTALL}
             add_output_name(cmd);
             append_token(cmd,c_file_name);
             append_token(cmd,external_c_files);
+            append_token(cmd,external_c_plus_plus_files);
             append_token(cmd,external_object_files);
             append_token(cmd,external_lib);
             add_lib_math;
@@ -1100,6 +1191,7 @@ feature {C_PRETTY_PRINTER,INSTALL}
             add_output_name(cmd);
             append_token(cmd,c_file_name);
             append_token(cmd,external_c_files);
+            append_token(cmd,external_c_plus_plus_files);
             append_token(cmd,external_object_files);
             append_token(cmd,external_lib);
             add_lib_math;
@@ -1111,6 +1203,7 @@ feature {C_PRETTY_PRINTER,INSTALL}
             append_token(cmd,external_lib_path);
             append_token(cmd,c_file_name);
             append_token(cmd,external_c_files);
+            append_token(cmd,external_c_plus_plus_files);
             append_token(cmd,external_object_files);
             append_token(cmd,external_lib);
 	    add_lib_math;
@@ -1123,6 +1216,7 @@ feature {C_PRETTY_PRINTER,INSTALL}
 	    add_output_name(cmd);
 	    append_token(cmd,c_file_name);
 	    append_token(cmd,external_c_files);
+	    append_token(cmd,external_c_plus_plus_files);
 	    append_token(cmd,external_object_files);
 	    append_token(cmd,external_lib);
 	    add_lib_math;
@@ -1138,6 +1232,7 @@ feature {C_PRETTY_PRINTER,INSTALL}
 	    add_lib_math;
 	    append_token(cmd,c_file_name);
 	    append_token(cmd,external_c_files);
+	    append_token(cmd,external_c_plus_plus_files);
 	    append_token(cmd,external_object_files);
 	    append_token(cmd,external_lib);
 	 elseif c_compiler = ccc then
@@ -1151,6 +1246,17 @@ feature {C_PRETTY_PRINTER,INSTALL}
 	    append_token(cmd,external_c_plus_plus_files);
 	    append_token(cmd,external_object_files);
 	    append_token(cmd,external_lib);
+         elseif c_compiler = vpcc then
+            cmd.append(vpcc);
+            append_token(cmd,c_compiler_options);
+            append_token(cmd,linker_options);
+            append_token(cmd,external_lib_path);
+            add_output_name(cmd);
+            append_token(cmd,c_file_name);
+            append_token(cmd,external_c_files);
+            append_token(cmd,external_c_plus_plus_files);
+            append_token(cmd,external_object_files);
+            append_token(cmd,external_lib);
 	 end;
       end;
 
@@ -1217,15 +1323,15 @@ feature {NONE}
    external_c_plus_plus_files: STRING is "";
          -- External C++ files.
 
-   append_token(head, tail: STRING) is
+   append_token(line, token: STRING) is
       do
-         if not tail.is_empty then
-            if tail.first /= ' ' then
-               if not head.is_empty then
-                  head.extend_unless(' ');
+         if not token.is_empty then
+            if token.first /= ' ' then
+               if not line.is_empty then
+                  line.extend_unless(' ');
                end;
             end;
-            head.append(tail);
+            line.append(token);
          end;
       end;
    
@@ -1485,6 +1591,8 @@ feature {NONE}
             Result := true;
          elseif beos_system = system_name then
             Result := true;
+         elseif elate_system = system_name then
+            Result := true;
          end;
       end;
 
@@ -1540,6 +1648,9 @@ feature {NONE}
 	    elseif c_compiler = vbcc then
 	       append_token(cmd,o_flag);
 	       cmd.append(output_name);
+	    elseif c_compiler = vpcc then
+	       append_token(cmd,o_flag);
+	       cmd.append(output_name);
             end;
          elseif c_compiler = gcc then
             append_token(cmd,o_flag);
@@ -1584,6 +1695,10 @@ feature {NONE}
             append_token(cmd,o_flag);
             append_token(cmd,output_name);
             add_x_suffix(cmd);
+         elseif c_compiler = vpcc then
+            append_token(cmd,o_flag);
+            append_token(cmd,output_name);
+            add_x_suffix(cmd);
          end;
       end;
 
@@ -1603,6 +1718,24 @@ feature {NONE}
             cmd.append(object_suffix);
             i := i + 1;
          end;
+      end;
+
+   add_external_lib(lib: STRING) is
+      require
+	 not lib.is_empty
+      do
+	 if not external_lib.has_string(lib) then
+	    append_token(external_lib,lib);
+	 end;
+      end;
+
+   add_external_lib_path(path: STRING) is
+      require
+	 not path.is_empty
+      do
+	 if not external_lib_path.has_string(path) then
+	    append_token(external_lib_path,path);
+	 end;
       end;
 
    exe_suffix: STRING is ".exe";

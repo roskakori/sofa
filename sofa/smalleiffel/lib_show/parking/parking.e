@@ -15,25 +15,24 @@
 --
 class PARKING
 
-creation {ANY}
-   make
+creation make
 
-feature {ANY}
+feature
 
    lower_level: INTEGER is
       do
          Result := level_list.lower;
       end;
-
+   
    upper_level: INTEGER is
       do
          Result := level_list.upper;
       end;
-
+   
    hour_price: REAL;
-
+   
    default_hour_price: REAL is 1.50;
-
+   
    count: INTEGER is
       local
          i: INTEGER;
@@ -47,20 +46,20 @@ feature {ANY}
             i := i + 1;
          end;
       end;
-
+   
    clock: DATE;
-
+   
    level_count(number: INTEGER): INTEGER is
       require
          number <= upper_level;
-         lower_level <= number;
+         lower_level <= number
       do
          Result := (level_list @ number).count;
       ensure
          Result >= 0;
       end;
 
-feature {ANY} -- Modifications :
+feature -- Modifications:
 
    make(ll: like level_list) is
       require
@@ -75,9 +74,9 @@ feature {ANY} -- Modifications :
          level_list = ll;
          last_car = 0;
       end;
-
+   
    arrival: INTEGER is
-      -- Gives 0 when no more place.
+	 -- Gives 0 when no more place.
       local
          i: INTEGER;
       do
@@ -101,7 +100,7 @@ feature {ANY} -- Modifications :
       ensure
          Result >= 0;
       end;
-
+   
    departure(car: INTEGER): REAL is
          -- Gives the price to pay or -1 when car has already leaved.
       require
@@ -124,12 +123,12 @@ feature {ANY} -- Modifications :
             stop := (Result >= 0) or (i > upper_level);
          end;
       end;
-
+   
    add_time(incr: INTEGER) is
       do
          clock.add_time(incr);
       end;
-
+   
    set_hour_price(hp: REAL) is
       require
          hp >= 0;
@@ -138,21 +137,21 @@ feature {ANY} -- Modifications :
       ensure
          hour_price = hp;
       end;
-
+   
 feature {NONE}
-
+   
    level_list: ARRAY[LEVEL];
-
+   
    last_car: INTEGER;
-
+   
 invariant
-
+   
    valid_price: hour_price >= 0;
-
+   
    clock /= Void;
-
+   
    last_car >= 0;
-
+   
    level_list /= Void;
-
+   
 end -- PARKING

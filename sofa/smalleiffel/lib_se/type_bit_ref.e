@@ -101,11 +101,6 @@ feature
          Result := c_sizeof_pointer;
       end;
 
-   run_class: RUN_CLASS is
-      do
-         Result := small_eiffel.run_class(run_type);
-      end;
-
    generic_list: ARRAY[TYPE] is
       do
          fatal_error_generic_list;

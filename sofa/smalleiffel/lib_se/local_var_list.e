@@ -24,13 +24,6 @@ creation {EIFFEL_PARSER} make
 
 creation {DECLARATION_LIST} runnable_from_current
 
-feature {NONE}
-
-   make(l: like list) is
-      do
-         declaration_list_make(l);
-      end;
-
 feature
 
    name(i: INTEGER): LOCAL_NAME1 is
@@ -63,7 +56,7 @@ feature
             fmt.put_character(';');
          else
             from
-               i := 1;
+               i := list.lower;
             until
                i > list.upper
             loop
@@ -148,7 +141,7 @@ feature {ONCE_ROUTINE_POOL,RUN_FEATURE}
                if not t.is_basic_eiffel_expanded then
                   rf3 := t.expanded_initializer;
                   if rf3 /= Void then
-                     cpp.expanded_writable(rf3,name(i));
+                     cpp.put_proc_call_0(rf3,name(i),Void);
                   end;
                end;
             end;
@@ -172,6 +165,13 @@ feature {RUN_FEATURE_3}
             cpp.inline_level_decr;
             i := i - 1;
          end;
+      end;
+
+feature {NONE}
+
+   make(l: like list) is
+      do
+         declaration_list_make(l);
       end;
 
 end -- LOCAL_VAR_LIST

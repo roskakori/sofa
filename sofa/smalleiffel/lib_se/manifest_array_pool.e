@@ -106,13 +106,13 @@ feature {NONE}
                      %m=");
          if gc_handler.is_off then
             body.append(
-               "malloc(sizeof(*m));%N%
+               "se_malloc(sizeof(*m));%N%
                %*m=M");
             ma_id.append_in(body);
             body.append(
                ";%N%
                %if(argc){%N%
-               %s=malloc(argc*sizeof(*s));%N");
+               %s=se_malloc(argc*sizeof(*s));%N");
          else
             body.append(fz_new);
             ma_id.append_in(body);

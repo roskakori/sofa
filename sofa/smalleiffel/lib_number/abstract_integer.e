@@ -22,38 +22,43 @@ feature
 	 -- Append the equivalent of `to_string' at the end of 
 	 -- `str'. Thus you can save memory because no other
 	 -- STRING is allocate for the job.
-      local
-	 val: NUMBER;
-	 i, j: INTEGER;
-      do
-	 if is_zero then
-	    str.extend('0');
-	 else
-	    if is_negative then
-	       str.extend('-');
-	    end;
-	    from
-	       i := str.count + 1;
-	       val := Current.abs;
-	    until
-	       val.is_zero
-	    loop
-	       str.extend((val @\\ 10).digit);
-	       val := val @// 10;
-	    end;
-	    from  
-	       j := str.count;
-	    until
-	       i >= j
-	    loop
-	       str.swap(i,j);
-	       j := j - 1;
-	       i := i + 1 ;
-	    end;
-	 end;
+--      local
+--	 val: NUMBER;
+--	 i, j: INTEGER;
+--      do
+--	 if is_zero then
+--	    str.extend('0');
+--	 else
+--	    if is_negative then
+--	       str.extend('-');
+--	    end;
+--	    from
+--	       i := str.count + 1;
+--	       val := Current.abs;
+--	    until
+--	       val.is_zero
+--	    loop
+--	       str.extend((val @\\ 10).digit);
+--	       val := val @// 10;
+--	    end;
+--	    from  
+--	       j := str.count;
+--	    until
+--	       i >= j
+--	    loop
+--	       str.swap(i,j);
+--	       j := j - 1;
+--	       i := i + 1 ;
+--	    end;
+--	 end;
+      deferred
       end; 
    
 feature {NUMBER}
+   
+   is_integer_value: BOOLEAN is
+      deferred
+      end;
    
    integer_divide_small_integer(other: SMALL_INTEGER): ABSTRACT_INTEGER is
       require

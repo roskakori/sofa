@@ -88,6 +88,7 @@ feature
          i: INTEGER;
          e: EXPRESSION;
          at, ft: TYPE;
+	 T1, T2: TYPE;
       do
          fal := rf.arguments;
          if fal = Void then
@@ -125,6 +126,8 @@ feature
                   error(ft.start_position,em1);
                end;
             elseif ft.is_like_feature then
+	       T1 := at.run_type;
+	       T2 := ft.run_type;
                if at.run_type.is_a(ft.run_type) then
                else
                   eh.add_position(e.start_position);
@@ -160,7 +163,7 @@ feature
                e2 := e1.to_runnable(current_type);
                if e2 = Void then
                   error(e1.start_position,"Bad expression.");
-               elseif e1 /= e2 then
+               else
                   put(e2,i);
                end;
                i := i - 1;
@@ -168,8 +171,6 @@ feature
             if nb_errors = 0 then
                Result := Current;
             end;
-         elseif ct.run_class = run_class then -- *** C'est POSSIBLE ???? ****
-            Result := Current;
          else
             !!Result.from_model(Current);
             Result := Result.to_runnable(ct);

@@ -128,7 +128,12 @@ feature {NONE}
          echo.file_removing(tmp_path);
 	 --
          tmp_path.copy(prefix_name);
-         tmp_path.append("_external_cpp.o");
+         tmp_path.append("_external_cpp");
+         tmp_path.append(system_tools.object_suffix);
+         echo.file_removing(tmp_path);
+	 --
+	 tmp_path.copy(prefix_name);
+         tmp_path.append(system_tools.object_suffix);
          echo.file_removing(tmp_path);
       end;
 

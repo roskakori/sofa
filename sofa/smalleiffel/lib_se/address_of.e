@@ -50,6 +50,11 @@ feature
 
    c_simple: BOOLEAN is true;
 
+   to_integer_or_error: INTEGER is
+      do
+	 to_integer_error;
+      end;
+
    static_result_base_class: BASE_CLASS is
       do
          Result := small_eiffel.get_class(as_pointer);

@@ -13,10 +13,8 @@ class EXAMPLE3
    --
    -- To start with NUMBERs, just compile an run it :
    -- 
-   --            compile -o example2 -boost example2
+   --            compile -o example3 -boost example3
    --
-
-inherit NUMBER_TOOLS;
 
 creation make
 
@@ -28,12 +26,15 @@ feature
 	 s: STRING;
       do
 	 if argument_count = 0 then
-	    io.put_string("factorial of 10 :%N");
-	    n := from_integer(10);
+	    io.put_string(
+            "%NYou are supposed to pass some argument to this command%Nin %
+	    %order to compute factorial for this argument.%NAs an example, %
+	    %if you pass 50 as an argument, it gives:%N");
+	    n := (50).to_number;
 	 else
 	    s := argument(1);
-	    if is_number(s) then
-	       n := from_string(s);
+	    if s.is_number then
+	       n := s.to_number;
 	       if not n.is_abstract_integer then
 		  io.put_number(n);
 		  io.put_string(" : this is not an integer !%N");

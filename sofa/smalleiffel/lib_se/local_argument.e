@@ -57,6 +57,11 @@ feature
          Result >= 1
       end;
 
+   frozen to_integer_or_error: INTEGER is
+      do
+	 to_integer_error;
+      end;
+
    frozen stupid_switch(r: ARRAY[RUN_CLASS]): BOOLEAN is
       do
          if small_eiffel.stupid_switch(result_type,r) then

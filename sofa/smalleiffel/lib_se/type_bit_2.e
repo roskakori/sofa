@@ -41,11 +41,6 @@ feature
          Result := run_type.nb;
       end;
 
-   run_class: RUN_CLASS is
-      do
-         Result := small_eiffel.run_class(run_type);
-      end;
-
    run_time_mark: STRING is
       do
          Result := run_type.written_mark;

@@ -1,12 +1,12 @@
-#!/local/bin/bash
+#!/bin/sh
 
 # system:     "Eiffel parser"
-# compiler:   "SmallEiffel -0.78"
+# compiler:   "SmallEiffel -0.76"
 # author:     "Eric Bezault <ericb@gobosoft.com>"
-# copyright:  "Copyright (c) 1999, Eric Bezault and others"
+# copyright:  "Copyright (c) 1997-2000, Eric Bezault and others"
 # license:    "Eiffel Forum Freeware License v1 (see forum.txt)"
-# date:       "$Date: 1999/10/02 12:50:54 $"
-# revision:   "$Revision: 1.2 $"
+# date:       "$Date: 2000/08/20 17:57:51 $"
+# revision:   "$Revision: 1.4 $"
 
 
 echo ${GOBO}/example/parse/eiffel/>			loadpath.se

@@ -11,7 +11,7 @@
 --
 class STRING
    --
-   -- Resizable character STRINGs. 
+   -- Resizable character STRINGs indexed from `1' to `count'. 
    --
    
 inherit
@@ -31,12 +31,23 @@ feature {STRING}
          -- The place where characters are stored.
    
 feature 
-   
+
    count: INTEGER;
-         -- String length.
+         -- String length which is also the maximum valid index.
    
    capacity: INTEGER;
          -- Capacity of the `storage' area.
+   
+   lower: INTEGER is 1;
+	 -- Minimum index (which is in fact always 1).
+
+   upper: INTEGER is
+	 -- Maximum index (same value as `count').
+      do
+	 Result := count;
+      ensure
+	 Result = count
+      end;
    
 feature -- Creation / Modification :
    
@@ -103,19 +114,22 @@ feature -- Testing :
    
    hash_code: INTEGER is
       local
-         i: INTEGER;
+         i, j: INTEGER
       do
-         i := count;
-         if i > 5 then
-            Result := i * item(i).code;
-            i := 5;
-         end;
-         from until i <= 0 loop
-            Result := Result + item(i).code;
-            i := i - 1;
-         end;
-         Result := Result * count;
-      end;
+         from
+	    j := count;
+	    i := 1
+	 until
+	    j <= 0 
+	 loop
+            Result := 5 * Result + item(i).code;
+            i := i + 1;
+	    j := j - 1;
+         end
+         if Result < 0 then
+            Result := - (Result + 1);
+         end
+      end
 
    infix "<" (other: like Current): BOOLEAN is
          -- Is Current less than `other' ?
@@ -532,6 +546,14 @@ feature -- Testing :
          -- We should check the value is within the system limits, but
          -- I can't see how to do that without trying to convert it.
       end; 
+
+   is_number: BOOLEAN is
+ 	 -- Can contents be read as a NUMBER ?
+      local
+	 number_tools: NUMBER_TOOLS;
+      do
+	 Result := number_tools.is_number(Current);
+      end;
 
    is_bit: BOOLEAN is
          -- True when the contents is a sequence of bits (i.e., mixed 
@@ -1057,6 +1079,16 @@ feature -- Conversion :
          end;
       end;
 
+   to_number: NUMBER is
+         -- Current must looks like an INTEGER.
+      require
+	 is_number
+      local
+	 number_tools: NUMBER_TOOLS;
+      do
+	 Result := number_tools.from_string(Current);
+      end;
+
    binary_to_integer: INTEGER is
          -- Assume there is enougth space in the INTEGER to store
          -- the corresponding decimal value.
@@ -1162,7 +1194,7 @@ feature -- Other features :
       ensure
          Result.count = (max_index - min_index + 1)
       end;
-   
+
    extend_multiple(c: CHARACTER; n: INTEGER) is
          -- Extend Current with `n' times character `c'.
       require
@@ -1452,14 +1484,15 @@ feature -- Interfacing with C string :
          -- compute the Eiffel `count'. This extra null character
          -- is not part of the Eiffel STRING.
          -- Also consider `from_external' to choose the most appropriate.
+      require
+	 p.is_not_null
       local
          s: like storage;
          i: INTEGER;
       do
-         clear;
          from
             s := s.from_pointer(p);
-            i := 0;
+	    count := 0;
          until
             s.item(i) = '%U'
          loop

@@ -8,14 +8,19 @@ indexing
 	author:     "Eric Bezault <ericb@gobosoft.com>"
 	copyright:  "Copyright (c) 1999, Eric Bezault and others"
 	license:    "Eiffel Forum Freeware License v1 (see forum.txt)"
-	date:       "$Date: 1999/10/02 14:01:31 $"
-	revision:   "$Revision: 1.3 $"
+	date:       "$Date: 1999/10/15 09:19:44 $"
+	revision:   "$Revision: 1.4 $"
 
 class PR_POSITION
 
 inherit
 
 	COMPARABLE
+
+	HASHABLE
+		undefine
+			is_equal
+		end
 
 	KL_IMPORTED_OUTPUT_STREAM_ROUTINES
 		undefine
@@ -71,6 +76,12 @@ feature -- Access
 			next_not_void: Result /= Void
 			same_rule: Result.rule = rule
 			next_position: Result.index = index + 1
+		end
+
+	hash_code: INTEGER is
+			-- Hash value
+		do
+			Result := index * rule.id
 		end
 
 feature -- Status report

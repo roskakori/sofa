@@ -66,9 +66,9 @@ feature {NUMBER}
 	    end;
 	 else
 	    if (n < 0) xor (d < 0) then
-	       !SMALL_FRACTION!Result.make(-num,den);
+	       !INTEGER_FRACTION!Result.make(-num,den);
 	    else
-	       !SMALL_FRACTION!Result.make(num,den);
+	       !INTEGER_FRACTION!Result.make(num,den);
 	    end;
 	 end;
       end;
@@ -78,7 +78,7 @@ feature {NUMBER}
 	 num, den : ABSTRACT_INTEGER;
 	 n_abs, g: ABSTRACT_INTEGER;
       do
-	 n_abs ?= n.abs; 
+	 n_abs ?= n.abs;
 	 g := n_abs.gcd(d.abs);
 	 if (g @= 1) then
 	    num := n;
@@ -92,12 +92,12 @@ feature {NUMBER}
 	 else	    
 	    num ?= num.abs;
 	    den ?= den.abs;
-	    if num.is_integer and then den.is_integer and then (n.is_negative xor d.is_negative) then
-	       !SMALL_FRACTION!Result.make(-num.to_integer,den.to_integer);
-	    elseif (num.is_integer and then den.is_integer) then 
-	       !SMALL_FRACTION!Result.make(num.to_integer,den.to_integer);
+	    if num.is_small_integer and then den.is_small_integer and then (n.is_negative xor d.is_negative) then
+	       !INTEGER_FRACTION!Result.make(-num.to_integer,den.to_integer);
+	    elseif (num.is_small_integer and then den.is_small_integer) then 
+	       !INTEGER_FRACTION!Result.make(num.to_integer,den.to_integer);
 	    else
-	       !LARGE_FRACTION!Result.make_simply(num,den,(n.is_negative xor d.is_negative));
+	       !NUMBER_FRACTION!Result.make_simply(num,den,(n.is_negative xor d.is_negative));
 	    end;	 
 	 end;
       end;
@@ -108,8 +108,10 @@ feature {NUMBER}
       local
 	 num: ABSTRACT_INTEGER;
       do
-	 if (n = Minimum_integer) then
-	    num := greater_large_negative_integer;
+	 if n >= Base then
+	    !LARGE_POSITIVE_INTEGER!num.make_smaller(n);
+	 elseif n <= -Base then
+	    !LARGE_NEGATIVE_INTEGER!num.make_smaller(n);
 	 else
 	    !SMALL_INTEGER!num.make(n);
 	 end;
@@ -122,8 +124,10 @@ feature {NUMBER}
       local
 	 den: ABSTRACT_INTEGER;
       do
-	 if (d = Minimum_integer) then
-	    den := greater_large_negative_integer;
+	 if d >= Base then
+	    !LARGE_POSITIVE_INTEGER!den.make_smaller(d);
+	 elseif d <= -Base then
+	    !LARGE_NEGATIVE_INTEGER!den.make_smaller(d);
 	 else
 	    !SMALL_INTEGER!den.make(d);
 	 end;

@@ -28,52 +28,21 @@ feature
          -- Name of the formal generic argument.
 
    constraint: TYPE;
+	 -- Non Void if any.
 
-feature {NONE}
-
-   make(n: like name; c: like constraint) is
-      require
-         n /= Void
-      do
-         name := n;
-         constraint := c;
-      ensure
-         name = n;
-         constraint = c
-      end;
-
-feature
-
-   base_class: BASE_CLASS is
-      do
-         Result := name.start_position.base_class;
-      ensure
-         Result.is_generic
-      end;
-
-   rank: INTEGER is
+   rank: INTEGER;
          -- In the corresponding declation list.
-      do
-         check
-            base_class /= Void;
-            base_class.is_generic;
-            base_class.formal_generic_list.count >= 1;
-         end;
-         Result := base_class.formal_generic_list.index_of(Current.name);
-      ensure
-         Result >= 1
-      end;
-
+   
    constrained: BOOLEAN is
       do
          Result := (constraint /= void);
       end;
-
+   
    start_position: POSITION is
       do
          Result := name.start_position;
       end;
-
+   
    pretty_print is
       do
          name.pretty_print;
@@ -84,7 +53,7 @@ feature
             fmt.level_decr;
          end;
       end;
-
+   
    short is
       do
          short_print.a_class_name(name);
@@ -104,6 +73,78 @@ feature {FORMAL_GENERIC_LIST}
                         %name of an existing class (VCFG.1).");
 
          end;
+      end;
+
+   set_rank(r: like rank) is
+      require
+	 r > 0
+      do
+	 rank := r;
+      ensure
+	 rank = r
+      end;
+
+   constraint_substitution(fga: like Current; r: INTEGER) is
+	 -- Substitute in the previously read `Current' `constraint'
+	 -- all occurrences of `fga' which will be added at rank `r'.
+      local
+	 fgan: STRING;
+	 cn: CLASS_NAME;
+      do
+	 if constraint /= Void then
+	    fgan := fga.name.to_string;
+	    if constraint.is_generic then
+	       substitute(constraint.generic_list,fga,r,fgan);
+	    else
+	       cn := constraint.base_class_name;
+	       if fgan = cn.to_string then
+		  !TYPE_FORMAL_GENERIC!constraint.make(cn,fga,r);
+	       end;
+	    end;
+	 end;
+      end;
+   
+feature {NONE}
+
+   substitute(gl: ARRAY[TYPE]; fga: like Current; r: INTEGER; fgan: STRING) is
+	 -- Substitute recursively all occurrences of `fgan' in `gl'.
+      require
+	 gl /= Void;
+	 fgan = fga.name.to_string
+      local
+	 i: INTEGER;
+	 tfg: TYPE_FORMAL_GENERIC;
+	 t: TYPE;
+	 cn: CLASS_NAME;	 
+      do
+	 from
+	    i := gl.upper;
+	 until
+	    i < gl.lower
+	 loop
+	    t := gl.item(i);
+	    if t.is_generic then
+	       substitute(t.generic_list,fga,r,fgan);
+	    else
+	       cn := t.base_class_name;
+	       if fgan = cn.to_string then
+		  !!tfg.make(cn,fga,r);
+		  gl.put(tfg,i);
+	       end;
+	    end;
+	    i := i - 1;
+	 end;
+      end;
+
+   make(n: like name; c: like constraint) is
+      require
+         n /= Void
+      do
+         name := n;
+         constraint := c;
+      ensure
+         name = n;
+         constraint = c
       end;
 
 invariant

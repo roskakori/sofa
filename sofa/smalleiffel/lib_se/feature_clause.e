@@ -142,7 +142,7 @@ feature {FEATURE_NAME_LIST}
             short_print.hook_or("hook204","feature(s) from ");
             short_print.a_class_name(bcn);
             short_print.hook_or("hook205","%N");
-            comment.short("hook206","   -- ","hook207","%N");
+            comment.short("hook206","   --","hook207","%N");
             short_print.hook_or("hook208","");
          end;
       end;
