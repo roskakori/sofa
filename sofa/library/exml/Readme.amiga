@@ -1,0 +1,61 @@
+If you want to use eXML for own projects, use
+${EXML}/examples/se_test/ as starting point, in particular the
+smakefile and SCOPTIONS.
+
+Forget all the makefile mess in the expat drawer, you don't need it;
+eXML also only compiles the necessary objects in its own makefiles.
+
+Several changes had to be applied on eXML before it worked with Sofa:
+
+- Added
+
+     ${EXML}/compiler_specific/se/smakefile and
+     ${EXML}/examples/se_test/smakefile
+
+  These are the only two makefiles you need to compile the example in
+  se_test.
+
+  Trying to change the rather chaotic Makefile.linux and make_incl_#?
+  stuff didn't seem sensible to me.
+
+- Added SCOPTIONS for every smakefile. They should work, but are not
+  particular optimized.
+
+- In ${EXML}/examples/se_test/root_class.e, the line
+
+     !! f.connect_to ("..\test_data\test.xml")
+
+  has been replaced by
+
+     !! f.connect_to ("/test_data/test.xml")
+
+- In ${EXML}/compiler_specific/se/clib/exml_parser.c, the lines
+
+     #include <xmlparse.h>
+     #include <exml_parser_callbacks.h>
+
+  have been replaced by
+
+     #include "xmlparse.h"
+     #include "exml_parser_callbacks.h"
+
+  This is a rather grey area in the ANSI definition of the C
+  preprocessor, but the second one works well with an appropriate
+  INCLUDEDIR passed to sc.
+
+- In ${EXML}/compiler_specific/se/clib, renamed
+
+     expat_parser_error_codes_wrap.c
+
+  to
+
+     expat_parser_error_codes.c
+
+  due to limited length of of AmigaOS file system. Note that SE
+  internally adds a ".tmp" suffix to filenames, so even
+  "expat_parser_error_codes_wrp.c" wouldn't work.
+
+- Removed all #?.(dll|exe|msc|scc|...) files because I didn't see
+  any point including them into the Amiga release.
+
+Thomas.

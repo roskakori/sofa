@@ -1,0 +1,25 @@
+There are a few things you should be aware of when using Gobo on Amiga:
+
+- Hardly any testing has been done.
+
+- Some classes have been renamed to have names with at most 30
+characters (as required by most Amiga file systems). Proper
+"rename.se" files are provided, thus there shouldn't be any problems.
+
+- All #?.ge files in library/kernel have been removed. They are not
+needed to use Gobo but merely were preprocessed with "gepp" to create
+"library/kernel/spec/#?/#?.e". If you still need them, you have to
+download the original Gobo distribution (see Sofa:gobo/doc for
+details). The reason for the removal is that some of the #?.ge files
+had too long names. When SE tried to open a corresponding #?.e file,
+the "unzip" had already overwritten it with the #?.ge, as the AmigaOS
+file system violently cut-off the name.
+
+- Also removed "bin/ge2e.sh" and "bin/make_spec.bat" because they
+won't work without the #?.ge files anyway.
+
+- If you want to recompile the "ge#?" tools, check the files
+"SCOPTIONS" and "make.amiga" in the respective directories in
+gobo/src.
+
+Thomas.

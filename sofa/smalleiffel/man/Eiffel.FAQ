@@ -1,0 +1,1349 @@
+Archive-name: eiffel-faq
+Posting-Frequency: approximately monthly
+Last-modified: 09 October 1998
+
+ EIFFEL: FREQUENTLY ASKED QUESTIONS
+ ----------------------------------
+
+This question-and-answer list is posted monthly to the Usenet
+newsgroups comp.lang.eiffel, comp.answers and news.answers.
+
+Please send corrections, additions and comments to Franck Arnaud
+(franck_arnaud@stratus.com).
+
+This information is abstracted and condensed from the posts of many
+contributors to comp.lang.eiffel, supplemented by information from
+vendors. No guarantees are made regarding its accuracy.
+
+This compilation is by Franck Arnaud. Distribution is unrestricted.
+It builds on the work of the previous maintainers: Rock Howard,
+Roger Browne, Conrad Taylor in chronological order.
+
+You can receive the latest copy by anonymous file transfer from:
+
+   ftp://ftp.cm.cf.ac.uk/pub/eiffel/eiffel-faq
+   ftp://rtfm.mit.edu/pub/usenet/news.answers/eiffel-faq
+
+or by sending an email message to mail-server@rtfm.mit.edu with this
+message body:
+
+   send /pub/usenet/news.answers/eiffel-faq
+
+ --------------------
+
+WHAT'S NEW?
+
+Changes since the last posting:
+
+   QCOM  Visual Eiffel current version is 2.5
+   QCOM  TowerEiffel moved to historical section
+   QCOM  SmallEiffel -0.80
+   QGRP  Rio de la Plata Eiffel Group added
+   LPRC  Consensus shift on feature objects
+
+ --------------------
+
+CONTENTS
+
+Frequently Asked Questions:
+
+   QEIF  What is Eiffel?
+   QORI  Where did Eiffel come from?
+   QCOM  What Eiffel compilers are available?
+   QFRE  Is Eiffel available for free or as shareware?
+   QARC  Is there an archive of the comp.lang.eiffel newsgroup?
+   QBOK  What books are available for learning about Eiffel?
+   QWEB  Where can I find Eiffel on the World-Wide-Web?
+   QEDI  Where can I get an Eiffel editor or emacs-mode?
+   QBON  What is BON?
+   QSAT  What is Sather? How does it compare to Eiffel?
+   QSTD  Are there standards for the Eiffel language?
+   QTGV  How fast do Eiffel applications run?
+   QGRP  Are there any Eiffel user groups?
+   QADR  Where can I get Eiffel products and services?
+   QCNF  Are there any conferences for Eiffel users?
+   QECC  Why do most Eiffel implementations compile to C?
+   QJVM  Where can I get an Eiffel to Java compiler?
+
+Language Issues:
+
+   LFEA  What features does Eiffel have?
+   LCHN  What changes have been made to the Eiffel language definition?
+   LLIB  What libraries come with Eiffel?
+   LDBC  What's the big deal about preconditions and postconditions?
+   LCON  Please explain and discuss covariance vs. contravariance.
+   LCAT  Is it true that there are "holes" in the Eiffel type system?
+   LTSK  Is there support for concurrency in Eiffel?
+   LOVL  Why doesn't Eiffel allow function overloading?
+   LPRC  Why are there no procedural types in Eiffel?
+   LATR  Why are there no class attributes in Eiffel?
+   LPAR  How can I call the parent-class version of a redefined
+         routine?
+   LEVC  Where can I find a comparison between Eiffel and C++?
+   LDES  Are there any destructors in Eiffel?
+   LDIS  How do I implement multiple inheritance efficiently?
+   LISA  How does the `Iterating several actions' example in ETL work?
+
+ --------------------
+
+QEIF: What is Eiffel?
+
+Eiffel is an advanced object-oriented programming language that
+emphasizes the design and construction of high-quality and reusable
+software.
+
+Eiffel is not a superset or extension of any other language. Eiffel
+strongly encourages OO programming and does not allow dangerous
+practices from previous generation languages although it does
+interface to other languages such as C and C++. Eiffel supports the
+concept of "Design by Contract" to improve software correctness.
+
+Beyond the language aspect Eiffel may be viewed as a method of
+software construction. Eiffel is an excellent vehicle for software
+education, including for a first programming course.
+
+ --------------------
+
+QORI: Where did Eiffel come from?
+
+Eiffel was created by Bertrand Meyer and developed by his company,
+Interactive Software Engineering (ISE) of Goleta, CA.
+
+Dr. Meyer borrowed on his extensive experience with OOP, particularly
+with Simula. He also added in important concepts from his academic
+work on software verification and computer language definition.
+
+Eiffel's design addresses many practical concerns that software
+engineers face when creating complex software. Eiffel has evolved
+continually since its conception on September 14, 1985 and its first
+introduction in 1986.
+
+Eiffel is named after Gustave Eiffel, the engineer who designed the
+Eiffel Tower.
+
+ --------------------
+
+QCOM: What Eiffel compilers are available?
+
+The following Eiffel compilers are currently available and supported
+by their vendors or authors. The list is ordered by date of first
+publication.
+
+In the case of commercial products, the price is not mentioned because
+there can be varying conditions depending on platforms, conditions of
+use (personal vs. professional), etc. Please check with the vendors'
+web-sites for up to date pricing information. As a rule of thumb,
+limited or personal versions of compilers cost from US$ 50 to US$ 200
+while a full-blown compiler for a single-user licence and the right to
+royalty-free distribution varies from US$ 200 to US$ 1500, on
+mainstream platforms.
+
+In the list below, the 'target' entry indicates what code is produced
+by the compiler. Most -- but not all -- compilers produce C code so a
+supported C compiler may be needed.
+
+In the 'platform' entry, an indication of supported platforms is given.
+"Win32" means Windows 95 and Windows NT on Intel x86. No compiler (but
+indirectly Smalleiffel) is available under Windows NT on RISC platforms
+to the best of our knowledge. "Unix" means various Unices, check with
+vendor for the actual list of platforms. Most vendors supporting Unix
+do support Linux on Intel x86.
+
+The 'brief description' sections are abstracted from the vendors' web
+pages.
+
+
+ Vendor: Interactive Software Engineering Inc, USA
+ Product: ISE Eiffel (current version: 4.2)
+ Licensing conditions: Commercial; free time-limited evaluation version
+ Target: C
+ Platforms: Win32, Unix
+ Web: http://www.eiffel.com/
+
+ Brief description:
+  The ISE Eiffel environment includes:
+  - EiffelBench, a complete graphical development environment with
+    unique facilities for fast compilation, power browsing,
+    documentation, symbolic debugging and more
+  - EiffelBase, which is also available under an open source license,
+    is a complete and professional set of classes covering containers,
+    collections, I/O, iterators, object persistence, table
+    searching etc.
+  - Under Windows, the Windows Eiffel Library (WEL), combining the
+    power of Eiffel with access to the Windows API.
+
+
+ Vendor: Dominique Colnet et al
+ Product: SmallEiffel the GNU Eiffel compiler (current version: -0.80)
+ Licensing conditions: Freeware (GPL)
+ Target: ANSI C / Java Virtual Machine
+ Platforms: Any ANSI C machine
+ Web: http://www.loria.fr/SmallEiffel/
+
+ Brief description:
+  SmallEiffel is intended to be a complete, though small and very fast,
+  free Eiffel compiler, available for a wide range of platforms.
+  It includes an Eiffel to C compiler, an Eiffel to Java bytecode
+  compiler, a documentation tool, a pretty printer, etc.
+  SmallEiffel uses an innovative strategy involving whole system
+  analysis which allows compilation to be often faster than the
+  incremental compilation of traditional compilers.
+  It was originally designed at the LORIA lab, Nancy, France,
+  in 1994-95, and has been used worldwide by many individuals
+  and Universities since September 1995.
+
+
+ Vendor: Halstenbach ACT GmbH, Germany
+ Product: iss-base (current version: 2.0cl1)
+ Licensing conditions: Commercial; 90-day free evaluation version
+ Target: ANSI C
+ Platforms: Win32, Unix
+ Web: http://www.halstenbach.com/ or http://www.halstenbach.de/
+
+ Brief description:
+  iss-base is especially targeted to the creation of complex, mission
+  critical applications with a strong focus on software quality.
+  As an independent developer of Eiffel technology, Halstenbach has
+  created a development environment covering the whole software life
+  cycle. Major strenghs of iss-base are robustness, speed of
+compilation,
+  a sophisticated UIMS with full Windows'95/NT support and corresponding
+  GUI builder, reliable ODBC support, portability between Unix and
+  Windows, many libraries especically for writing commercial
+  applications, e.g., CORBA connectivity, extensive date/time support,
+  BCD-arithmetics, support for report generators, etc.
+
+  (Note: the compiler and base libraries are based on but not the same
+  as ISE Eiffel. Other parts of the product are unrelated with ISE
+  products.)
+
+
+ Vendor: Object Tools GmbH, Germany
+ Product: Visual Eiffel (current version: 2.5)
+ Licensing conditions: Commercial; free feature-limited eval. version
+ Target: Native Intel x86
+ Platforms: Win32 only
+ Web: http://www.object-tools.com/ or http://www.eiffel.de/
+
+ Brief description:
+  Using Visual Eiffel and DM will help you to develop complex Windows
+  applications in a very short time. Visual Eiffel gives you
+  - an integrated workbench with the Windows look and feel
+  - a professional Eiffel compiler producing very efficient native
+    code for Intel processors
+  - DM - the most rapid RAD tool you have ever seen gives you
+    everything to build applications for Windows fast.
+  - many useful libraries for the production of commercial Windows
+    applications - for ActiveX component integration, for ODBC access,
+    for the creation of nice graphical packages and much more.
+
+
+Other Eiffel compilers are worth mentioning although they may be
+either not supported any more, or an older version, or at an early
+stage of development so that their implementation of the language
+may be far from complete.
+
+
+ - A beta version of Eiffel/S 2.0 (not 1.3) is available from
+   Object Tools for PowerPC-based Apple Macintosh. It works
+   with the Codewarrior C compiler and IDE. It includes MOTEL,
+   a library wrapping the most common Mac toolbox entities and
+   providing an event driven application framework.
+   http://www.object-tools.com/
+
+ - FEC is a native Eiffel compiler for SUN SPARC machines. An early
+   beta version (including the full source code) can be downloaded
+   from Fridtjof Siebert's page at
+  
+http://www.informatik.uni-stuttgart.de/ifi/ps/siebert/fridi_eiffel.html
+
+ - SIG Eiffel/S, version 1.3: Eiffel/S was the first Eiffel 3
+   compiler, and the first Eiffel compiler available on the PC
+   platform. Version 1.3, is still available as shareware from
+   Object Tools (formerly SIG) but it is a few years old. A
+   much improved version has been announced for a while,
+   but is not generally available (except for the Mac). Eiffel/S 1.3
+   is a command line compiler producing C code, it is available
+   for DOS32, Windows 95 and NT and many Unix platforms.
+   Object Tools is at http://www.object-tools.com/.
+
+ - J-Eiffel is an Eiffel compiler generating JVM bytecode. A very early
+   version of the compiler -- including the source code -- is available
+   on Pirmin Kalberer's web site at http://www.spin.ch/~kalberer/
+
+ - EON Eiffel: An Eiffel to C++ compiler, written in C++,
+   not actively maintained.
+
+ - TowerEiffel was a commercial compiler with an emphasis on the
+performance of
+   generated code. It is not actively maintained or sold as Tower
+Technology
+   has moved on to write a static Java compiler using the same kinds of
+   system-wide optimisations found in most Eiffel compilers.
+
+
+ --------------------
+
+QFRE: Is Eiffel available for free or as shareware?
+
+SmallEiffel is a freeware compiler, provided as a highly
+portable C package that can compile on most ANSI C platforms.
+The full Eiffel source code of the compiler itself (in Eiffel)
+is included.
+
+A ready-to-run package for Windows, including a freeware C
+compiler, is available at http://www.elj.com/elj-win32/ .
+
+Many commercial vendors offer free evaluation versions, with
+some limitations. Commercial vendors often also have cheap
+entry-level versions for popular platforms like Win32 on
+Intel-based PCs.
+
+ --------------------
+
+QARC: Is there an archive of the comp.lang.eiffel newsgroup?
+
+Yes, on the WWW at:
+  http://www.cm.cf.ac.uk/CLE/
+or at the following FTP sites:
+  ftp://wuarchive.wustl.edu/usenet/comp.lang.eiffel/
+
+The newsgroup is also archived at the usual places on the web
+(DejaNews, AltaVista, etc).
+
+ --------------------
+
+QBOK: What books are available for learning about Eiffel?
+
+
+ESSENTIAL READING
+
+ Title: Object-Oriented Software Construction, second edition
+Author: Bertrand Meyer, ISE Inc.
+  ISBN: ISBN 0-13-629155-4 - Prentice Hall 1997
+ Short: This book is the comprehensive reference on all aspects of
+        object technology, from design principles to O-O techniques,
+        Design by Contract, O-O analysis, concurrency, persistence,
+        abstract data types and many more. Written by a pioneer in
+        the field, contains an in-depth analysis of both
+        methodological and technical issues.
+
+        While not presented as an 'Eiffel book' (Eiffel is presented
+        as the 'notation' used to illustrate the concept) it is
+        essential reading for any Eiffelist and it actually includes
+        a rather complete description of the 'notation' -- Eiffel.
+
+        Comes with a CD-ROM containing: the complete hyperlinked text,
+        for easy reference; software to read the text on major industry
+        platforms; supplementary material (reusable components,
+        mathematical complements); and a complete graphical O-O
+        development environment supporting the concepts of the book.
+
+
+ Title: Eiffel: The Language
+Author: Bertrand Meyer
+  ISBN: ISBN 0-13-247925-7 -- Prentice Hall 1992
+ Short: This book combines an introduction to Eiffel, the language
+        reference, and a good deal of philosophy into its 600 pages.
+        This is a rigorous and comprehensive book which some readers
+        may find heavy going despite Dr. Meyer's clarity of expression.
+        It is the definitive language reference, and essential reading
+        for all serious Eiffel users. Get the second or later printing
+        (same ISBN), which includes many corrections and changes (there
+        is not a second edition, and none is currently underway). This
+        book is also available in French (ISBN 2-7296-0525-8).
+
+
+OTHER BOOKS
+
+ Title: Object Oriented Programming in Eiffel, 2nd edition
+Author: Pete Thomas and Ray Weedon -- ISBN: 0-201-33131-4 -- AW 1997
+ Short: This book is a very comprehensive Eiffel tutorial and textbook,
+        with a solid "Abstract Data Type" approach.
+
+ Title: Algorithms and Data Structures
+Author: Jeffrey Kingston -- ISBN: 0-201-40374-9 -- AW 1997
+ Short: A treatment of the central algorithms and data structures of
+        computer science, including complete Eiffel implementations.
+
+ Title: An Object-Oriented Introduction to Computer Science Using Eiffel
+Author: Richard Wiener -- ISBN: 0-13-838725 -- PH 1997
+ Short: None
+
+ Title: Object Technology for Scientific Computing Object-Oriented
+            Numerical Software in Eiffel and C
+Author: Paul Dubois -- ISBN: 0-13-267808-X -- PH 1996
+ Short: Accompanying CD with the Free Eiffel for UNIX & Linux
+        environments.
+
+ Title: Object-Oriented Software Engineering with Eiffel
+Author: Jean-Marc Jezequel -- ISBN: 0-201-63381-7 -- AW 1996
+ Short: A comprehensive guide to Eiffel. In addition to describing
+        Eiffel, the book contains descriptions and comparisons of
+        compilers and libraries available on the market.
+
+ Title: Object Structures: Building OO Software Components with Eiffel
+Author: Jacob Gore -- ISBN: 0-201-63480-5 -- AW 1996
+ Short: This is the first "data structures" book for Eiffel, bringing
+        to the study of that language the first comprehensive
+        treatment of one of the most important topics in any
+        programming language.
+
+ Title: Eiffel Object-Oriented Programming
+Author: John Tyrrell -- ISBN: 0-333-64554-5 -- 1995
+ Short: This is an inexpensive and very approachable book.
+
+ Title: Software Development Using Eiffel: There can be life other than
+C++
+Author: Richard Wiener -- ISBN: 0-13-100686-X -- PH 1995
+ Short: This is a useful book with a lot of code examples for those
+        with a grounding in another OO language.
+
+ Title: Object Success
+Author: Bertrand Meyer -- ISBN: 0-13-192833-3 -- PH 1995
+ Short: This book is a  manager's guide to object orientation, its
+        impact on the corporation and its use for re-engineering the
+        software process.
+
+ Title: Object Oriented Programming in Eiffel
+Author: R. Rist and R. Terwilliger -- ISBN: 0-13-205931-2 -- PH 1995
+ Short: This is a textbook with an emphasis on design.
+
+ Title: Seamless Object-Oriented Software Architecture: Analysis and
+            Design of Reliable Systems
+Author: Kim Walden & Jean-Marc Nerson -- ISBN: 0-13-031303-3 -- PH 1994
+ Short: This book describes the Business Object Notation (BON) Method
+        in detail.
+
+ Title: Reusable Software: The Base Object-Oriented Component Libraries
+Author: Bertrand Meyer -- ISBN: 0-13-245499-8 -- PH 1994
+ Short: This book describes principles of library design and the
+        taxonomy of fundamental computing structures. Serves as a
+        manual for the EiffelBase libraries.
+
+ Title: An Object-Oriented Environment: Principles and Application
+Author: Bertrand Meyer -- ISBN: 0-13-245507-2 -- PH 1994
+ Short: This book describes the ISE EiffelBench environment as well as
+        the "Melting Ice" compilation technology and the EiffelBuild
+        GUI application builder.
+
+ Title: Object-Oriented Applications
+Author: Meyer and Nerson editors -- ISBN: 0-13-013798-7 -- PH 1993
+ Short: This book includes an introduction to Eiffel technology
+        followed by seven in-depth descriptions of large applications
+        written in Eiffel.
+
+ Title: Eiffel: Objektorientiertes Programmieren in der Praxis
+Author: Frieder Monninger -- ISBN: ISBN 3-88229-028-5 -- 1993
+ Short: This book is a very down-to-earth Eiffel handbook in German.
+
+ Title: Eiffel: An Introduction
+Author: Robert Switzer -- ISBN: 0-13-105909-2 -- PH 1993
+ Short: This book is a very clear and concise Eiffel primer, with many
+        code fragments and two substantial Eiffel applications. Also
+        available in French (ISBN 2-225-84-656-1).
+
+ Title: Object Oriented Software Construction, first edition
+Author: Bertrand Meyer -- ISBN: 0-13-629049-3 -- PH 1988
+ Short: An earlier edition of the second edition mentioned above, based
+        on a previous version of the language.
+        Also available in French, German, Italian, Dutch, etc.
+
+Publishers are Addison Wesley (AW) and Prentice Hall (PH).
+
+ --------------------
+
+QWEB: Where can I find Eiffel on the World-Wide-Web?
+
+http://www.cm.cf.ac.uk/CLE/
+  An Eiffel home page that is held on the University of Wales College
+  of Cardiff's server.
+
+http://www.eiffel-forum.org/
+  The web site of the Eiffel Forum user group includes a repository
+  of free software and information on the current projects.
+
+http://www.elj.com/
+  Geoff Eldridge's Eiffel pages including GUERL, a preview of Eiffel
+  Liberty, an online journal, the online C++ Critique, and other
+  useful information.
+
+http://www.eiffel.tm/
+  A directory of Eiffel resources maintained by Roger Browne of
+  Everything Eiffel.
+
+The main vendors websites are:
+
+ Halstenbach ACT   http://www.halstenbach.de/
+ ISE               http://www.eiffel.com/
+ Object Tools      http://www.object-tools.com/
+
+ --------------------
+
+QEDI: Where can I get an Eiffel editor or emacs-mode?
+
+Tower Technology Corporation supplies an Eiffel 3 emacs mode that
+supports syntax-directed highlighting, auto-indentation and is easily
+customized for font use, color and indentation amounts. It comes as
+part of the TowerEiffel system, but is also available free for anyone
+who requests it. Send email to elisp@atlanta.twr.com to get the latest
+version.
+
+The WINEDIT shareware programmer's editor offers colour syntax
+highlighting, works with Eiffel/S under MS-Windows, and is available
+from all main Windows shareware archives.
+
+Alan Philips' free Programmers File Editor also works with Eiffel/S
+under MS-Windows, has templates but not syntax highlighting, available
+from http://www.lancs.ac.uk/people/cpaap/pfe/ .
+
+The vim editor, an enhanced version of Unix's vi, includes Reimer
+Behrend's Eiffel syntax file as part of the standard distribution,
+from http://www.vim.org/ .
+
+Franck Arnaud's Eiffel extension to the Windows/WindowsNT programmers
+editor Codewright from Premia implements chromacoding of Eiffel code,
+has smart indenting and some templates. Available from
+http://www.altsoft.demon.co.uk/free/ .
+
+ --------------------
+
+QBON: What is BON?
+
+BON ("Business Object Notation") is a method for high-level analysis
+and design, offering a seamless reversible transition to an Eiffel
+implementation. The method emphasizes Design by Contract and
+systematic development.
+
+ISE supports BON with its EiffelCase tool.
+
+ --------------------
+
+QSAT: What is Sather? How does it compare to Eiffel?
+
+Sather is an OO language, originally patterned after Eiffel but now
+very different, created at ICSI of Berkeley, CA.
+
+Sather does not support Design by Contract, but has some other
+interesting features. See the Usenet newsgroup comp.lang.sather
+or the Sather home page at http://www.icsi.berkeley.edu/~sather/.
+
+ --------------------
+
+QSTD: Are there standards for the Eiffel language?
+
+The definition of the Eiffel language is in the public domain. This
+definition is controlled by NICE, the Non-profit International
+Consortium for Eiffel.
+
+The Eiffel trademark is owned and controlled by NICE. NICE is using
+Bertrand Meyer's book, "Eiffel: The Language" (2nd Printing), as the
+initial definition of the language.
+
+In 1995 NICE published the first version (called "Vintage 95") of
+the Eiffel Library Kernel Standard (ELKS). Those parts of an Eiffel
+application that use only the standard classes and features should
+run with minimal change on any compiler supporting ELKS-95.
+
+The NICE board members for 1998 are Eric Bezault (Chairman), James
+McKim (Secretary), Frieder Monninger (Treasurer), Bertrand Meyer
+and Christine Mingins.
+
+NICE email: nice@atlanta.twr.com
+
+ --------------------
+
+QTGV: How fast do Eiffel applications run?
+
+Early implementations of Eiffel were slow. Recent implementations have
+improved dramatically. However, to achieve maximum performance under
+any Eiffel implementation, run-time assertion monitoring must be
+switched off.
+
+It's hard to generalise, but compared to C++, simple
+computation-intensive applications will run perhaps 15% slower. Large
+applications are often dominated by memory management rather than
+computation. The effect of garbage collection is an oft-debated point,
+generally the overhead is quite low (10%) and in principle a style of
+programming assuming a GC could be more efficient than typical manual
+memory management. This also depends on the kind of application, the
+implementation of the garbage collector, etc.
+
+ --------------------
+
+QGRP: Are there any Eiffel user groups?
+
+The 'Eiffel Forum' is an organization for individuals interested in
+Eiffel. One of the main aims is to put in place a web infrastructure,
+similar to the Perl CPAN, to make user or vendor developed resources,
+reusable components and supporting information accessible to a wide
+and diverse user community.
+
+The website is at http://www.eiffel-forum.org/
+
+Compiler vendors usually run user groups for their user base, often
+in the form of a mailing-list or meetings during conferences. Contact
+the individual vendors for more information.
+
+South American users of Eiffel can look at the home page of RIPLEG
+(Rio de la Plata Eiffel Group) at http://www.angelfire.com/biz2/ripleg/
+
+ --------------------
+
+QADR: Where can I get Eiffel products and services?
+
+These vendors, resellers and suppliers of Eiffel training and
+consultancy are listed in alphabetical order:
+
+
+AUSTRALIA
+
+Class Technology Pty. Ltd.
+ POST PO Box 6274, North Sydney NSW 2060, Australia
+ TEL +61 2 9922 7222           FAX +61 2 9922 7703
+ EMAIL eiffel@class.com.au     WEB http://www.class.com.au/
+
+
+EUROPEAN UNION
+
+Advanced Media Technology Ltd.
+ POST Box 16, Hatolantie 140, SF-34 301 Kuru, Finland
+ TEL +358 400 620 236          FAX +358 3 4737 117
+ EMAIL jukka.haukijarvi@eiffel.fi
+ WEB http://www.eiffel.fi/
+
+Cap Gemini France, ITMI APTOR, Eiffel Group
+ POST 86-90 rue Thiers, F-92513 Boulogne-Billancourt Cedex, France
+ TEL +33 1 4910 5300           FAX +33 1 4910 5102
+ EMAIL eiffel@capgemini.fr
+
+Eiffel Software Iberica
+ POST Isabel II, 4, 1D; 20011 San Sebastian, Spain
+ TEL/FAX +34 943 472108
+ EMAIL jipferur@si.ehu.es
+
+Eiffel Ireland
+ POST 45 Hazelwood, Shankill, Co Dublin, Ireland
+ TEL +353 1 282 3487
+ EMAIL sparker@eiffel.ie       WEB http://www.eiffel.ie/Eiffel/
+
+Enea Data
+ POST Box 232, Nytorpsvagen 5, S-183 23 Taby, Sweden
+ TEL +46 8 638 5000            FAX +46 8 638 50 50
+ EMAIL eiffel@enea.se          WEB http://www.enea.se/
+
+EtnoTeam
+ POST Via Adelaide Bono Cairoli 34, I-20127 Milano, Italy
+ TEL +39 2 261621              FAX +39 2 26110755
+ EMAIL sales@etnomi.it         WEB http://www.etnomi.it/
+
+Everything Eiffel
+ POST 6 Bambers Walk, Wesham PR4 3DG, England
+ TEL & FAX +44 1772 687525     WEB http://www.eiffel.demon.co.uk/
+ EMAIL roger@eiffel.demon.co.uk
+
+Halstenbach ACT GmbH
+ POST Breidenbrucher Strasse 2, D-51674 Wiehl, Germany
+ TEL + 49 2261 9902 0          FAX +49 2261 9902 99
+ EMAIL info@halstenbach.de     WEB http://www.halstenbach.de/
+
+Langmack & Partner, Feinarbeit
+ POST Gitshinner Strasse 91 - 2. Hof, D-10969 Berlin, Germany
+ TEL +49 30 616794 61          FAX +49 30 616794 67
+ EMAIL langmack@feinarbeit.de
+
+Object Tools GmbH
+ POST Nordstr. 5, D-35619 Braunfels, Germany
+ TEL +49 6472 911030           FAX +49 6472 911031
+ EMAIL eiffel@eiffel.de        WEB http://www.eiffel.de/
+
+Jan Willamowius
+ POST Rueckertstr. 27, D-22089 Hamburg, Germany
+ TEL +49 40-20981888
+ EMAIL jan@janhh.shnet.org
+
+
+
+JAPAN
+
+Information and Math Science Lab Inc.
+ POST 2-43-1, Ikebukuro, Toshima-ku, Tokyo 171
+ TEL +81 3 3590 5211           FAX +81 3 3590 5353
+ EMAIL fushimi@imslab.co.jp    WEB http://www.imslab.co.jp/
+
+
+NEW ZEALAND
+
+Objective Methods Ltd
+ POST PO Box 17356 (77 Chamberlain Rd)
+       Karori, Wellington, New Zealand
+ TEL +64 4 476 9499            FAX +64 4 476 9237
+ EMAIL dkenny@actrix.gen.nz
+
+
+SWITZERLAND
+
+Abstraction
+ POST Faubourg de l'Hopital, CH-2000 Neuchatel, Switzerland
+ TEL +41 32 7250493            FAX +41 32 7259857
+ EMAIL abstraction@access.ch
+
+
+UNITED STATES OF AMERICA
+
+Halstenbach ACT, Inc.
+ POST 827 State Street, Santa Barbara, CA 93101, USA
+ TEL +1 805 568 0023           FAX +1 805 884 0806
+ EMAIL info@halstenbach.de     WEB http://www.halstenbach.de/
+
+Interactive Software Engineering, Inc
+ POST ISE Building, 2nd floor, 270 Storke Road, Goleta, CA 93117, USA
+ TEL +1 805 685 1006           FAX +1 805 685 6869
+ EMAIL info@eiffel.com         WEB http://www.eiffel.com/
+
+Object Tools, Inc.
+ POST 13267 Summit Sq. Center, Route 413 & Doublewoods Rd,
+      Langhorne, PA 19047, USA
+ TEL/FAX +1 215 504 0854
+ EMAIL info@object-tools.com   WEB http://www.object-tools.com/
+
+Tower Technology Corporation
+ POST 1501 Koenig Lane, Austin, TX 78756, USA
+ TEL +1 512 452 9455           FAX +1 512 452 1721
+ EMAIL tower@twr.com           WEB ttp://www.twr.com/
+
+
+ --------------------
+
+QCNF: Are there any conferences for Eiffel users?
+
+The conferences listed here are not just for Eiffel. Eiffel shares the
+spotlight with other OO languages including C++ and Smalltalk.
+
+TOOLS is an international conference devoted to the applications of
+OO technology. Other events, such as user group or NICE meetings
+are often held in conjunction with TOOLS. http://www.tools.com/
+
+The ACM SIGPLAN Conference On Object-Oriented Programming Systems,
+Languages and Applications (OOPSLA) is probably the largest technical
+conference about OO Technology. OOPSLA home page is at
+http://www.acm.org/sigplan/oopsla/
+
+ECOOP is the annual European Conference for Object-Oriented
+Programming. http://www.iam.unibe.ch/ECOOP/
+
+ --------------------
+
+QECC: Why do most Eiffel implementations compile to C?
+
+By using C as a target language, an Eiffel implementor can:
+
+ - bring Eiffel to the marketplace faster and at lower cost
+ - port their implementation more easily to other platforms
+ - take advantage of optimisation provided by the C compiler
+
+Much of the technology that makes Eiffel relatively simple to use also
+makes it more difficult to implement (an Eiffel-to-C compiler is
+perhaps 4 to 5 times more difficult to create than a native Pascal
+compiler).
+
+Compiling Eiffel to C seems to work well under Unix. C is sometimes
+thought of as the native code of Unix.
+
+On the other hand, C is not universal on other platforms, and the
+Eiffel purchaser may need to buy a C compiler as well, and possibly
+replace it if the supported C compilers change with new versions of
+the Eiffel compiler.
+
+With a native-code compiler, you may get somewhat better throughput
+and the potential for smaller executables and slightly better
+performance.
+
+ --------------------
+
+QJVM: Where can I get an Eiffel to Java compiler?
+
+Since Java became fashionable, everyone wants their favourite
+language to be compiled for the JVM (Java Virtual Machine)'s byte
+code. It is tempting to think about providing Eiffel compilation
+to this platform with total interoperability between Java and Eiffel
+code.
+
+Unfortunately, things are not as simple as they look at first sight.
+There are fundamental differences between the Java and Eiffel object
+models (dynamic vs. static object systems, single vs. multiple
+inheritance, design by contract vs. wishful thinking, are among the
+problems).
+
+While it is of course possible to provide a compiler from Eiffel to
+the JVM (which is a Turing machine), it comes necessarily at a cost,
+be it performance or interoperability or both. It is unlikely in the
+foreseeable future to have an Eiffel to JVM compiler where it is
+possible to mix and match freely classes written in Java and Eiffel
+classes without having to worry about which language they are
+written in.
+
+Nevertheless, most compiler vendors are moving towards providing
+some support for the JVM, with differing limitations depending on
+the vendor and implementation strategy.
+
+SmallEiffel is the first compiler available to produce some
+usable result on the JVM. ISE and Object Tools have announced
+ongoing efforts to support Java. Pirmin Kalberer provides an
+early version of an Eiffel to JVM compiler.
+
+ --------------------
+
+LFEA: What features does Eiffel have?
+
+Eiffel is a pure object-oriented language. Its modularity is based on
+classes. It stresses reliability, and facilitates design by contract.
+It brings design and programming closer together. It encourages the
+re-use of software components.
+
+Eiffel offers classes, multiple inheritance, polymorphism, static
+typing and dynamic binding, genericity (constrained and
+unconstrained), a disciplined exception mechanism, systematic use of
+assertions to promote programming by contract, and deferred classes
+for high-level design and analysis.
+
+Eiffel has an elegant design and programming style, and is easy to
+learn.
+
+An overview is available at
+http://www.eiffel.com/doc/manuals/language/intro/
+
+ --------------------
+
+LCHN: What changes have been made to the Eiffel language definition?
+
+Eiffel is still a relatively new language, and there have been a
+number of changes to its definition.
+
+There were significant changes between the publication of
+"Object-Oriented Software Construction", first edition in 1988,
+and the release of Eiffel 2.3.
+
+More significant changes came with the introduction of Eiffel 3, the
+current and only version of the language in use today. These changes
+are summarised in Eiffel: The Language.
+
+There were some less significant changes between the first
+and second printings of "Eiffel: The Language":
+
+   - New basic types INTEGER_REF, REAL_REF, CHARACTER_REF and
+     BOOLEAN_REF etc have been introduced to provide non-expanded
+     basic types.
+
+   - Introduction of the POINTER type to enable external references to
+     be passed around in Eiffel programs.
+
+   - Calls from Eiffel to external routines no longer implicitly pass
+     the current object as the first parameter.
+
+There are many other (more minor) changes, which Neil Wilson has
+summarized in ftp://ftp.cm.cf.ac.uk/pub/eiffel/Docs.
+
+Since then the following change has been adopted and widely
+implemented:
+
+   - The Precursor construct allows the ancestor's version of
+     a redefined feature to be conveniently called (see LPAR).
+
+
+ --------------------
+
+LLIB: What libraries come with Eiffel?
+
+All vendors aim to support the Eiffel Library Standard kernel classes.
+
+In addition, extensive library classes are supplied with the compilers
+including data structures, graphics, lexical analysis and parsing, IO,
+persistence, formatting and more.
+
+Contact the vendors for further details.
+
+ --------------------
+
+LDBC: What's the big deal about preconditions and postconditions?
+
+The big deal is that it supports programming by contract. For example,
+preconditions (require clauses) are simple boolean statements that are
+used to check that the input arguments are valid and that the object
+is in a reasonable state to do the requested operation. If not, an
+exception is generated. Similarly, postconditions (ensure clauses)
+make sure that a method has successfully performed its duties, thus
+"fulfilling its contract" with the caller. Invariants are boolean
+expressions that are checked every time an object method returns back
+to a separate object.
+
+You can use these ideas in any OO programming language, but usually
+must supply your own assertion mechanisms or rely on programmer
+discipline. In Eiffel, the ideas are integrated into the whole fabric
+of the environment. We find them used by:
+
+ - the exception handling mechanism.
+   (Tracebacks almost always identify the correct culprit code since
+   preconditions almost always denote an error in the calling method,
+   while postconditions denote an error in the called method.)
+
+ - the automatic compilation system.
+   (Assertions can be disabled entirely or selectively by type on a
+   per class basis.)
+
+ - the Eiffel compiler
+   (Invariants, preconditions and postconditions are all inherited in
+   a manner that makes logical sense.)
+   (Assertion expressions are not allowed to produce side effects so
+   they can be omitted without effect.)
+
+ - the automatic documentation tools
+   (Preconditions and postconditions are important statements about
+   what a method does, often effectively describing the "contract"
+   between the caller and callee. Invariants can yield information
+   about legal states an object can have.)
+
+In the future we expect to see formal methods technology work its way
+into the assertion capability. This will allow progressively more
+powerful constraints to be put into place. In addition, Meyer has
+argued in his concurrency model (see LTSK) that assertions play
+a central role in concurrent and distributed object-oriented
+programming.
+
+ --------------------
+
+LCON: Please explain and discuss covariance vs. contravariance.
+
+Consider the following situation: we have two classes PARENT and
+CHILD. CHILD inherits from PARENT, and redefines PARENT's feature
+'foo'.
+
+   class PARENT
+      feature
+         foo (arg: A) is ...
+   end
+
+   class CHILD
+      inherit
+         PARENT redefine foo end
+      feature
+         foo (arg: B) is ...
+   end
+
+The question is: what restrictions are placed on the type of argument
+to 'foo', that is 'A' and 'B'? (If they are the same, there is no
+problem.)
+
+Here are two possibilities:
+
+   (1)  B must be a child of A (the covariant rule - so named because
+        in the child class the types of arguments in redefined
+        routines are children of types in the parent's routine, so the
+        inheritance "varies" for both in the same direction)
+
+   (2)  B must be a parent of A (the contravariant rule)
+
+Eiffel uses the covariant rule.
+
+At first, the contravariant rule seems theoretically appealing. Recall
+that polymorphism means that an attribute can hold not only objects of
+its declared type, but also of any descendant (child) type. Dynamic
+binding means that a feature call on an attribute will trigger the
+corresponding feature call for the *actual* type of the object, which
+may be a descendant of the declared type of the attribute. With
+contravariance, we can assign an object of descendant type to an
+attribute, and all feature calls will still work because the
+descendant can cope with feature arguments at least as general as
+those of the ancestor. In fact, the descendant object is in every way
+also a fully-valid instance of the ancestor object: we are using
+inheritance to implement subtyping.
+
+However, in programming real-world applications we frequently need to
+specialize related classes jointly.
+
+Here is an example, where PLOT_3D inherits from PLOT, and
+DATA_SAMPLE_3D inherits from DATA_SAMPLE.
+
+   class PLOT
+      feature
+         add(arg: DATA_SAMPLE) is ...
+
+   class PLOT_3D
+      inherit
+         PLOT redefine add end
+      feature
+         add(arg: DATA_SAMPLE_3D) is ...
+
+This requires the covariant rule, and works well in Eiffel.
+
+It would fail if we were to put a PLOT_3D object into a PLOT attribute
+and try to add a DATA_SAMPLE to it. It fails because we have used
+inheritance to implement code re-use rather than subtyping, but have
+called a feature of the ancestor class on an object of the descendant
+class as if the descendant object were a true subtype. It is the
+compiler's job to detect and reject this error, to avoid the
+possibility of a run-time type error.
+
+Here's another example where a real-world situation suggests a
+covariant solution. Herbivores eat plants. Cows are herbivores. Grass
+is a plant. Cows eat grass but not other plants.
+
+   class HERBIVORE                               class PLANT
+   feature
+      eat(food: PLANT) is ...
+      diet: LIST[PLANT]
+
+   class COW                                     class GRASS
+   inherit                                       inherit
+      HERBIVORE                                     PLANT
+         redefine eat
+      end
+   feature eat(food: GRASS) is ...
+
+This does what we want. The compiler must stop us from putting a COW
+object into a HERBIVORE attribute and trying to feed it a PLANT, but
+we shouldn't be trying to do this anyway.
+
+Also consider the container 'diet'. We are not forced to redefine this
+feature in descendant classes, because with covariant redefinition of
+the argument to 'eat', the feature 'diet' can always contain any
+object that can be eaten (e.g. grass for a cow). (With contravariant
+redefinition of the argument to 'eat', it would be necessary to
+re-open the parent class to make the type of the container 'diet' more
+general).
+
+To summarise: Real-world problems often lend themselves to covariant
+solutions. Eiffel handles these well. Incorrect programs in the
+presence of covariant argument redefinition can cause run-time type
+errors unless the compiler catches these.
+
+Sather uses the contravariant rule, but uses separate mechanisms for
+subtyping and code reuse and only allows dynamic binding on true
+subtypes. This seems to make contravariance work well, but it can
+force the Sather programmer to use concrete types when modelling
+covariant problems. Concrete types cannot be further subtyped in
+Sather, so this can reduce the potential for re-use (in Eiffel, any
+type can be further subtyped, but the compiler must check that it is
+used validly).
+
+ --------------------
+
+LCAT: Is it true that there are "holes" in the Eiffel type system?
+
+No. The design of Eiffel makes it possible to catch all type errors at
+compile time, so that an Eiffel program cannot abort with a run time
+type error.
+
+However, to catch a class of certain more obscure type errors at
+compile time, the compiler must analyse the way that classes interact
+within the entire system, rather than just looking at each class one
+by one.
+
+The main types of errors that cannot be checked easily are:
+ (a) restriction of exports in a descendant class.
+ (b) covariant redefinition of routines parameters as in question LDBC.
+ (c) covariant signatures in conforming types of a generic class
+     (like 'put' in LIST[ANY] and LIST[STRING])
+
+There is a proposal underway that, if accepted, will allow compilers
+to incrementally check this class of errors by looking at classes
+and not at the whole system every time.
+
+Because system-wide compile-time validity checking can be complex,
+no compiler available today implements full static type checking. Some
+insert run-time checks. On the other hand, the cases where system
+level validity problems can occur are not too frequent so this is not
+a major annoyance in practice.
+
+ --------------------
+
+LTSK: Is there support for concurrency in Eiffel?
+
+Eiffel does support concurrency in the latest specification for the
+language as defined by Interactive Software Engineering (ISE). A
+more complete description on concurrency -- the SCOOP (Simple
+Concurrent Object-Oriented Programming) model -- can be found
+in chapter 30 of "Object Oriented Software Construction 2ed" by
+Bertrand Meyer. Papers are also available from ISE web site at
+http://www.eiffel.com/doc/manuals/technology/concurrency/ .
+
+Some compilers also support various forms of multithreading
+independently of SCOOP.
+
+ --------------------
+
+LOVL: Why doesn't Eiffel allow function overloading?
+
+In Eiffel, no two features of a class may have the same identifier,
+regardless of their respective signatures.  This prevents the use of
+function overloading ("multiple polymorphism"), a common programming
+technique in languages like C++.
+
+Eiffel is designed to be minimal: it includes exactly the features
+that its designer considered necessary, and nothing else.
+
+Because Eiffel already supports (single) polymorphism through its
+inheritance system, the only positive thing that function overloading
+buys you is reducing the number of feature names you have to learn.
+This is at the expense of reducing the ability of the compiler to trap
+mistakes (often type errors).
+
+Readability is also enhanced when overloading is not possible. With
+overloading you would need to consider the type of the arguments as
+well as the type of the target before you can work out which feature
+is called. With multiple inheritance and dynamic binding this is
+awkward for a compiler and error-prone for a human. There is no
+intuitive rule which could be used to disambiguate routine calls where
+there is no "nearest" routine.
+
+However, in Eiffel it's easy to write one routine with arguments of
+the most general applicable type, then use the assignment attempt
+operator to carry out the appropriate operation according to the
+run-time type of the arguments (thereby explicitly programming the
+disambiguation "rules").
+
+Having said that, the lack of multiple polymorphism does force us to
+write some common mathematical operations (e.g. matrix math) in an
+awkward way, and forces arithmetic expressions to be treated specially
+(the "arithmetic balancing rule", ETL p385). But no-one has come up
+with a solution which is so simple, elegant and useful that it
+improves the quality of Eiffel as a whole.
+
+ --------------------
+
+LPRC: Why are there no procedural types in Eiffel?
+
+A proposal is currently under consideration by NICE to add routine
+types to the language.
+
+The reason why these types were not implemented earlier, is that
+the notion of allowing a routine to be passed as an argument to a
+routine is in many people's view incompatible with the OO method.
+The definition of object-orientation implies that every operation
+belongs to an object type, so one does not manipulate routines
+just by themselves.
+
+Nevertheless, routine types can be useful in some specialist cases,
+like interfaces to other object systems, some forms of reflection,
+etc. The proposed extension is indeed not intended for general use,
+although there is concern that it may become used beyond the
+specialist cases when available.
+
+ --------------------
+
+LATR: Why are there no class attributes in Eiffel?
+
+In Eiffel, the "once" function provides greater functionality in a
+more disciplined way. The body of a "once" function is executed once
+only per system (not per instance of the class), when it is first
+called. Thereafter, the "once" function returns the same Result
+without re-executing its body.
+
+The "once" function can therefore be used to implement a shared
+attribute of reference type (initialized on its first use).
+
+A "once" function can be included in a mixin class. The shared
+attribute returned by that once function is then available to all
+instances of classes which inherit from the mixin class.
+
+ --------------------
+
+LPAR: How can I call the parent-class version of a redefined routine?
+
+When an inherited routine is redefined in a child class, is there a
+way for the redefined routine to call the version in the parent class?
+
+1) If you are responsible for the design of the parent class, you may
+   anticipate such a need. You may provide multiple versions of the
+   same routine body, with some versions frozen (not redefinable):
+
+   class PARENT
+   feature foo, frozen parent_foo is
+      do
+         ...
+      end
+   end
+
+   class CHILD
+   inherit
+      PARENT
+         redefine foo
+      end
+   feature foo is
+      do
+         parent_foo
+         ...
+      end
+   end
+
+2) Otherwise, you use repeated inheritance to get two versions of
+   'foo', and redefine one of them:
+
+   class PARENT
+   feature foo is
+      do
+         ...
+      end
+   end
+
+   class CHILD
+   inherit
+      PARENT
+         rename foo as parent_foo
+      end
+      PARENT
+         redefine foo
+         select foo  -- (in case of dynamic binding)
+      end
+   feature
+      foo is
+         do
+            parent_foo
+            ...
+         end
+   end
+
+3) While usable both these constructs have their limitations and a
+   proposal is under way to replace them with a more direct solution:
+   the new reserved word Precursor that allows to call the parent
+   version of a redefined routine in its body. In the rare cases when
+   a routine has more than one precursor, the call can be qualified to
+   specify which precursor is called.
+
+   Under this proposal, the example becomes:
+
+    class CHILD
+    inherit
+       PARENT
+          redefine foo
+       end
+    feature
+       foo is
+          do
+             Precursor -- call previous version
+             ...
+          end
+
+ --------------------
+
+LEVC: Where can I find a comparison between Eiffel and other languages?
+
+In Richard Wiener's book "Software Development Using Eiffel: There can
+be life after C++" (Prentice-Hall, ISBN 0-13-100686-X).
+
+Ian Joyner's "C++ critique" includes a comparison between C++, Eiffel
+and other languages. It is at the following URL:
+http://www.progsoc.uts.edu.au/~geldridg/cpp/cppcv3.html
+
+You can also find a comparison of Eiffel, C++, Java, and Smalltalk at
+ISE's Web site,
+http://www.eiffel.com/doc/manuals/technology/oo_comparison/
+
+ --------------------
+
+LDES: Are there any destructors in Eiffel?
+
+Eiffel objects are garbage-collected, so that there is no need for the
+software developer to worry about whether, how and when to "destroy"
+or "free" them in the software text.
+
+Some implementations offer a "free" procedure for programmers who
+absolutely want to remove an object manually. Such a procedure is "use
+at your own risk" and is not needed in normal Eiffel development.
+
+Coming back to normal usage, the need may arise to ensure that certain
+operations will automatically take place whenever the garbage
+collector reclaims an object. For example if an Eiffel object
+describing a file becomes unreachable and hence is eventually
+garbage-collected, you may want to ensure that the physical file will
+be closed at that time. Some implementations of Eiffel provide a
+mechanism for that purpose: procedure 'dispose' from the Kernel
+Library class MEMORY.
+
+Whenever the garbage collector collects an object, it calls 'dispose'
+on that object. The procedure does nothing by default (so that a smart
+GC will of course avoid executing any actual call). But any class may
+inherit from MEMORY and redefine 'dispose' to perform appropriate
+actions, such as closing a file. Such actions are sometimes called
+"finalization". This technique achieves it conveniently.
+
+Because there is no guarantee as to the order in which the garbage
+collector will reclaim objects that have become unreachable, safe
+redefinitions of 'dispose' should only act on external resources such
+as file descriptors, database elements, window system resources etc,
+not on Eiffel object structures themselves.
+
+ --------------------
+
+LDIS: How do I implement multiple inheritance efficiently?
+
+People with a background in C++ or single-inheritance languages
+often think that multiple inheritance carries a penalty because
+it cannot be implemented using the classic dispatch table scheme
+(where every polymorphic feature has a fixed position in a pointer
+table that descendants can customise without breaking any code
+using the fixed position of an ancestor's polymorphic feature.)
+
+There are other ways to implement inheritance which allows Eiffel
+not to suffer performance problems because of multiple inheritance.
+Eiffel compilers generally use one of two methods.
+
+In both cases, we need to assume that every type in the system is
+assigned an integer identifier -- the type ID.
+
+The first implementation is the 'sparse matrix' model. Every
+polymorphic feature has an associated pointer table with an entry
+for each type, indexed by type ID. This allows all polymorphic
+calls to be executed at the (same) cost of a single pointer
+derefence.
+
+The immediate drawback of this, is that it generates a rather big
+data table (a matrix of all polymorphic routines per all types in
+a system). Fortunately, there are sparse matrix algorithms allowing
+to compress these tables efficiently by carefully selecting the IDs
+(an evident optimisation is to try to group all descendant next
+to their parent so that only a short section of the type ID space
+need be covered).
+
+The other method is completely different and uses the equivalent of
+an inspect statement on the type ID, calling the appropriate static
+function for each concrete type. In this case, it is obvious that the
+compiler needs a global knowlegde of the system: for each polymorphic
+routine call, it needs to know all concrete subtypes really used in
+the system, and all redefinitions of the routines.
+
+At first sight, it could be thought that the inspect statement could
+slow down the system. Actual compilers using this solution have proved
+that they can be as efficient as (or more than) those implemented
+using the first method.
+
+It should now be clear that, for both methods, it is necessary
+for the compiler to have at compile time -- or at the very least at
+optimisation time -- a view of the complete system. This could appear
+like a serious restriction but it is not much of a concern because
+Eiffel compilers must have this view in the first place in order to
+be able to differenciate between static and polymorphic routines --
+all routines being potentially polymorphic in Eiffel -- and this
+must be done to have compiled systems perform reasonably.
+
+ --------------------
+
+LISA: How does the `Iterating several actions' example in ETL work?
+
+The example code page 176 of Eiffel: The Language, 2nd printing does
+not work with any widely available compiler. It has confused and
+puzzled many newcomers to the language and what it is supposed to
+do is not clearly defined in the language definition.
+
+What the example should do is as follows. When a feature is replicated
+under multiple inheritance (renamed so that the feature is now known
+under two names) and in the same inheritance clause a routine or
+attribute its source text references is also replicated, the routine
+body of the first feature should be adapted to call the corresponding
+replicated features on each path of the inheritance. The mechanism
+is not intended to scale to more complex cases where the replication
+do not occur in a single inheritance clause.
+
+The opinions are divided on whether this feature should be discarded
+completely because of the the conceptual complexity and odd
+side-effects or better defined and actually implemented.
