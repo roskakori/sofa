@@ -1,0 +1,176 @@
+<TABLE BORDER=0 CELLSPACING=5 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#3366FF" NOSAVE >
+<TR NOSAVE>
+<TD NOSAVE>
+<CENTER><FONT COLOR="#FFFFFF" SIZE=+3><B>Externals</B></FONT></CENTER>
+</TD>
+</TR>
+</TABLE>
+
+<BR><BR><BR>
+<P>
+Here is the information you need if you want to call C or Java
+code from Eiffel code (to call Eiffel feature from C or Java see
+<A HREF="cecil.html"><code>cecil</code></A>
+file).
+</P><P>
+The most common way to call external code from Eiffel is to use
+the <I>external</I> feature definition as described in the book
+"Eiffel The Language".
+See also the SmallEiffel directory <TT>lib_show/external</TT> to
+have some examples.
+</P><P>
+Below is the current list of SmallEiffel <I>external</I> specifications.
+</P>
+
+<TABLE BORDER=0 COLS=1 WIDTH="100%" BGCOLOR="#3366FF" NOSAVE >
+<TR NOSAVE>
+<TD NOSAVE><FONT COLOR="#FFFFFF" SIZE="+2">external "C_WithoutCurrent"</FONT></TD>
+</TR>
+</TABLE>
+<P>
+Simple call to a C function (or procedure). The external called
+routine does <B>not</B> get Current as an argument.
+A C prototype is automatically added in a generated C header file.
+Use this when you provide yourself the C code for the external routine.
+<BR>
+Note: for compatibility with other Eiffel compilers <TT>external "C"</TT> is
+treated exactly as <TT>external "C_WithoutCurrent"</TT>.
+</P>
+
+<TABLE BORDER=0 COLS=1 WIDTH="100%" BGCOLOR="#3366FF" NOSAVE >
+<TR NOSAVE>
+<TD NOSAVE><FONT COLOR="#FFFFFF" SIZE="+2">external "C_WithCurrent"</FONT></TD>
+</TR>
+</TABLE>
+<P>
+C call with Current. The external called routine gets Current as
+its first argument. A C prototype is automatically added in a generated
+C header file.
+Use this when you provide yourself the C code for the external routine.
+</P>
+
+<TABLE BORDER=0 COLS=1 WIDTH="100%" BGCOLOR="#3366FF" NOSAVE >
+<TR NOSAVE>
+<TD NOSAVE><FONT COLOR="#FFFFFF" SIZE="+2">external
+"C_InlineWithoutCurrent"</FONT></TD>
+</TR>
+</TABLE>
+<P>
+Similar to <TT>"C_WithoutCurrent"</TT>, except that no prototype is
+produced. <BR>
+Use this if you already have the corresponding prototype coming
+from somewhere else (<TT>stdio.h</TT> for example), which is likely if
+you call a routine from a standard C library (e.g. <TT>printf</TT>).
+<SMALL>Actually, the name is not really well chosen, since "Inline"
+has little to do with this...</SMALL>
+
+
+</P>
+
+<TABLE BORDER=0 COLS=1 WIDTH="100%" BGCOLOR="#3366FF" NOSAVE >
+<TR NOSAVE>
+<TD NOSAVE><FONT COLOR="#FFFFFF" SIZE="+2">external "C_InlineWithCurrent"</FONT></TD>
+</TR>
+</TABLE>
+<P>
+Similar to <TT>"C_WithCurrent"</TT>, except that no prototype is
+produced. <BR>
+Use this if you already have the corresponding prototype coming
+from somewhere else (<TT>stdio.h</TT> for example), which is likely if
+you call a routine from a standard C library (e.g. <TT>printf</TT>).
+<SMALL>Actually, the name is not really well chosen, since "Inline"
+has little to do with this...</SMALL>
+</P>
+
+<TABLE BORDER=0 COLS=1 WIDTH="100%" BGCOLOR="#3366FF" NOSAVE >
+<TR NOSAVE>
+<TD NOSAVE><FONT COLOR="#FFFFFF" SIZE="+2">external "SmallEiffel"</FONT></TD>
+</TR>
+</TABLE>
+<P>
+This external specification is reserved to the SmallEiffel compiler itself.
+Do not use it. Such a feature is directly supported both by <TT>compile_to_c</TT> and
+<TT>compile_to_jvm</TT>. For example, <I>infix "+"</I> of INTEGER is direcly
+mapped as C '+' by <TT>compile_to_c</TT>. For the same <I>infix "+"</I>, command
+<TT>compile_to_jvm</TT> produce the appropriate Java virtual machine
+byte code.
+</P>
+
+<TABLE BORDER=0 COLS=1 WIDTH="100%" BGCOLOR="#3366FF" NOSAVE >
+<TR NOSAVE>
+<TD NOSAVE><FONT COLOR="#FFFFFF" SIZE="+2">external "JVM_invokestatic"</FONT></TD>
+</TR>
+</TABLE>
+<P>
+Calling a Java static method. As it is a static Java call, the
+Eiffel receiver is not used. The "alias" field of the feature is
+used to indicate the Java class, the Java function name and the
+corresponding Java bytecode descriptor.
+Syntax to use in the alias string is :
+<DL COMPACT><DT><DD><TT>
+   alias "&lt;JavaClassPath&gt;.&lt;MethodName&gt; &lt;Descriptor&gt;"
+</TT></DL>
+A dot is the separator between <I>&lt;JavaClassPath&gt;</I> and <I>&lt;MethodName&gt;</I>.
+<BR>
+A blank character is the separator between <I>&lt;MethodName&gt;</I> and
+<I>&lt;Descriptor&gt;</I>.
+<BR>
+The <I>&lt;JavaClassPath&gt;</I> uses the JVM internal notation as described
+in JVMS(*). For example, when one wants to use java.lang.Math,
+the <I>&lt;JavaClassPath&gt;</I> is "java/lang/Math".
+The <I>&lt;MethodName&gt;</I> gives the Java method name.
+The <I>&lt;Descriptor&gt;</I> gives the internal Java bytecode descriptor as
+described in JVMS(*).
+
+<PRE>
+(*) - JVMS -
+   "The Java Virtual Machine Specification",
+   Tim Lindholm and Frank Yellin, The Java Series,
+   Addison-Wesley, ISBN 0-201-63452-X.
+</PRE>
+
+</P>
+
+<TABLE BORDER=0 COLS=1 WIDTH="100%" BGCOLOR="#3366FF" NOSAVE >
+<TR NOSAVE>
+<TD NOSAVE><FONT COLOR="#FFFFFF" SIZE="+2">external "JVM_invokevirtual"</FONT></TD>
+</TR>
+</TABLE>
+<P>
+Calling a Java virtual method. As for "JVM_invokestatic", the
+alias string gives all needed information to call the virtual
+function. The Current Eiffel target is not used (only arguments
+and the result are considered).
+</P>
+
+<TABLE BORDER=0 COLS=1 WIDTH="100%" BGCOLOR="#3366FF" NOSAVE >
+<TR NOSAVE>
+<TD NOSAVE><FONT COLOR="#FFFFFF" SIZE="+2">Inlining C code</FONT></TD>
+</TR>
+</TABLE>
+<P>
+Another way to call C code from Eiffel is to use "c_inline_c" or
+"c_inline_h" as defined in GENERAL. The argument of "c_inline_c"
+(or "c_inline_h") must always be a manifest string which may
+contains the C code you want to put inlieu.
+<BR>
+Using c_inline_[c/h] also implies you do know <B>exactly</B> the C code
+SmallEiffel produces. For portability, it is also much better to use previous
+solutions.
+<BR>
+People who tinker with the C code generated by SmallEiffel, not limiting
+themselves to the Cecil and/or external interfaces, should also read
+<A HREF="c_code.html">this page about the C code generated by SmallEiffel</A>,
+Otherwise they might get into trouble.
+</P>
+
+</P>
+
+
+<CENTER><P><IMG SRC="se-line.gif" ALT="[Line]" HEIGHT=16 WIDTH=550>
+<BR>
+<I><FONT SIZE=-1>Copyright &copy; Dominique COLNET and Suzanne COLLIN -
+<A HREF="mailto:colnet@loria.fr">&lt;colnet@loria.fr&gt;</A> <BR>
+Last update: 05 May 1999, by OZ.
+</FONT></I><BR></P></CENTER>
+

@@ -1,0 +1,513 @@
+
+                             The short command
+
+   Usage
+
+   short [-<format>] [options] <Class>
+
+   Command short prints on the standard output the interface of a given
+   <Class>.
+   The default -<format> is -plain: no special characters are added.
+   Command short is customizable and some predefined formats are already
+   available (see below for predefined formats and how to add a new
+   output format).
+
+   Options
+
+   -sort:
+          Features are sorted alphabetically.
+   -short:
+          Does not consider inherited features.
+   -no_style_warning:
+          Suppress output for warning messages related to non respect of
+          standard Eiffel style guidelines (for example ItEm will not
+          trigger a warning).
+   -case_insensitive:
+          Switch case insensitive mode on.
+          For example, when this mode is selected, the Eiffel parser
+          considers that the following identifiers refer to the same
+          feature: item, ITEM, ItEm, ...
+   -no_warning:
+          Suppresses output for all warning messages (error messages are
+          still printed).
+   -version:
+          Show the number of the [1]version of SmallEiffel you're using.
+
+   Predefined output formats
+
+   -plain:
+          The default output format. No special character added.
+   -tex1:
+          Simple output mode for TeX. Encloses the interface in a simple
+          verbatim TeX environment.
+   -tex2:
+          Output mode for TeX. Uses a TeX alltt environment with a \bf
+          font for keywords, \it font for comments and \tt font for
+          identifiers.
+   -tex3:
+          Output mode for TeX. Follows style guidelines given in ETL
+          apendix A. As the previous mode, this mode also uses a TeX
+          alltt environment.
+   -html1:
+          HTML output. Written by Matthias Klose.
+
+   Adding a new output format
+
+   To define a new output format, you have to add a new sub-directory in
+   the SmallEiffel "short" directory. In order to change the output, this
+   new directory must contains various hook files, which contain text
+   used to replace the default output.
+   Here is the current list of hook files.
+
+       1. Changing the output for the class interface header
+   "hook000" - If this hook file exists, the contents of this file is
+          printed very first.
+          "hook010" - If this hook file exists, and if the processed
+          class is an expanded one, the contents of this file is printed
+          before the class name to replace the default string "expanded
+          class interface ".
+          "hook011" - If this hook file exists, and if the processed
+          class is an deferred one, the contents of this file is printed
+          before the class name to replace the default string "deferred
+          class interface ".
+          "hook012" - If this hook file exists, and if the processed
+          class is an ordinary one (not deferred nor expanded) the
+          contents of this file is printed before the class name to
+          replace the default string "class interface ".
+          "hook013" _ If this hook file exists, the contents of this file
+          is printed before the class name whatever the kind of class
+          (expanded, deferred or ordinary) to replace the default empty
+          string "".
+          "hook014" - If this hook exists, the contents of the file is
+          printed after the class name to replace the default string
+          "%N".
+          "hook015" - If this hook file exists, and if a class header
+          comment is present, this file is printed once before the
+          heading class comment.
+          "hook016" - If this hook file exists, and if an heading comment
+          is present, the contents of this file is printed to replace the
+          default string " -- " at the beginning of each comment line.
+          "hook017" - If this hook file exists, and if an heading comment
+          is present, the contents of this file is printed to replace the
+          default string "%N" at the end of each comment line.
+          "hook018" - If this hook file exists, and if a class heading
+          comment is present, the contents of this file is printed once
+          after the heading comment.
+          "hook019" - If this hook file exists, and if the processed
+          class has no heading comment, this file is printed once.
+
+       2. Changing the output for the creation list
+   "hook100" - If it exists, this file is printed before the creation
+          list to replace the default string "creation%N".
+          "hook101" - If it exists, this file is printed after the
+          creation list to replace the default empty string "".
+          "hook102" - If it exists, this file is printed when clas has no
+          creation list.
+
+       3. Changing the output for the feature list
+   "hook200" - If exists, printed before the feature list when option
+          -sort is selected to replace the default string "feature(s)%N".
+          "hook201" - If exists, printed after the feature list when
+          option -sort is selected to replace the default empty string
+          "".
+          "hook202" - If exists, printed before each feature list with no
+          heading comment to replace the default string "feature(s) from
+          ".
+          "hook203" - If exists, printed after the class name of
+          "hook202" to replace the default string "%N".
+          "hook204" - If exists, printed before a feature list with a
+          heading comment to replace the default string "feature(s) from
+          ".
+          "hook205" - If exists, printed after the class name introduced
+          at "hook204" to replace the default string "%N".
+          "hook206" - If exists, printed before each line of the feature
+          list comment to replace the default string " -- ".
+          "hook207" - If exists, printed after each line of the feature
+          list comment to replace the default string "%N".
+          "hook208" - If exists, printed after a feature list comment to
+          replace the default empty string "".
+
+       4. Changing the output for a feature signature
+   "hook300" - If this hook exists, the contents of this file is printed
+          before each feature to replace the default string " ".
+          "hook301" - If this hook exists, the contents of this file is
+          printed once when the feature has no arguments to replace the
+          default empty string "".
+          "hook302" - If this hook exists, the contents of this file is
+          printed once when the feature has arguments to replace the
+          default string " (".
+          "hook303" - If this hook exists, the contents of this file is
+          printed when the feature has arguments to replace the default
+          string " ;".
+          "hook304" - If this hook exists, the contents of this file is
+          printed when the feature has arguments to replace the default
+          string ", ".
+          "hook305" - If this hook exists, the contents of this file is
+          printed when the feature has arguments to replace the default
+          string ": ".
+          "hook306" - If this hook exists, the contents of this file is
+          printed once when the feature has arguments to replace the
+          default string ")".
+          "hook307" - If this hook exists, the contents of this file is
+          printed once when the feature has no result to replace the
+          default string "%N".
+          "hook308" - If this hook exists, the contents of this file is
+          printed once before the result type of the feature to replace
+          the default string ": ".
+          "hook309" - If this hook exists, the contents of this file is
+          printed once after the result type of the feature to replace
+          the default string "%N".
+
+       5. Changing the output for a feature comment
+   "hook310" - If this hook file exists, and if a feature has a heading
+          comment, this file is printed once before the comment.
+          "hook311" - If this hook file exists, and if a feature has a
+          heading comment, the contents of this file is printed to
+          replace the default string " -- " at the beginning of each
+          comment line.
+          "hook312" - If this hook file exists, and if a feature has a
+          heading comment, the contents of this file is printed to
+          replace the default string "%N" at the end of each comment
+          line.
+          "hook313" - If this hook file exists, and if a feature has a
+          heading comment, the contents of this file is printed once
+          after this comment.
+          "hook314" - If this hook file exists, and if a feature has no
+          heading comment, the contents of this file is printed.
+
+       6. Changing the output for require clauses
+           6.1. For the header of a require clause
+   "hook400" - If this hook file exists, and if a feature has no require
+          assertion, the contents of this file is printed to replace the
+          default empty string "".
+          "hook401" - If this hook file exists, and if a feature has one
+          require assertion, the contents of this file is printed before
+          the latest inherited assertion to replace the default string "
+          require%N".
+          "hook402" - If this hook file exists, and if a feature has more
+          than one require assertion, the contents of this file is
+          printed before the require assertion to replace the default
+          string " require else%N".
+          "hook403" - If this hook file exists, and if a feature has at
+          least one require assertion, the contents of this file is
+          printed to finish the job (once after the last printed require
+          assertion) to replace the default empty string "".
+          "hook412" - If exists, printed when a require clause has no
+          heading comment to replace the default empty string "".
+          "hook413" - If exists, printed once before the require clause
+          heading comment to replace the default empty string "".
+          "hook414" - If exists, printed before each line of the heading
+          comment to replace the default string " -- ".
+          "hook415" - If exists, printed after each line of the heading
+          comment to replace the default string "%N".
+          "hook416" - If exists, printed once after the require clause
+          heading comment.
+          "hook417" - If exists, printed when a require clause has no
+          assertion to replace the default empty string "".
+          "hook418" - If exists, printed once before the first assertion
+          of a require clause to replace the default empty string "".
+          "hook433" - If exists, printed once after the last assertion of
+          a require clause to replace the default empty string "".
+          "hook434" - If exists, printed to finish a require clause to
+          replace the default empty string "".
+
+           6.2. For each assertion in a require clause
+   "hook419" - If exists, printed before each assertion of a require
+          clause to replace the default string " ".
+          "hook420" - If exists, printed when an assertion has no tag to
+          replace the default empty string "".
+          "hook421" - If exists, printed before a tag to replace the
+          default empty string "".
+          "hook422" - If exists, printed after a tag to replace the
+          default string ": ".
+          "hook423" - If exists, printed when the assertion has no
+          expression to replace the default empty string "".
+          "hook424" - If exists, printed before the expression to replace
+          the default empty string "".
+          "hook425" - If exists, printed after the expression (except for
+          the last assertion) to replace the default string ";".
+          "hook426" - If exists, printed when an assertion has no comment
+          to replace the default string "%N".
+          "hook427" - If exists, printed once before the assertion
+          comment to replace the default empty string "".
+          "hook428" - If exists, printed before each line of the
+          expression comment to replace the default string " -- ".
+          "hook429" - If exists, printed after each line of the
+          expression comment to replace the default string "%N".
+          "hook430" - If exists, printed once after the assertion's
+          comment to replace the default string "".
+          "hook431" - If exists, printed after the assertion to replace
+          the default empty string "".
+
+           6.3. For the last assertion in a require clause
+
+           Same hook file list as described in section 6.2 except
+   "hook425" which becomes :
+   "hook432" - If exists, printed after the last expresion to replace the
+          default empty string "".
+
+       7. Changing the output for ensure clauses
+           7.1. For the header of the ensure clause
+   "hook500" - If this hook file exists, and a feature has no ensure
+          clause, the contents of this file is printed to replace the
+          default empty string "".
+          "hook511" - If this hook file exists, the contents of this file
+          is printed before each ensure clause to replace the default
+          string " ensure%N".
+          "hook512" - If exists, printed when ensure clause has no
+          heading comment to replace default empty string "".
+          "hook513" - If exists, printed once before the ensure clause
+          heading comment to replace the default empty string "".
+          "hook514" - If exists, printed before each line of the heading
+          comment to replace the default string " -- ".
+          "hook555" - If exists, printed after each line of the heading
+          comment to replace the default string "%N".
+          "hook516" - If exists, printed once after the ensure clause
+          heading comment.
+          "hook517" - If exists, printed when an ensure clause has no
+          assertion to replace the default empty string "".
+          "hook518" - If exists, printed once before the first assertion
+          of the ensure clause to replace the default empty string "".
+          "hook533" - If exists, printed once after the last assertion of
+          the ensure clause to replace the default empty string "".
+          "hook534" - If exists, printed to finish the ensure clause to
+          replace the default empty string "".
+
+           7.2. For each assertion in the ensure assertion
+   "hook519" - If exists, printed before each assertion of the ensure
+          clause to replace the default string " ".
+          "hook520" - If exists, printed when an assertion has no tag to
+          replace the default empty string "".
+          "hook521" - If exists, printed before a tag to replace the
+          default empty string "".
+          "hook522" - If exists, printed after a tag to replace the
+          default string ": ".
+          "hook523" - If exists, printed when the assertion has no
+          expression to replace the default empty string "".
+          "hook524" - If exists, printed before the expression to replace
+          the default empty string "".
+          "hook525" - If exists, printed after the expresion (except for
+          the last assertion) to replace the default string ";".
+          "hook526" - If exists, printed when an assertion has no comment
+          to replace the default string "%N".
+          "hook527" - If exists, printed once before the assertion
+          comment to replace the default empty string "".
+          "hook528" - If exists, printed before each line of the
+          expression comment to replace the default string " -- ".
+          "hook529" - If exists, printed after each line of the
+          expression comment to replace the default string "%N".
+          "hook530" - If exists, printed once after the assertion's
+          comment to replace the default string "".
+          "hook531" - If exists, printed after the assertion to replace
+          the default empty string "".
+
+           7.3. For the last assertion in the ensure clause
+
+           Same hook files list as described in section 7.2 except
+   "hook525" which becomes :
+   "hook532" - If exists, printed after the last expresion to replace the
+          default empty string "".
+
+       8. Changing the output after each feature
+   "hook599" - If exists, printed after each feature to replace the
+          default empty string "".
+
+       9. Changing the output for the class invariant
+           9.1. For the header of the class invariant
+   "hook800" - If this hook file exists, and when no class invariant
+          exists, the contents of this file is printed to replace the
+          default empty string "".
+          "hook811" - If this hook file exists, the contents of this file
+          is printed before the class invariant to replace the default
+          string "invariant%N".
+          "hook812" - If exists, printed when class invariant has no
+          heading comment to replace default empty string "".
+          "hook813" - If exists, printed once before the invariant
+          heading comment to replace the default empty string "".
+          "hook814" - If exists, printed before each line of the heading
+          comment to replace the default string " -- ".
+          "hook855" - If exists, printed after each line of the heading
+          comment to replace the default string "%N".
+          "hook816" - If exists, printed once after the invariant heading
+          comment.
+          "hook817" - If exists, printed when class invariant has no
+          assertion to replace the default empty string "".
+          "hook818" - If exists, printed once before the first assertion
+          of the class invariant to replace the default empty string "".
+          "hook833" - If exists, printed once after the last assertion of
+          the class invariant to replace the default empty string "".
+          "hook834" - If exists, printed to finish the class invariant to
+          replace the default empty string "".
+
+           9.2. For each assertion in the class invariant
+   "hook819" - If exists, printed before each assertion of the class
+          invariant to replace the default string " ".
+          "hook820" - If exists, printed when an assertion has no tag to
+          replace the default empty string "".
+          "hook821" - If exists, printed before a tag to replace the
+          default empty string "".
+          "hook822" - If exists, printed after a tag to replace the
+          default string ": ".
+          "hook823" - If exists, printed when the assertion has no
+          expression to replace the default empty string "".
+          "hook824" - If exists, printed before the expression to replace
+          the default empty string "".
+          "hook825" - If exists, printed after the expresion (except for
+          the last assertion) to replace the default string ";".
+          "hook826" - If exists, printed when an assertion has no comment
+          to replace the default string "%N".
+          "hook827" - If exists, printed once before the assertion
+          comment to replace the default empty string "".
+          "hook828" - If exists, printed before each line of the
+          expression comment to replace the default string " -- ".
+          "hook829" - If exists, printed after each line of the
+          expression comment to replace the default string "%N".
+          "hook830" - If exists, printed once after the assertion's
+          comment to replace the default string "".
+          "hook831" - If exists, printed after the assertion to replace
+          the default empty string "".
+
+           9.3. For the last assertion in the class invariant
+
+           Same hook files list as described in section 9.2 except
+   "hook825" which becomes :
+   "hook832" - If exists, printed after the last expresion to replace the
+          default string ";".
+
+       10. Changing the output for the class interface footer
+   "hook900" - When exists, printed once before class footer to replace
+          the default empty string "".
+          "hook901" - When exists, printed once at the end of an expanded
+          class before the class name to replace the default "end of
+          expanded ".
+          "hook902" - When exists, printed once at the end of a deferred
+          class before the class name to replace the default "end of
+          deferred ".
+          "hook903" - When exists, printed once at the end of an ordinary
+          (not expanded nor deferred) class, before the class name to
+          replace the default string "end of ".
+          "hook904" - When exist, printed just before the class name to
+          replace the default empty string "".
+          "hook905" - When exists, the contents of this file is printed
+          after the class name to replace the default string "%N".
+          "hook999" - If this hook file exists, the contents of this file
+          is printed once to finish the job.
+
+       11. Changing the output for class names
+   "Bcn" - When exists, printed Before each class name.
+          "Mcn" - When exists, the corresponding class name is printed
+          one more time (using lower case letters) just before the
+          contents of this hook file.
+          "Acn" - When exists, printed After each class name.
+          "Ucn" - To replace the Underscore character in a class name.
+
+       12. Changing the output for a type mark
+   "Btm" - When exists, printed Before each type mark.
+          "Atm" - When exists, printed After each type mark.
+          "open_sb" - To replace the opening square bracket (default
+          "[").
+          "close_sb" - To replace the closing square bracket (default
+          "]").
+          "fgl_sep" - To replace the default comma "," in a formal
+          generic argument list.
+          "tm_blank" - To replace a blank character in a type mark.
+          "tm_sep" - To replace default string "," as a separator in a
+          generic list.
+          "like" - To replace the default string "like ".
+          "expanded" - To replace the default string "expanded ".
+
+       13. Changing the output for feature names
+           13.1. Simple feature names
+   "Bsfn" - When exists, printed Before each Simple Feature Name.
+          "Asfn" - When exists, printed After each Simple Feature Name.
+          "Usfn" - To replace the underscore character in a simple
+          feature name.
+
+           13.2. Infix feature names
+   "Bifn" - When exists, replaces the default string "infix %"" Before an
+          infix feature name definition.
+          "Aifn" - When exists, replaces the default string "%"" to close
+          "Bifn".
+          "Binfix" - When exists, replaces the default string " " printed
+          before the infix name used in an expression.
+          "Ainfix" - When exists, replaces the default string " " printed
+          after the infix name used in an expression.
+          "rem" - When exists, replaces the default string "\\".
+
+           13.3. Prefix feature names
+   "Bpfn" - When exists, replaces the default string "prefix %"" Before a
+          prefix feature name definition.
+          "Apfn" - When exists, replaces the default string "%"" to close
+          "Bpfn".
+
+       14. Changing the output for an argument name
+   "Ban" - When exists, printed Before each argument name.
+          "Aan" - When exists, printed after each argument name.
+          "Uan" - To replace the Underscore character in an argument
+          name.
+
+       15. Changing the output for a tag name
+   "Btag" - When exists, printed Before each tag name.
+          "Atag" - When exists, printed after each tag name.
+          "Utag" - To replace the Underscore character in a tag name.
+
+       16. Changing the output for an effective argument list
+   "op_eal" - To replace the default string "(" to open an effective
+          argument list.
+          "eal_sep" - To replace the default string "," in an effective
+          argument list.
+          "cl_eal" - To replace the default string ")" for an effective
+          argument list.
+
+       17. Changing the output for manifest strings
+   "open_ms" - To replace the default opening string "%"".
+          "close_ms" - To replace the default closing string "%"".
+          "Prcnt_ms" - To replace a % character inside a manifest string.
+          "Slash_ms" - To replace a / character inside a manifest string.
+
+       18. Changing the output for a manifest array
+   "op_ma" - To replace the default string "<<" to open a manifest array.
+          "ma_sep" - To replace the default string "," in a manifest
+          array.
+          "cl_ma" - To replace the default string ">>" to close a
+          manifest array.
+
+       19. Changing the output for comments lines
+   "BECL" - Before Each Comment Line. This hook is applied to all
+          comments whatever the kind of comment. If exists, printed
+          before the contents of each line of each comment (usually after
+          the default string "-- ").
+          "AECL" - After Each Comment Line. This hook is applied to all
+          comments whatever the kind of comment. If exits, printed after
+          the contents of each line of each comment (usually, printed
+          before the default "%N").
+          "Ucomment" - To replace the Underscore character in a comment.
+          "op_quote" - To replace the default opening quote mark "`".
+          "cl_quote" - To close an "op_quote" to replace the closing
+          quote mark "'".
+
+       20. Miscellaneous tuning
+   "open_b" - To replace the default opening bracket "(" in expressions.
+          "close_b" - To replace the default closing bracket ")" in
+          expressions.
+          "arrow" - To replace the default string "->" in a formal
+          generic list.
+          "dot" - To replace the default string "." in an expression.
+          "Result" - To replace the default string "Result".
+          "old" - To replace the default string "old " in ensure clauses.
+          "op_strip" - To replace the default string "strip (".
+          "cl_strip" - To replace default string ")" which closes
+          "op_strip".
+          "fnl_sep" - To replace the default string ", " in a feature
+          name list.
+          "Current" - To replace the default string "Current".
+          "Void" - To replace the default string "Void".
+
+                                   [Line]
+   Copyright © Dominique COLNET and Suzanne COLLIN - [2]<colnet@loria.fr>
+                  Last update: 05 June 1999, by DC & OZ.
+
+References
+
+   1. file://localhost/home/colnet/SmallEiffel/man/man/SmallEiffelFAQ.html#Q02
+   2. mailto:colnet@loria.fr

@@ -1,0 +1,103 @@
+
+                         About the generated C code
+
+   People who want or have to code part of their applications and/or
+   libraries in C should really limit themselves to the clean interfaces
+   provided by [1]Cecil or the [2]external mechanism. This page mentions
+   some facts you should be aware of before you start.
+
+   Generated type names
+
+   First and above all, SmallEiffel generates one unique type name in the
+   C code for each living type present in the Eiffel code. This type is
+   of the form Txyz where xyz represents the number corresponding to the
+   name of the type, including its parameters in the case of generic
+   types. (More details about this in our [3]research papers). When you
+   compile your application, you can find them in a mangling table,
+   somewhere in the C code, which looks like this:
+D 2  T1489 R BOOLEAN_CONSTANT 210,253
+A 1  T945  R BIT_CONSTANT 945
+A*1  T218  R TAG_NAME 218
+A 1  T602  R TYPE_BIT_1 602
+
+   But don't use this information ! The mangling table is only valid for
+   one specific compilation of one specific application with one specific
+   compiler and specific libraries...
+
+   Indeed, when computing a type code, collisions may occur, and affect
+   this process. Thus, the number (and name) corresponding to each type
+   depends not only on the type name, but also on the order in which they
+   are compiled. That is, on the application and libraries compiled...
+   They also depend on the compilation mode used, and the version of the
+   compiler you're using. So what is T145 now may become T234 the next
+   time you compile...
+
+   Consequently, do not, ever, rely on the type numbers in the generated
+   C code, because they are not constant ! (Except for a few ones which
+   have a fixed, hard-coded name). So don't bother writing in your own C
+   code things such as new123 or T456, because the only thing we
+   guarantee in this case is that your code shall break one day or
+   another...
+
+   The mangling table
+
+   OK, so now you understand why you cannot use type numbers, but you
+   still want to know what those things in the mangling table mean. :)
+
+   First, a big caveat. Although it hasn't changed a lot and has been
+   very stable for quite some time now, the mangling table coding may
+   change in the future ! As I'm writing these lines, we have no plans to
+   change it, and we prefer keeping it the way it is. But once again, we
+   do not commit ourselves to the current representation.
+   Here is excerpts of a mangling table which cover all the possible
+   cases (taken from some compile_to_c.h):
+A 1  T220  R E_DEBUG 220
+A 6  T326  R FIXED_ARRAY[RUN_FEATURE] 389,384,367,352,326,53
+D 2  T166  R BOOLEAN_CONSTANT 169,168
+A*1  T215  R E_ENSURE 215
+A 1  T37   E NATIVE_ARRAY[STRING] 37
+
+   Each mangling table entry comprises 7 fields:
+
+   Liveness
+          The first field shows whether the type is Dead or (A)Live, that
+          is whether instances of this type are ever created at run-time.
+          (Ok, it should have been L, instead of A...)
+
+   Tagless
+          When the second character on a line is a star *, it marks an
+          untagged type, that is a type on which there is no late binding
+          but only static calls. Note that the type inference algorithm
+          used in SmallEiffel increases the number of such types.
+
+   # of live subtypes
+          Number of concrete, live descendants of the type (including
+          itself). It is thus the number of items in the last field.
+
+   Type mangled name
+          The type name in the C code. As [4]explained above, the ID
+          number varies.
+
+   Reference
+
+   Is the type a Reference or an Expanded one?
+
+   Full type name
+          Self-explanatory...
+
+   Live subtypes list
+          A comma-separated list of type IDs listing all the live
+          descendants of the current type (including itself, if it is a
+          live one).
+
+                                   [Line]
+   Copyright © Dominique COLNET and Suzanne COLLIN - [5]<colnet@loria.fr>
+                     Last update: 05 May 1999, by OZ.
+
+References
+
+   1. file://localhost/home/colnet/SmallEiffel/man/man/cecil.html
+   2. file://localhost/home/colnet/SmallEiffel/man/man/external.html
+   3. file://localhost/home/colnet/SmallEiffel/man/papers/papers.html
+   4. file://localhost/home/colnet/SmallEiffel/man/man/c_code.html#generated-type-ids
+   5. mailto:colnet@loria.fr

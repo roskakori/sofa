@@ -1,0 +1,3 @@
+Calling java.lang.Double.toString(1.0);
+Calling java/lang/String.length();
+Result = 3

@@ -1,0 +1,120 @@
+
+<TABLE BORDER=0 CELLSPACING=5 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#3366FF" NOSAVE >
+<TR NOSAVE>
+<TD NOSAVE>
+<CENTER><FONT COLOR="#FFFFFF" SIZE=+3><B>The <TT>finder</TT> command</B></FONT></CENTER>
+</TD>
+</TR>
+</TABLE>
+
+<BR><BR><BR>
+
+<TABLE BORDER=0 COLS=1 WIDTH="100%" BGCOLOR="#3366FF" NOSAVE >
+<TR NOSAVE>
+<TD NOSAVE><FONT COLOR="#FFFFFF" SIZE="+2">Usage</FONT></TD>
+</TR>
+</TABLE>
+
+<P>
+<TT>finder [options] &lt;Class&gt;</TT>
+</P><P>
+Command <TT>finder</TT> tells you which file is loaded when searching
+for an Eiffel &lt;Class&gt;.
+<BR><BR>
+When an Eiffel file is found, <TT>finder</TT> prints the full path name
+on standard output.
+<BR><BR>
+The exit status is set GENERAL.exit_success_code only when an
+existing file is found (thus allowing usage of command finder
+in shell scripts).
+</P><P>
+To see the loading path used by SmallEiffel, you can for example
+type the <TT>finder</TT> command using a bad (inexistant) class name.
+The default loading path may be updated (see <TT>READ_ME</TT> file of
+the <TT>sys</TT> directory).
+</P><P>
+When invoked without any argument, the <TT>finder</TT> command
+prints this help.
+</P>
+
+
+<TABLE BORDER=0 COLS=1 WIDTH="100%" BGCOLOR="#3366FF" NOSAVE >
+<TR NOSAVE>
+<TD NOSAVE><FONT COLOR="#FFFFFF" SIZE="+2">Options</FONT></TD>
+</TR>
+</TABLE>
+<P>
+<DL COMPACT>
+
+<DT>
+<I>-version</I>:<BR><DD>
+Show the number of the <A HREF="SmallEiffelFAQ.html#Q02">version of SmallEiffel</A>
+you're using.
+<BR><BR>
+
+<DT>
+<I>-verbose</I>:<BR><DD>
+ Print system information during the compilation (full path of
+   loaded files, type inference score, removed files, etc.).
+<BR><BR>
+
+</DL>
+
+<TABLE BORDER=0 COLS=1 WIDTH="100%" BGCOLOR="#3366FF" NOSAVE >
+<TR NOSAVE>
+<TD NOSAVE><FONT COLOR="#FFFFFF" SIZE="+2">Where does <TT>finder</TT> search ?</FONT></TD>
+</TR>
+</TABLE>
+<P>
+<A NAME="algorithm"></A>The algorithm used by SmallEiffel to look for
+an Eiffel source file is the following:
+</P>
+<P>
+<FONT COLOR="#a000a0"><B>1. Lower case filenames - </B></FONT>
+SmallEiffel looks all along the loading path using
+&lt;class&gt; name in lower case as tail. If needed, the Eiffel
+suffix (".e") is added automatically. SmallEiffel only looks for
+suffixed files on the disk. Only the first file encountered
+according to the order of the path is taken in account.
+File is always supposed to have the same name as the inside
+class definition.
+</P><P>
+<FONT COLOR="#a000a0"><B>2. Renamed files - </B></FONT>
+When the above search has failed to find a file, SmallEiffel tries
+to search for files "rename.se" in all directories of the path.
+<BR>
+A file "rename.se" allows the user to put in file "foo" the class
+"bar" for example.
+<BR>
+Such renaming facilities has been added especially for DOS (file
+names are limited to 8 characters).
+<BR>
+Each line of a "rename.se" file is a renaming directive containing
+two names, first the full name and then the short name to use in the
+directory where the "rename.se" file is.
+<BR>
+File "SmallEiffel/misc/rename.se" is an example of a "rename.se" file
+to put in SmallEiffel/lib_std/ for DOS.
+</P><P>
+Thus, knowing the algorithm of SmallEiffel to find a class file, it is
+better not to use the renaming facilities to speed up class loading.
+</P><P>
+<FONT COLOR="#a000a0"><B>3. Upper case filenames - </B></FONT>Finally,
+when both previous steps did not find the required Eiffel class file,
+SmallEiffel looks along the loading path for a file bearing the class
+name upper in upper case letters.
+If needed, the Eiffel suffix ".e" is added automatically.
+<BR>
+One must note that the overhead to find an upper case file name is
+not negligeable at all and that a lower case file name may hide some
+upper case name.
+</P>
+
+
+<BR>
+<CENTER><IMG SRC="se-line.gif" ALT="[Line]"><BR><FONT SIZE="-1"><I>
+Copyright &copy; Dominique COLNET and Suzanne COLLIN -
+<A HREF="mailto:colnet@loria.fr">&lt;colnet@loria.fr&gt;</A>
+<BR>
+Last update: 05 June 1999, by DC & OZ.
+</I></FONT><BR></CENTER>

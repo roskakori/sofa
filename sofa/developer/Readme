@@ -1,0 +1,31 @@
+DEVELOPER MATERIAL
+
+	The material collected here is not needed to develop applications
+	with Sofa. It is only helpful if you want to contribute to Sofa
+	yourself.
+
+
+REQUIREMENTS
+
+	Some of the scripts require certain assigns and directories to exist:
+
+		sofa:archive      - where created archives like "gobo.lha" end up
+		sofa_archive:     - where original archives like "gobo15.zip" are stored
+		release:          - where sofa.(lha|readme) end up
+		release:backup/   - where sofa_XY.lha ends up
+								  (X=version, Y=release)
+
+	Open some CLI, create the directories wherever you want, and add
+	appropriate assigns to your user-startup.
+
+	ARexx must be running.
+
+
+CONTENTS
+
+	script/  - Various scripts and their support files
+	rebuild/ - Material needed to rebuild optimized SmallEiffel with SAS/c
+
+	Note that "sofa:Readme" is generated automatically by
+	"script/make_sofa.rexx". If you want to change its content, you
+	have to modify "script/readme.#?" or the script itself.

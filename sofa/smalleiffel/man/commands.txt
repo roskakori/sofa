@@ -1,0 +1,64 @@
+
+                           Commands documentation
+
+   install
+
+   The installation program for SmallEiffel [1]More about install here.
+
+   compile
+
+   Starting from an Eiffel source program, generates the corresponding C
+   code and then the executable. This is probably the command you want to
+   use. [2]More about compile here.
+
+   compile_to_c
+
+   The Eiffel to C compiler itself. You do not generally invoke it
+   explicitely. [3]More about compile_to_c here.
+
+   compile_to_jvm
+
+   The Eiffel to Java bytecode compiler. Starting from an Eiffel source
+   program, generates the corresponding .class files. [4]More about
+   compile_to_jvm here.
+
+   short
+
+   Eiffel interface extraction tool. Can generate documentation using
+   different formats (ASCII, HTML, etc.) [5]More about short here.
+
+   pretty
+
+   Eiffel pretty printer. [6]More about pretty here.
+
+   finder
+
+   Used to find Eiffel source files according to the system
+   configuration. [7]More about finder here.
+
+   clean
+
+   Used to clean Eiffel project directories. [8]More about clean here.
+
+   print_jvm_class
+
+   Java bytecode disassembler and pretty printer. We find it more
+   convenient than javap. [9]More about print_jvm_class here.
+
+                                   [Line]
+             Copyright © Dominique COLNET and Suzanne COLLIN -
+                           [10]<colnet@loria.fr>
+              Last update: Friday February 11th 2000, by DC.
+
+References
+
+   1. file://localhost/home/colnet/SmallEiffel/man/man/install.html
+   2. file://localhost/home/colnet/SmallEiffel/man/man/compile.html
+   3. file://localhost/home/colnet/SmallEiffel/man/man/compile_to_c.html
+   4. file://localhost/home/colnet/SmallEiffel/man/man/compile_to_jvm.html
+   5. file://localhost/home/colnet/SmallEiffel/man/man/short.html
+   6. file://localhost/home/colnet/SmallEiffel/man/man/pretty.html
+   7. file://localhost/home/colnet/SmallEiffel/man/man/finder.html
+   8. file://localhost/home/colnet/SmallEiffel/man/man/clean.html
+   9. file://localhost/home/colnet/SmallEiffel/man/man/print_jvm_class.html
+  10. mailto:colnet@loria.fr

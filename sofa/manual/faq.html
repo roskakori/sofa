@@ -1,0 +1,496 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html><head>
+<title>Manual - Questions &amp; Answers</title>
+</head>
+
+<body>
+<h1>Questions &amp; Answers</h1>
+
+
+
+<p>Here are some questions and answers that should help you getting
+into Eiffel, solve common problems and figure what you can do and
+cannot with Sofa.</p>
+
+<ul>
+<li><a href="#general">Eiffel</a>
+    <ul>
+   <li><a href="#other-faq">Are there any other relevant FAQ's?</a>
+   <li><a href="#newbee">I'm new to Eiffel. Where should I start?</a>
+   <li><a href="#editor">Are there any Eiffel modes for Amiga editors?</a>
+   <li><a href="#dead">How dead is Eiffel?</a>
+   <li><a href="#dbc">I read all the FAQ's and introductions, but still have no clue what's Design by Contract.</a>
+    </ul>
+<li><a href="#c-compiler">C Compiler</a>
+    <ul>
+   <li><a href="#which-c-compiler">I have no C compiler yet. Which one should I install?</a>
+   <li><a href="#new-c-compiler">I already have a C compiler, but it's not supported by Sofa. How can I add support?</a>
+   <li><a href="#hello.c-does-not-work">I just installed a C compiler, but even <tt>hello.c</tt> doesn't compile!</a>
+   <li><a href="#amiga.lib">Do I need <tt>amiga.lib</tt>?</a>
+   <li><a href="#includes">Do I need the AmigaOS includes?</a>
+   <li><a href="#hello.e-does-not-work">I can compile <tt>hello.c</tt> with the C compiler, but when I try <tt>hello.e</tt> with SmallEiffel, it doesn't work.</a>
+   <li><a href="#weird-linker">A couple of minutes ago, everything worked fine, but now the C linker chokes!</a>
+   <li><a href="#scoptions">I'm using SAS/c and just created a SCOPTIONS file. Now the C linker chokes!</a>
+    </ul>
+<li><a href="#smalleiffel">SmallEiffel</a>
+    <ul>
+   <li><a href="#big">Why are the compiled programs so big?</a>
+   <li><a href="#slow">Why are the compiled programs so slow?</a>
+   <li><a href="#developer-serious">Can I use SmallEiffel to develop serious applications?</a>
+   <li><a href="#point">Bwuahahaha! How can anyone possibly use this crap?</a>
+   <li><a href="#developer-libraries">Can I use SmallEiffel to develop shared libraries or reentrant code?</a>
+   <li><a href="#develop-concurrent">Can I use SmallEiffel to develop applications that start new tasks?</a>
+   <li><a href="#other-eiffel-compilers">Buhuu! Eiffel is nice, but SmallEiffel sucks. Aren't there any other Eiffel compilers for AmigaOS?</a>
+    </ul>
+<li><a href="#gc">Garbage Collection</a>
+    <ul>
+   <li><a href="#gc-works">Does garbage collection work in Sofa?</a>
+   <li><a href="#gc-does-not-really-work">Does garbage collection really work in Sofa?</a>
+   <li><a href="#gc-just-sucks">Does garbage collection work in general?</a>
+    </ul>
+<li><a href="#java">Java</a>
+    <ul>
+   <li><a href="#compile_to_jvm">According to the manual, SmallEiffel can compile to Java. So where is <tt>compile_to_jvm</tt>?</a>
+    </ul>
+</ul>
+
+<h2><a name="general">Eiffel</a></h2>
+
+<p><a name="other-faq"><b>Are there any other relevant FAQ's?</b></a></p>
+
+<p>The <a href="../SmallEiffel/man/Eiffel.FAQ">Eiffel FAQ</a>
+describes general questions about the language, tools books and
+vendors. The <a
+href="../SmallEiffel/man/SmallEiffelFAQ.html">SmallEiffel FAQ</a>
+deals with the particular compiler used for Sofa. Both documents are
+included with Sofa.</p>
+
+<p><a name="newbee"><b>I'm new to Eiffel. Where should I start?</b></a></p>
+
+<p>The first four chapters of the book "Object-Oriented Software
+Engineering with Eiffel" are also available for download as a PDF
+document from <a
+href="http://www.irisa.fr/pampa/EPEE/book.html">http://www.irisa.fr/pampa/EPEE/book.html</a>.
+Chapter two gives an overview of Eiffel mostly by explaining short
+examples. This is particular useful if you already know some other
+programming language.</p>
+
+<p>"Eiffel Object Oriented Programming" is a complete book about
+Eiffel. It's probably not the best book about Eiffel you can find, but
+it's free. You can find it at <a
+href="http://www.doc.mmu.ac.uk/library/notes/ajt/">http://www.doc.mmu.ac.uk/library/notes/ajt/</a>.
+(Use e.g <A HREF="http://wuarchive.wustl.edu/~aminet/dirs/aminet/dev/gg/wget.tgz">aminet:dev/gg/wget.tgz</A> to download a local copy).</p>
+
+<p>A quite exhaustive collection of useful links for newcomers can be
+found at <a
+href="http://elj.com/eiffel/getting-started/">http://elj.com/eiffel/getting-started/</a>. At
+the same site, you can find lots of other interesting links and daily
+news about Eiffel. Just start browsing at <a
+href="http://elj.com/">http://elj.com/</a>. </p>
+
+<p>On the long run, you probably should read "Object-Oriented Software
+Construction". You can find more information and excerpts from it at
+<a href="http://eiffel.com/">http://eiffel.com/</a>.</p>
+
+<p><em>Don't read</em> "Eiffel the Language", second printing, as it
+is completely outdated. And <em>don't read</em> any of Bertrand
+Meyer's papers on Design by Contract or "introductions" to Eiffel, as
+they will only confuse you.</p>
+
+<p><a name="editor"><b>Are there any Eiffel modes for Amiga editors?</b></a></p>
+
+<p>There is an Eiffel/Sofa mode for <a
+href="http://members.tripod.com/golded/">GoldEd Studio 6</a> at
+<A HREF="http://wuarchive.wustl.edu/~aminet/dirs/aminet/text/edit/">aminet:text/edit/envSOF*.lha</A>. An
+older but unsupported version that works with GoldEd 4 (now freeware)
+can be found at <A HREF="http://wuarchive.wustl.edu/~aminet/dirs/aminet/text/edit/">aminet:text/edit/GedEiffel.lha</A>.</p>
+
+<p><a name="dead"><b>How dead is Eiffel?</b></a></p>
+
+<p>Comparing the amount of postings in <a
+href="news:comp.lang.eiffel">comp.lang.eiffel</a> and <a
+href="news:comp.sys.amiga.programmer">comp.sys.amiga.programmer</a>,
+about as dead as Amiga ;-)</p>
+
+
+<p><a name="dbc"><b>I read all the FAQ's and introductions, but still have no clue what's Design by Contract.</b></a></p>
+
+<p>If you still haven't understood any description of Design by
+Contract (DbC), here's anotherone that should be quite simple to grasp
+for beginners and give some motivation to use it:</p>
+
+<p>The most important application of DbC is "Coding without Design".
+That means, you have an interesting, basic idea of a program, and just
+sit down and start hacking it in.</p>
+
+<p>Of course there are a lot of people telling you that's not the
+proper way to create Software, but hell, what do they know? Most of
+them haven't written a program with 10000 lines of code in their
+lives. Just ignore them. (Well, maybe not for university exams).</p>
+
+<p>But back to coding: When you hack in your Eiffel code, you can
+specify some sort of "self-test" with all these <tt>require</tt>,
+<tt>ensure</tt> and <tt>invariant</tt> stuff. When the program
+executes, it will test itself all the time.</p>
+
+<p>This self-test can be very detailed, and there are whole books
+about how to test what. However, to be practically useful, just
+specify obvious conditions that are trivial to code. For example, are
+function parameters in range, is a certain data structure sorted, is a
+certain attribute greater than zero all the time and so on. This takes
+almost no additional time, and once it's there, it will be tested
+anytime you execute the program.</p>
+
+<p>The most annoying thing about "Coding without Design" is that the
+program changes a lot during its development because you get to
+understand it better while you write it (brain-wankers nowadays call
+it "refactoring"). But often, the program doesn't work anymore after
+such a change because you fucked up some minor detail, and have to
+start digging what's wrong. And that takes the fun out of coding.</p>
+
+<p>With DbC, this happens a lot less because the self-test will detect
+most of these silly small bugs you introduce by copying-and-pasting
+around. And because of this, it's useful. Once you figured that, you
+can start looking at the more esoteric corners of it (and maybe even
+read some papers of Bertrand Meyer).</p>
+
+
+
+
+<h2><a name="c-compiler">C Compiler</a></h2>
+
+
+<p><a name="which-c-compiler"><b>I have no C compiler yet. Which one should I install?</b></a></p>
+
+<p>If you can find a cheap copy of SAS/c somewhere, use it.</p>
+
+<p>Otherwise, use Dice. It's quite simple to install.</p>
+
+<p>The support for Vbcc is still somewhat flaky, partially because of
+the careless attitude of the SmallEiffel people towards portability
+beyond Windows and Linux, partially because of minor quirks in Vbcc.
+But both are constantly improving.</p>
+
+<p>Gcc is only for real heroes. Also expect to read the SmallEiffel
+manual a lot before you can make it work without
+<tt>ixemul.library</tt>. Unfortunately, Gcc is quite different in many
+ways from other Amiga C compilers, thus the support in Sofa somewhat
+sucks. Feel invited to help fixing this.</p>
+
+<p><a name="new-c-compiler"><b>I already have a C compiler, but it's not supported by Sofa. How can I add support?</b></a></p>
+
+<p>The current support is already quite exhaustive, because it
+includes two relatively easy to setup freely distributable compilers
+(Dice and Vbcc). Maybe it's the easiest to just install one of
+them.</p>
+
+<p>Nevertheless, it can of course make sense to support more C
+compilers, as long as they have some kind of command line interface.
+Normally, you should only have to add a couple of lines to
+<tt>SYSTEM_TOOLS</tt> and submit it to the SmallEiffel people.</p>
+
+<p>Don't bother trying MaxonC. It can't deal with many simple ANSI C
+constructs, and thus is useless for the C code generated by
+SmallEiffel.</p>
+
+
+<p><a name="hello.c-does-not-work"><b>I just installed a C compiler, but even <tt>hello.c</tt> doesn't compile!</b></a></p>
+
+<p>Bad luck. Check the manual, contact the support of the C compiler,
+or describe your problem in <a
+href="news:comp.sys.amiga.programmer">comp.sys.amiga.programmer</a>.</p>
+
+
+<p><a name="amiga.lib"><b>Do I need <tt>amiga.lib</tt>?</b></a></p>
+
+<p>Yes, but it should be included with your compiler anyway.</p>
+
+<p>(If you toy with the C compiler options, you can also write certain
+programs without it. But if you are already that experienced, you
+wouldn't ask this question, would you?)</p>
+
+
+<p><a name="includes"><b>Do I need the AmigaOS includes?</b></a></p>
+
+<p>Yes, unless you want to start messing. If you don't have them, get
+them, for example from the Developer CD.</p>
+
+<p>No, if you don't want to use class <tt>DIRECTORY</tt> or sofa
+library, and don't mind a couple of warnings during installation.</p>
+
+
+<p><a name="hello.e-does-not-work"><b>I can compile <tt>hello.c</tt> with the C compiler, but when I try <tt>hello.e</tt> with SmallEiffel, it doesn't work.</b></a></p>
+
+<p>Ensure that in your <tt>user-startup</tt> the
+"<tt>BEGIN&nbsp;sofa</tt>" part comes <em>after</em> possible
+initializations of your C compiler. If you have installed Sofa
+<em>before</em> your C compiler, this is probably not true. In this
+case, just load the <tt>user-startup</tt> in your editor and move the
+Sofa related stuff to the end of the file.</p>
+
+<p>If this was not the problem, try again with SnoopDos (<A HREF="http://wuarchive.wustl.edu/~aminet/dirs/aminet/util/moni/">aminet:util/moni/</A>) and submit the generated log to the Sofa
+Support.</p>
+
+<p><a name="weird-linker"><b>A couple of minutes ago, everything worked fine, but now the C linker chokes!</b></a></p>
+
+<p>Probably you changed the options passed to <tt>compile</tt>. For
+instance, you added a <tt>-boost</tt>. SmallEiffel's incremental
+compilation is not very smart in this respect, and doesn't
+automatically rebuild the program from the scratch.</p>
+
+<p>Just type</p>
+
+<blockquote><kbd>clean <i>root_class</i></kbd></blockquote>
+
+<p>to remove all traces of previous compilations. Then try to
+<tt>compile</tt> again.</p>
+
+
+<p><a name="scoptions"><b>I'm using SAS/c and just created a SCOPTIONS file. Now the C linker chokes!</b></a></p>
+
+<p>With its minimalistic default options, SAS/c wouln't be able to
+compile the C code generated by SmallEiffel. (Major problems are the
+lack of a floating point link library and <tt>near</tt> code and data
+models.) So SmallEiffel usually passes appropriate options to SAS/c
+that guarantee that the C compiler and linker can cope with the C code,
+although they might cause some unnecessary bloat.</p>
+
+<p>If you want to specify more optimal options or additional link
+libraries (such as the <a href="../library/sofa/welcome.html">sofa
+library</a>) in a <tt>SCOPTIONS</tt> file in the current directory,
+you have to manually specify those usually automatic basic
+options.</p>
+
+<p>Just make sure that SCOPTIONS contains the following lines:</p>
+
+<blockquote>
+Data=far<br>
+Code=far<br>
+Math=ieee<br>
+Parameters=both<br>
+Batch
+</blockquote>
+
+<p>(Again ,this is not a very optimized set of options. But now the
+program should compile again, and you can refine them later.)</p>
+
+<p>Furthermore, do <em>not</em> enable <tt>StringMerge</tt>, it will
+probably break your code.</p>
+
+
+<h2><a name="smalleiffel">SmallEiffel</a></h2>
+
+<p><a name="big"><b>Why are the compiled programs so big?</b></a></p>
+
+<p>Maybe because you compiled them with assertions enabled. Checking
+assertions introduces a huge overhead both in performance and size,
+but also checks for bugs and gives detailed information about failed
+assertions. In production code, you can disable assertions by
+specifying <tt>-boost</tt>.</p>
+
+<p>Nevertheless, Eiffel has a general tendency towards big executables.
+Even with <tt>-boost</tt>, you quickly get programs with 100 to 200K,
+although the source code might be ridiculously small. There are several
+reasons for that:</p>
+
+<ul>
+
+<li>Eiffel programs usually need to be linked with code for garbage
+collection, floating point and some other "basic" stuff.
+
+<li>Eiffel libraries are often designed to be flexible, but cohesive.
+Consequently, your code gets a lot of features it never uses, but that
+the optimizer has a hard time figuring it out.
+
+<li>You won't get very far with C data and code models set to
+<tt>near</tt>
+
+</ul>
+
+<p>But once Eiffel programs have reached those 100 to 200K, they
+continue growing quite slowly.</p>
+
+<p><a name="slow"><b>Why are the compiled programs so slow?</b></a></p>
+
+<p>First, they speed up a lot with <tt>-boost</tt> (see the <a
+href="#big">previous question</a>) because all assertion checks are
+disabled.</p>
+
+<p>But a major reason is that Eiffel does a lot of dynamic memory
+allocations. For example, strings and arrays can grow as needed. This
+is quite different to most C programs, which use hardcoded limits and
+just crash at a certain size of input. ("Hey, but they crash much
+faster!").</p>
+
+<p>Internally, SmallEiffel uses the ANSI C functions <tt>malloc()</tt>
+and <tt>calloc()</tt> for memory allocations. With some C compilers,
+they are very slow (e.g. SAS/c). Fortunately, there are libraries
+which can map <tt>malloc()</tt> to the memory pools, for instance
+<A HREF="http://wuarchive.wustl.edu/~aminet/dirs/aminet/dev/c/MemPools.lha">aminet:dev/c/MemPools.lha</A>. Just link it to the
+executable.</p>
+
+<p><a name="developer-serious"><b>Can I use SmallEiffel to develop serious applications?</b></a></p>
+
+<p>No.</p>
+
+<p>The included version of SmallEiffel is particular vulnerable to all
+sorts of errors in the environment it is executed in. For example, it
+does not detect when it runs out of memory and cheerfully continues to
+read and write memory through <tt>NULL</tt> pointers (the C equivalent
+to <tt>Void</tt>). Furthermore, it simply ignores read and write
+errors during file access. Additionally, there are some limitations
+with <a href="#gc">garbage collection</a> described below. And try to
+stay away from complex <tt>expanded</tt> classes (which don't really
+seem to work with any Eiffel compiler - duh).</p>
+
+
+<p><a name="point"><b>Bwuahahaha! How can anyone possibly use this crap?</b></a></p>
+
+<p>Well, many contemporary C++ and Java environments have similar
+problems. (Ok, error detection with file handling usually works). And
+take a look at the average C program: how many of them check for
+<tt>NULL</tt> after <tt>malloc()</tt>, how many of them check the
+result of <tt>puts()</tt> or <tt>fwrite()</tt>? Not many, you will
+find. And still, people even dare to sell such shit.</p>
+
+<p>Consider SmallEiffel a nice toy for developing in-house tools or
+zero-reliability software like games. Apart from that, there is a
+certain chance that it will improve in future.</p>
+
+
+<p><a name="developer-libraries"><b>Can I use SmallEiffel to develop shared libraries or reentrant code?</b></a></p>
+
+<p>Very unlikely.</p>
+
+<p>The problem is that for reasons of portability, SmallEiffel heavily
+relies on ANSI C functions, which in turn many of them use global
+variables and buffers.</p>
+
+<p>Additionally, Eiffel's <tt>once</tt> features don't fit well with
+them either.</p>
+
+
+<p><a name="develop-concurrent"><b>Can I use SmallEiffel to develop applications that start new tasks?</b></a></p>
+
+<p>Not in a way <tt>exec/CreateNewProc()</tt> would support it. And
+for similar reasons as above, it's unlikely that SmallEiffel will get
+built-in support for multi-threading soon.</p>
+
+<p>However, you can use <tt>system</tt> in class <tt>GENERAL</tt> to
+start another program in an own task
+like</p>
+
+<blockquote>
+system("run &lt;&gt;nil: some_application")
+</blockquote>
+
+<p>Then use Rexx for communication between them.</p>
+
+<p>Although sofa library doesn't support it yet, it should also be
+possible to use more flexible dos.library/System() for starting and
+the lighter exec message ports for communication.</p>
+
+
+<p><a name="other-eiffel-compilers"><b>Buhuu! Eiffel is nice, but SmallEiffel sucks. Aren't there any other Eiffel compilers for AmigaOS?</b></a></p>
+
+<p>No.</p>
+
+<p>There is an incomplete Eiffel compiler written in AmigaE available
+from <A HREF="http://wuarchive.wustl.edu/~aminet/dirs/aminet/dev/e/eiffel.lha">aminet:dev/e/eiffel.lha</A>. It has a lot of promising
+concepts, but too many things are missing to consider it useful and
+the original author has abandoned it.</p>
+
+
+<h2><a name="gc">Garbage Collection</a></h2>
+
+<p><a name="gc-works"><b>Does garbage collection work in Sofa?</b></a></p>
+
+<p>Yes.</p>
+
+<p><a name="gc-does-not-really-work"><b>Does garbage collection really work in Sofa?</b></a></p>
+
+<p>The practical usefulness of a garbage collector depends a lot on
+the implementation. Too simple garbage collectors can freeze a program
+for a considerable time during collection, perform horribly in
+low-memory situations or crash at all, leak memory for certain special
+cases, have a considerable memory and performance overhead etc.</p>
+
+<p>Most of these unfortunately apply for the garbage collector in
+Sofa.</p>
+
+<p>Apart from that, there are a couple of problems with redefining
+<tt>dispose</tt> in class <tt>MEMORY</tt> (comparable to Oberon's
+<tt>dispose</tt> or Java's finalizers). Some of them are related to an
+incomplete implementation in SmallEiffel, others to undefined
+situations in the Eiffel language.</p>
+
+
+<p><a name="gc-just-sucks"><b>Does garbage collection work in general?</b></a></p>
+
+<p>No, but it will still take some time for the software industry to
+grasp that.</p>
+
+<p>Not considering that many practical implementations don't work
+because of the reasons mentioned in the previous question, garbage
+collection has several conceptional problems, which have not been
+solved even theoretically:</p>
+
+<ul>
+
+<li>If errors happen during the collection, it's difficult if not
+impossible to handle them. (In Eiffel, it is undefined what happens to
+assertions and developer exceptions during collection). The practical
+implication today usually is unreported data loss.
+
+<li>It is almost impossible to report errors during collection to the
+user, as the cause-effect chasm between the operation that has to be
+collected and the error during the collection is too huge. For
+instance, imagine one selects "quit" and the applications announces a
+"write error" (because you saved a file some time ago, but the
+collector tried to flush the buffer and close it only now). The
+practical implication is horrible usability and unhelpful error
+messages.
+
+<li>If you have a resource that should be released as soon as possible
+(such as semaphores or exclusive file locks), it's inapplicable. The
+practical implication is that you have revert to manual resource
+management, or other programs cannot do their job.
+
+<li>Debugging can become more difficult, as the program does not
+necessarily behave the same with the same input, because nobody knows
+when something is released. Due to Eiffel's attitude towards
+side-effects - the strict separation between commands and queries -
+this normally is not a problem. But once there's a buggy side-effect
+producing <tt>dispose</tt>... The practical implication usually is
+programmer hair loss.
+
+</ul>
+
+<p>Despite all this, garbage collection is probably still an
+improvement to manual resource handling, at least for memory related
+resources. But it's in no way a solution for general resource
+handling.</p>
+
+<p>Garbage collection is not very interesting from a technical point
+of view rather than a psychological one. It's a nice example for a
+"out of sight - out of mind" strategy which is very common among
+certain people(s). Freud would probably have called it a successful
+application of "Verdrängungsmechanismen".</p>
+
+<h2><a name="java">Java</a></h2>
+
+<p><a name="compile_to_jvm"><b>According to the manual, SmallEiffel can compile to Java. So where is <tt>compile_to_jvm</tt>?</b></a></p>
+
+<p>A <tt>compile_to_jvm</tt> executable has not been included with
+Sofa because nobody has yet done a remotely useful implementation of
+the Java Virtual Machine for AmigaOS. Yes, there is some stuff
+floating around, but if you can make it work you can easily figure how
+to compile <tt>compile_to_jvm</tt>.</p>
+
+<p>For normal beings, it would only have wasted storage and
+bandwidth.</p>
+
+
+</body></html>
+
+

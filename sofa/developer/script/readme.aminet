@@ -1,0 +1,6 @@
+Short:    Eiffel compiler and additional libraries
+Type:     dev/lang
+Uploader: Thomas Aglassinger <agi@sbox.tu-graz.ac.at>
+Author:   The Sofa Team
+Kurz:     Eiffel Compiler und weitere Bibliotheken
+Requires: AmigaOS 3.x, 68020

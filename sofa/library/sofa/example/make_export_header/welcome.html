@@ -1,0 +1,124 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html><head>
+<title>Sofa Library - Make_export_header</title>
+</head>
+
+<body>
+<h1>Make_export_header</h1>
+
+
+<h2>Version</h2>
+
+1.0
+
+<h2>Description</h2>
+
+	<p>Make_export_header scans C source files (*.c) for prototypes and
+	variables to be exported, and creates a C header file (*.h)
+	declaring them. This header file can then be included by other C
+	files that want to use the exported routines or variables.</p>
+
+<h2>Author</h2>
+
+	Thomas Aglassinger &lt;agi@sbox.tu-graz.ac.at&gt;
+
+<h2>Features</h2>
+
+<ul>
+
+<li>does not write header if existing header is identical, and
+consequently does not spoil dependencies and enforce a recompile of
+all modules that include the header
+
+<li>supports declarations going over multiple line (uses "{", "=" or
+";" to detect the end)
+
+<li>number of declarations and length of identifiers is only limited
+by available memory
+
+<li>source code included
+
+<li>portable and fast, because coded in Eiffel
+
+</ul>
+
+<h2>Template</h2>
+
+<kbd>make_export_header target.h source1.c source2.c ...</kbd>
+
+<h2>Usage</h2>
+
+<p>In the C source, you have to mark declarations of functions and
+variables to be exported with the pseudo-keyword "export". Because
+such a keyword does not exist, you have to define an empty macro
+before you can use it in the source. For example:</p>
+
+<blockquote>
+#define export /* empty */<br>
+<br>
+/* a variable to be exported */<br>
+export char * hugo = "some text";<br>
+<br>
+/* a function to be exported */<br>
+export int sepp(int resi, char * susi)<br>
+{<br>
+&nbsp;&nbsp;&nbsp;...<br>
+}<br>
+</blockquote>
+
+<p>If this is stored in a source file "sepp.c", you can call</p>
+
+<blockquote><kbd>make_export_header export_sepp.h sepp.c</kbd></blockquote>
+
+<p>Essentially, "export_sepp.h" will contain:</p>
+
+<blockquote>
+extern char * hugo;<br>
+int sepp(int resi, char * susi);
+</blockquote>
+
+<p>Additionally, there is the usual <tt>#ifdef EXPORT_SEPP_H ...</tt> so that
+you can include "export_sepp.h" multiple times without causing
+problems. Finally, there is a little comment telling you not to modify
+this file because it is generated automatically.</p>
+
+<p>Probably you want a single header file for all exported symbols in
+a project. For that, just specify the names of all the sources, for
+instance:</p>
+
+<blockquote><kbd>make_export_header export_sepp.h sepp.c hugo.c resi.c susi.c ...</kbd></blockquote>
+
+<h2>Limitations</h2>
+
+<ul>
+
+<li>doesn't really parse the C code; It just looks for the "export"
+keyword, and checks for terminating character. It is probably easy to
+confuse with nested comments or too much macros magic.
+
+<li>structs and #define's cannot be exported; they need to be put into
+a separate header file
+
+</ul>
+
+<h2>Bugs</h2>
+
+<ul>
+
+<li>does not detect read/write errors (because compiled with SmallEiffel)
+
+<li>crashes if it runs out of memory (because compiled with SmallEiffel)
+
+<li>status output cannot be suppressed
+
+<li>"export" keyword cannot be redefined (to for example "Prototype")
+
+<li>comments in prototypes might confuse it, if they contain the word
+	  "export" (Comments in other places are treated properly).
+
+</ul>
+
+</body></html>
+
+
+

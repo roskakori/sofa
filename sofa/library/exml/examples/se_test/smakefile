@@ -1,0 +1,38 @@
+#
+# smakefile
+#
+# If exml.lib does not exist in Sofa's library drawer, create it using
+# ${EXML}/compiler_specific/se/smakefile. See there for details.
+#
+# Then, just type
+#
+#    smake
+#    root_class
+#
+# to compile and perform a test run
+#
+
+SOFA=/////sofa
+EXML=///exml
+EXPAT=//expat
+CLIB=$(EXML)/compiler_specific/se/clib
+
+EIFFEL_ROOT_CLASS=root_class
+EIFFEL_CREATION_ROUTINE=make
+ROOT_DIR=$(EXML)/examples/se_test
+
+CECIL=-cecil $(EXML)/compiler_specific/se/cecil.se
+EXT_C=$(CLIB)/exml_parser.c $(CLIB)/expat_parser_error_codes.c
+EFLAGS=-all_check -no_style_warning
+
+$(EIFFEL_ROOT_CLASS) :
+	compile $(EFLAGS) $(CECIL) $(EXT_C) $(EIFFEL_ROOT_CLASS) $(EIFFEL_CREATION_ROUTINE)
+
+clean :
+	clean $(EIFFEL_ROOT_CLASS)
+
+sterile : clean
+	-delete quiet $(EIFFEL_ROOT_CLASS)
+
+
+

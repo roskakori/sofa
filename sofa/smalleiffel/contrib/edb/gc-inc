@@ -1,0 +1,7 @@
+#include <gc.h>
+#define malloc(n) GC_malloc(n)
+#define calloc(m,n) GC_malloc((m)*(n))
+#define realloc(p,n) GC_realloc((p),(n))
+#define free(p) GC_free(p)
+#define gc_is_off GC_dont_gc
+#define gc_start() GC_gcollect()

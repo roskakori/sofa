@@ -1,0 +1,37 @@
+-- INSTALL.READ_ME --
+
+If you have a UNIX-like platform (Linux, Unix BSD, HP-UX, IRIX,
+XENIX, ...), simply run one of the following script : INSTALL.SH 
+(which is written in bourne shell) or INSTALL.CSH (which is written 
+in c-like shell).
+
+If you have OS2, read INSTALL.OS2 file.
+
+If you have Windows95/NT, simply run INSTALL.BAT.
+
+
+Otherwise, or if the installation procedure fails and cannot be
+fixed, please follow the general installation procedure described
+below :
+
+-- 1 -- Put a copy of the entire SmallEiffel directory on your
+        hard disk, where you want.
+
+-- 2 -- Set the environment variable "SmallEiffel" to indicate
+        the directory you have chosen.
+
+-- 3 -- Compile with your C ANSI Compiler all commands stored
+        in directory "bin_c". Large commands are splitted into several
+        numbered C files. Have a look in files *.make to see how to 
+        compile. Put the resulting executable files in the SmallEiffel
+        directory "bin".
+
+-- 4 -- Have a look at the READ_ME file in directory "sys" to set
+        up the good system, the default C compiler, the default 
+        loading path, ...
+
+-- 5 -- Do not forget to select the architecture-dependent code for
+        the garbage collector (see file SmallEiffel/sys/gc).
+
+-- 6 -- Add SmallEiffel sub_directory "bin" in your system path.
+

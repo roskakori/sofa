@@ -1,0 +1,6 @@
+An HTML mode writen by Matthias Klose .
+
+hooks.sh	- Bourne shell script to generate the HTML hooks.
+                  Please, update this hooks.sh script and not directly
+                  the hook files.
+htmlshort	- Python script to generate clickable HTML documentation

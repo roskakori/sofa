@@ -1,0 +1,304 @@
+
+                         Frequently Asked Questions
+
+   Table of contents
+
+   Q01: [1]Why the name SmallEiffel The GNU Eiffel Compiler?
+   Q02: [2]What's the matter with version numbering?
+   Q03: [3]Is it possible to have the complete Eiffel source code of
+   SmallEiffel?
+   Q04: [4]Is it possible to use SmallEiffel for large/commercial
+   applications?
+   Q05: [5]Is it possible to do incremental compilation with
+   SmallEiffel?
+   Q06: [6]Is there a SmallEiffel mailing list?
+   Q07: [7]What about the Guru section?
+   Q08: [8]Is it difficult to switch from ISE to SmallEiffel?
+   Q09: [9]Are there mirror FTP sites for SmallEiffel?
+   Q10: [10]Is it possible to use the Boehm-Demers-Weiser garbage
+   collector with SmallEiffel?
+   Q11: [11]Why don't you post more messages in newsgroups and/or mailing
+   lists?
+   Q12: [12]It is possible to create applets with compile_to_jvm?
+   Q13: [13]Where do I send bug reports?
+   Q14: [14]Is there a mechanism to precompile libraries?
+   Q15: [15]How is SmallEiffel compiled?
+   Q16: [16]How do I keep informed about SmallEiffel?
+   Q17:
+     [17]What documentation is provided with SmallEiffel?
+   Where can I find Eiffel documentation?
+   Q18: [18]Does SmallEiffel compile the whole Eiffel language ?
+   Q19: [19]How can I help ?
+   Q20: [20]Why don't you change this and add that?! It would be much
+   better/cooler/whatever !
+
+   Questions and answers
+
+   Q01: Why the name SmallEiffel The GNU Eiffel Compiler?
+   A01: SmallEiffel comes from the mixing of the names Smalltalk and
+   Eiffel. Our aim is to offer an Eiffel development environment as easy
+   to use as Smalltalk and as safe as Eiffel. Since version -0.82,
+   SmallEiffel has been promoted by the Free Software Foundation the
+   official GNU Eiffel Compiler.
+
+   Q02: What's the matter with version numbering?
+   A02: Version numbering uses negative numbers. The first distributed
+   version was numbered -0.99, the second one -0.98, the third -0.97, and
+   so on. Version number -0.0 should correspond to the very best Eiffel
+   compiler on this planet :-)
+
+   Q03: Is it possible to have the complete Eiffel source code of
+   SmallEiffel?
+   A03: Since it is the GNU Eiffel Compiler, the complete source code of
+   SmallEiffel is of course in the distribution. The source code for
+   additional libraries is also provided.
+
+   Q04: Is it possible to use SmallEiffel for large/commercial
+   applications?
+   A04: It is very possible to use SmallEiffel for a large application.
+   An Eiffel compiler is a really big project and SmallEiffel itself is
+   fully written in Eiffel. SmallEiffel is completely free and any
+   private compagny can use SmallEiffel freely, and distribute freely the
+   products made with it. They do not have to pay royalties. However,
+   SmallEiffel doesn't come with any warranty (please read the COPYING
+   file in the distribution). For extended support as well as consulting,
+   see [21]here.
+
+   Q05: Is it possible to do incremental compilation with SmallEiffel?
+   A05: Before release -0.91 the answer was no. The answer is now YES.
+   Because of the SmallEiffel type inference mechanism, SmallEiffel
+   always produces all needed C files from scratch. As old C files are
+   automatically saved, only modified C files are recompiled. See
+   [22]man/compile for details.
+
+   Q06: Is there a SmallEiffel mailing list?
+   A06: Yes! SmallEiffel users and developpers can share their
+   experiences and ideas by subscribing to the [23]SmallEiffel official
+   mailing list.
+
+   Q07: What about the Guru section?
+   A07: Some feature section of the SmallEiffel library are labelled with
+   :
+        feature -- The Guru section :
+   If you really need your software to be portable on other Eiffel
+   compilers, do not use those features.
+
+   Q08: Is it difficult to switch from ISE to SmallEiffel?
+   A08: If your original ISE software only uses simple types like
+   INTEGER, STRING, ARRAY, BOOLEAN, CHARACTER and DOUBLE, it is usually
+   very simple. It is a little bit difficult for simple input/output
+   (used with predefined `io') because some features have different
+   names. If your original software heavily relies on the EiffelBase
+   library, it may be very difficult. For example, one must keep in mind
+   that SmallEiffel.ARRAY inherit SmallEiffel.COLLECTION and that ISE
+   library also have a class COLLECTION. By the way, subclasses of
+   ISE.COLLECTION cannot be used. The ISE.LINKED_LIST can be used in
+   conjunction with SmallEiffel.ARRAY because ISE.LINKED_LIST do not
+   inherit ISE.COLLECTION (no clash).
+
+   Q09: Are there mirror FTP sites for SmallEiffel?
+   A09: Australia
+   [24]ftp://ftp.progsoc.uts.edu.au/pub/Eiffel/SmallEiffel/
+   Austria [25]http://gd.tuwien.ac.at/pub/languages/SmallEiffel/
+   USA [26]ftp://ftp.cs.rit.edu/pub/mirrors/SmallEiffel/
+
+   Q10: Is it possible to use the Boehm-Demers-Weiser garbage collector
+   with SmallEiffel?
+   A10: Yes.
+   You just have to disable the generation of the GC by SmallEiffel
+   (option -no_gc) and replace it by the BDW library. Note that the BDW
+   GC can be easily added because SmallEiffel only uses
+   malloc/realloc/calloc/free.
+   You can download the BDW library from :
+   [27]http://reality.sgi.com/boehm_mti/gc_source
+
+   How to integrate the Boehm-Demers-Weiser garbage collector with
+   SmallEiffel (from a message of Dietmar Wolz) :
+    1. Make the gc.a file from the BDW package. Then move this gc.a file
+       to /usr/lib/libgc.a.
+    2. Move gc.h the to working directory and add the following lines:
+       #define malloc(n) GC_malloc(n)
+       #define calloc(m,n) GC_malloc((m)*(n))
+       #define realloc(p,n) GC_realloc((p),(n))
+       #define free(p) GC_free(p)
+    3. instead of calling
+           "compile -o executable -boost -O root"
+       now call
+           "compile -o executable -boost -O root -no_gc -lgc -include
+       gc.h
+
+
+   Q11: Why don't you post more messages in newsgroups and/or mailing
+   lists?
+   A11: First, because we strongly believe that too much information
+   kills information. Scientists call this "cognitive overload". :)
+   Second, because we don't have the time. It takes an awful amount of
+   time to follow discussions, whichever their quality. We try to do
+   that. But it's even more time-consuming to be part of them. So, we
+   often have too choose betwen posting/mailing, and working directly on
+   SmallEiffel. Since our mailboxes tend to overflood, we generally
+   choose the latter :)
+
+   Q12: It is possible to create applets with compile_to_jvm?
+   A12: Not yet. SmallEiffel was designed to compile Eiffel applications
+   to C code or Java bytecode, but not applets.
+
+   Q13: Where and how do I send bug reports?
+   A13: Before sending any bug report, please:
+    1. Compile your application with the -verbose flag, without the
+       -no_warning flag, and with all assertions on (default mode, or
+       -all_check flag). This may reveal a problem in the code you're
+       trying to compile rather than in SmallEiffel...
+    2. Check that you've got the [28]latest version of SmallEiffel.
+    3. Check that the bug has not been fixed in our [29]latest (beta or
+       working) version
+    4. Verify that is it not a known problem by [30]looking at our "not
+       yet implemented" page
+    5. Check whether the problem has not already been reported in [31]the
+       SmallEiffel mailing-list
+
+   A good and useful bug report -- that is, one that is more likely to be
+   fixed -- is one that respects the following simple guideline: BE
+   PRECISE . More precisely ;-) :
+    1. Which hardware architecture do you use ? What operating system and
+       which version of it ? What is your version of SmallEiffel ? Your C
+       compiler or JVM, and its version ?
+    2. Tell us how to reproduce the problem. Try to isolate it on a small
+       program and send us the latter with all instructions necessary in
+       order for us to reproduce the problem. Don't forget to tell us the
+       compilation command you used.
+    3. If for any reason you can't send us the small program mentionned
+       above, things may be much more difficult for us. So give us all
+       the releavant information you have. The compilation command line
+       that creates the problem (once again, preferably, with the
+       -verbose flag, without the -no_warning flag, and with all
+       assertions on -- default mode, or -all_check flag) and its verbose
+       output. The execution stack trace you get in case of a crash.
+       Whether the problem occurs with any assertion level or not.
+       Whether the GC is concerned (try with and w/o the -no_gc flag).
+
+   Bug reports can be sent either to [32]Dominique.Colnet@loria.fr and
+   Olivier.Zendra@loria.fr, or to [33]the SmallEiffel mailing-list.
+   Don't worry if you don't get an ack: we don't send them because it
+   takes time, but we store all the bug reports we receive. And we even
+   try to fix them ASAP! :)
+
+   Q14: Is there a mechanism to precompile libraries?
+   A14: No, there is no such mechanism in SmallEiffel. But if you're
+   concerned about speed, don't worry, precomputed libraries are not the
+   only way to be fast ! Just try SmallEiffel, and you'll see :)
+
+   Q15: How is SmallEiffel compiled?
+   A15: With Eiffel optimization options -boost and -no_gc. The garbage
+   collector is indeed useless on the SmallEiffel commands: since
+   SmallEiffel did not include a GC in its first versions, we were very
+   careful about memory when we developped it.
+   With C compilation optimizations turned on (it depends on the C
+   compiler used; we generally use GCC).
+   The resulting executables are stripped.
+
+   Q16: How do I keep well informed about SmallEiffel?
+   A16: The best way is to keep an eye on our web pages, more especially
+   on the [34]What's New? page and the [35]History of Changes.
+   People who want detailed information may also decide to stay tuned to
+   [36]the SmallEiffel mailing-list.
+
+   Q17: What documentation is provided with SmallEiffel?
+   Where can I find Eiffel documentation?
+   A17: The documentation provided with SmallEiffel is a transcript of
+   what you can find on the original SmallEiffel Web site, at
+   [37]http://SmallEiffel.loria.fr. It is related only to the use and
+   internals of SmallEiffel (yes, we know we still have to improve it ;)
+   ).
+   For information and documentation about the Eiffel language, check the
+   links on our [38]Internet resources page. Note that we are not aware
+   of any complete Eiffel language manual freely available on the Web
+   (yet?).
+
+   Q18: Does SmallEiffel compile the whole Eiffel language ?
+   A18: Yes. "Small" in SmallEiffel does not mean that a subset of the
+   language is used. See the [39]question about the SmallEiffel name.
+
+   Q19: How can I help ?
+   A19: The best way to help SmallEiffel and its users is probably to
+   pick up some area you're interested in, and develop with SmallEiffel
+   your own library, application, tool, extension, etc., releasing it to
+   other users.
+   To avoid duplicate efforts, we suggest you have a look to [40]what
+   other people are already doing around SmallEiffel and help them if
+   something that's of interest to you is already under work. There are
+   actually very good things in there, some we were not even aware of,
+   when they were under development ! :)
+   Another very good way to help us is to follow the [41]bug report
+   guidelines when you find some problem with SmallEiffel :))
+   Finally, you may also consider funding the development of particular
+   features you wouls like to have.
+
+   Q20: Why don't you change this and add that?! It would be much
+   better/cooler/whatever !
+   A20: People must understand that we can't always do everything. We
+   simply can't. Because we don't have the time. Whether we like it or
+   not, we also have other things to do than provide free stuff, modify
+   our compiler and/or libraries to please everybody. We do as much as we
+   can, but we don't do miracles, sorry.
+   Since SmallEiffel is free of charge and open-source, people who do
+   need things we don't provide can always implement them and have them
+   benefit everybody. A good way to do this is to start working on it,
+   and ask other people (i.e. not the SmallEiffel team ;) ) to join and
+   help. See the [42]"How can I help ?" question.
+   Alternatively, someone or some company who does need us to implement
+   something may always consider funding a bit the development of
+   SmallEiffel... After all, we've even heard that some people were
+   selling sofware and making a bit of money with it... ;)))
+
+                                   [Line]
+
+             Copyright © Dominique COLNET and Suzanne COLLIN -
+                           [43]<colnet@loria.fr>
+                     Last update: 30 June 1999, by OZ.
+
+References
+
+   1. file://localhost/home/colnet/SmallEiffel/man/man/SmallEiffelFAQ.html#Q01
+   2. file://localhost/home/colnet/SmallEiffel/man/man/SmallEiffelFAQ.html#Q02
+   3. file://localhost/home/colnet/SmallEiffel/man/man/SmallEiffelFAQ.html#Q03
+   4. file://localhost/home/colnet/SmallEiffel/man/man/SmallEiffelFAQ.html#Q04
+   5. file://localhost/home/colnet/SmallEiffel/man/man/SmallEiffelFAQ.html#Q05
+   6. file://localhost/home/colnet/SmallEiffel/man/man/SmallEiffelFAQ.html#Q06
+   7. file://localhost/home/colnet/SmallEiffel/man/man/SmallEiffelFAQ.html#Q07
+   8. file://localhost/home/colnet/SmallEiffel/man/man/SmallEiffelFAQ.html#Q08
+   9. file://localhost/home/colnet/SmallEiffel/man/man/SmallEiffelFAQ.html#Q09
+  10. file://localhost/home/colnet/SmallEiffel/man/man/SmallEiffelFAQ.html#Q10
+  11. file://localhost/home/colnet/SmallEiffel/man/man/SmallEiffelFAQ.html#Q11
+  12. file://localhost/home/colnet/SmallEiffel/man/man/SmallEiffelFAQ.html#Q12
+  13. file://localhost/home/colnet/SmallEiffel/man/man/SmallEiffelFAQ.html#Q13
+  14. file://localhost/home/colnet/SmallEiffel/man/man/SmallEiffelFAQ.html#Q14
+  15. file://localhost/home/colnet/SmallEiffel/man/man/SmallEiffelFAQ.html#Q15
+  16. file://localhost/home/colnet/SmallEiffel/man/man/SmallEiffelFAQ.html#Q16
+  17. file://localhost/home/colnet/SmallEiffel/man/man/SmallEiffelFAQ.html#Q17
+  18. file://localhost/home/colnet/SmallEiffel/man/man/SmallEiffelFAQ.html#Q18
+  19. file://localhost/home/colnet/SmallEiffel/man/man/SmallEiffelFAQ.html#Q19
+  20. file://localhost/home/colnet/SmallEiffel/man/man/SmallEiffelFAQ.html#Q20
+  21. file://localhost/home/colnet/SmallEiffel/man/support/support.html
+  22. file://localhost/home/colnet/SmallEiffel/man/man/compile.html
+  23. file://localhost/home/colnet/SmallEiffel/man/support/mailing-list.html
+  24. ftp://ftp.progsoc.uts.edu.au/pub/Eiffel/SmallEiffel/
+  25. http://gd.tuwien.ac.at/pub/languages/SmallEiffel/
+  26. ftp://ftp.cs.rit.edu/pub/mirrors/SmallEiffel/
+  27. http://reality.sgi.com/boehm_mti/gc_source/
+  28. file://localhost/home/colnet/SmallEiffel/man/misc/HISTORY.html
+  29. file://localhost/home/colnet/SmallEiffel/man/misc/HISTORY.html
+  30. file://localhost/home/colnet/SmallEiffel/man/misc/NOT_YET_IMPLEMENTED.html
+  31. file://localhost/home/colnet/SmallEiffel/man/Mailing-list/threads.html
+  32. mailto:Dominique.Colnet@loria.fr,Olivier.Zendra@loria.fr
+  33. file://localhost/home/colnet/SmallEiffel/man/support/mailing-list.html
+  34. file://localhost/home/colnet/SmallEiffel/man/general/whatsnew.html
+  35. file://localhost/home/colnet/SmallEiffel/man/misc/HISTORY.html
+  36. file://localhost/home/colnet/SmallEiffel/man/support/mailing-list.html
+  37. http://SmallEiffel.loria.fr/
+  38. file://localhost/home/colnet/SmallEiffel/man/general/resources.html
+  39. file://localhost/home/colnet/SmallEiffel/man/man/SmallEiffelFAQ.html#Q01
+  40. file://localhost/home/colnet/SmallEiffel/man/general/repository.html
+  41. file://localhost/home/colnet/SmallEiffel/man/man/SmallEiffelFAQ.html#Q13
+  42. file://localhost/home/colnet/SmallEiffel/man/man/SmallEiffelFAQ.html#Q19
+  43. mailto:colnet@loria.fr

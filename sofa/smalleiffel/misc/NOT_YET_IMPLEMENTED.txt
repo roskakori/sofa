@@ -1,0 +1,70 @@
+
+               List of known bugs and unimplemented features
+
+     * When you repeatedly inherit from a class that contains a routine
+       that assigns to an attribute, and specify for the routine and
+       attribute to be replicated twice, the routine fails to follow the
+       replicated feature. That is, you have two routines assigning to
+       the one attribute, instead of having two routines assigning to
+       different attributes. This contravenes the discussion in ETL pp
+       174-177. The following code illustrates the issue (it fails at
+       run-time).
+class BOARD
+feature
+   set_max_board_members (b: INTEGER) is
+      do
+         max := b;
+      end
+   max: INTEGER
+end
+class BOARD2
+inherit
+   BOARD
+      rename
+         set_max_board_members as set_min_board_members,
+         max as min
+      end
+   BOARD
+      select set_max_board_members
+   end
+end
+class BOARD_ORGANISER
+creation make
+feature
+   make is
+      do
+         !!board2;
+         board2.set_max_board_members (3)
+         board2.set_min_board_members (1)
+         check
+            board2.max = 3
+         end
+      end;
+   board2: BOARD2;
+end
+       This bug is not easy to fix at all and also seems to be present in
+       all commercial Eiffel compilers (if your commercial compiler can
+       correctly execute this code, please drop us a note to advise us
+       otherwise).
+     * Some features of class BIT are not yet implemented when using long
+       BIT sequences (i.e. more than 32 bits). All unimplemented features
+       are reported at compile-time (please do not report these, except
+       where you cannot work around them).
+     * Command line arguments cannot be given as argument of the root
+       procedure (not yet implemented). For the time being, you can use
+       features argument_count and argument of class GENERAL.
+     * Incomplete ELKS'95 compatibility... but we are still waiting the
+       ELKS'2000 before working on this problem.
+     * Features deep_clone and deep_equal of class GENERAL are not yet
+       implemented for compile_to_jvm.
+     * compile_to_jvm doesn't allow you to make applets.
+     * dispose is not implemeented yet for expanded objects.
+
+                                   [Line]
+
+   Copyright © Dominique COLNET and Suzanne COLLIN - [1]<colnet@loria.fr>
+                     Last update: 05 May 1999, by OZ.
+
+References
+
+   1. mailto:colnet@loria.fr

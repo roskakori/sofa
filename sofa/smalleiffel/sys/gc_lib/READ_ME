@@ -1,0 +1,2 @@
+Have a look in "generic.c" for more information about GC tuning on
+your architecture/C-compiler.

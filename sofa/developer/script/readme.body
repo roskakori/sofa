@@ -1,0 +1,59 @@
+AUTHOR
+
+  The Sofa Team
+
+DESCRIPTION
+
+  Sofa is the Amiga distribution of SmallEiffel, the GNU Eiffel
+  compiler. It also includes some goodies like the Gobo data
+  structures library, parser generator tools and Amiga-related
+  libraries for ARexx, argument parsing and pattern matching.
+
+  Eiffel is an advanced object-oriented programming language that
+  emphasizes the design and construction of high-quality and reusable
+  software. It supports the concept of "Design by Contract" to improve
+  software correctness, allowing a program to validate its consistency
+  during run time. Interfaces to other languages such as ARexx, C and
+  C++ are supported.
+
+  Eiffel's design addresses many practical concerns that software
+  engineers face when creating complex software. It has an elegant
+  design and programming style, and is easy to learn.
+
+FEATURES
+
+  - supports incremental compilation
+  - compiles to native C code or Java byte code
+  - does *not* require ixemul.library
+
+NEW FEATURES
+
+  - more documentation and some examples
+  - C compiler support for Dice and Vbcc
+  - sofa.lib, for accessing some AmigaOS releted features such as
+    ARexx, argument parsing and pattern matching
+
+SPECIAL REQUIREMENTS
+
+  - a C compiler (SAS/c, Dice or Vbcc) or Java byte code interpreter
+  - AmigaOS 3.x,
+  - 68020
+  - 4MB free RAM
+  - 30MB free harddisk space
+
+AVAILABILITY
+
+  - Aminet mirrors, for example
+    ftp://wuarchive.wustl.edu/pub/aminet/dev/lang/sofa.lha
+
+PRICE
+
+  Freeware.
+
+DISTRIBUTABILITY
+
+  Freely distributable. All material included in Sofa is distributed
+  under some open source license, such as Eiffel Forum License, the
+  GNU General Public License or the Mozilla Public License. Refer to
+  the documentation of the respective tool or library for details.
+

@@ -1,0 +1,48 @@
+
+                             The clean command
+
+   Usage
+
+   clean [options] <Root> ...
+
+   Command clean removes all intermediate files produced by previous
+   compile or compile_to_c.
+   Names (<Root> ...) can have the Eiffel suffix, no suffix at all, or
+   the suffix used for SmallEiffel command files on your system (.make on
+   UNIX or .BAT on DOS for example).
+
+   Options
+
+   -verbose:
+          Print system information during the compilation (full path of
+          loaded files, type inference score, removed files, etc.).
+   -version:
+          Show the number of the [1]version of SmallEiffel you're using.
+
+   Examples
+
+   Example 1
+   To remove intermediate files produced for the HELLO_WORLD program.
+
+   Type: clean hello_world
+   You can also type: clean hello_world.e
+   or you can also type: clean HELLO_WORLD
+   on Unix, you can type: clean hello_world.make
+   on DOS, you can do: clean hello_world.BAT
+
+   Example 2
+   Under Unix or DOS, remove all intermediates files in the current
+   directory : clean *.e
+   If the root class file is not in the current directory, you can type
+   (for Unix) : clean *.make
+
+   Option -verbose can be used to see what files are removed.
+
+                                   [Line]
+   Copyright © Dominique COLNET and Suzanne COLLIN - [2]<colnet@loria.fr>
+                     Last update: 05 June 1999, by OZ.
+
+References
+
+   1. file://localhost/home/colnet/SmallEiffel/man/man/SmallEiffelFAQ.html#Q02
+   2. mailto:colnet@loria.fr

@@ -1,0 +1,34 @@
+This directory contains some software and tools not written and
+not maintained by the SmallEiffel team.
+
+In case of problem with this software, please contact first the 
+author of the software, not the SmallEiffel team.
+
+Contents and brief description of this directory.
+
+---------------------------------------------------------------
+- edb -
+Brief description : This directory contains a collection of 
+scripts to use gdb as source level debugger for SmallEiffel.
+
+Contact First : mmogaki@kanagawa.hitachi.co.jp (Mogaki Masato)
+
+---------------------------------------------------------------
+- lib -
+Brief description: This directory contains miscellaneous classes.
+It currently features:
+
+  Case_insensitive_strings:  p_m_hegt@hotmail.com (P.M. Hegt) 
+  String_formatter: p_m_hegt@hotmail.com (P.M. Hegt) 
+
+---------------------------------------------------------------
+- htmldoc -
+Brief description: This directory contains miscellaneous files
+wrapping short to generate html documentation for libraries a
+bit more easily.
+
+Contact first: matthias.klose@cs.tu-berlin.de
+----------------------------------------------------------------
+Last update: May 18, 1999 by Olivier Zendra
+
+

@@ -1,0 +1,261 @@
+<TABLE BORDER=0 CELLSPACING=5 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#3366FF" NOSAVE >
+<TR NOSAVE>
+<TD NOSAVE>
+<CENTER><FONT COLOR="#FFFFFF" SIZE=+3><B>System configuration</B></FONT></CENTER>
+</TD>
+</TR>
+</TABLE>
+
+<BR><BR><BR>
+
+<P>
+System customization is performed thanks to the
+<code>"system.se"</code> file which must be in the
+sub-directory <code>"sys"</code> of the installation directory.
+</P><P>
+When the system name is correctly set in the file
+<code>"system.se"</code>,
+SmallEiffel performs some automatic customizations.
+For example, if the <code>"system.se"</code> file contains the
+string "DOS", SmallEiffel uses the suffix <code>".BAT"</code> for script
+files and the suffix <code>".EXE"</code> for executables files.
+</P><P>
+The <code>"sys"</code> directory contains various files to customize
+SmallEiffel with the system, the C compiler and the linker used as well as
+the default loadpath used to look for Eiffel source code.
+</P>
+
+
+<TABLE BORDER=0 COLS=1 WIDTH="100%" BGCOLOR="#3366FF" NOSAVE >
+<TR NOSAVE>
+<TD NOSAVE><FONT COLOR="#FFFFFF" SIZE="+2">The <TT>SmallEiffel</TT> environment variable </FONT></TD>
+</TR>
+</TABLE>
+<P>
+Environment variable <TT>SmallEiffel</TT> must be set with the
+absolute path of the file <code>"system.se"</code> which is in the
+sub-directory <code>"sys"</code> of the installation directory.
+<BR>
+Under a UNIX-like system, the value of the <TT>SmallEiffel</TT>
+environment variable may be for example:
+<code>/usr/lib/SmallEiffel/sys/system.se</code>
+<BR>
+The contents of the file <code>"system.se"</code> indicate the
+<A HREF="system.html">system</A>
+you are running.
+</P>
+
+
+<TABLE BORDER=0 COLS=1 WIDTH="100%" BGCOLOR="#3366FF" NOSAVE >
+<TR NOSAVE>
+<TD NOSAVE><FONT COLOR="#FFFFFF" SIZE="+2"><A NAME="systems"></A>File
+<code>system.se</code></FONT></TD>
+</TR>
+</TABLE>
+<P>
+The first word of file <code>"system.se"</code> is used by SmallEiffel to
+know which operating system is running.
+Currently supported values are:
+<TABLE>
+
+<TR><TD><B>UNIX</B></TD>
+<TD>for all UNIX-like systems, GNU/Linux, HP-UX, Solaris, SunOS, Irix, XENIX, etc.
+</TD></TR>
+
+<TR><TD><B>Windows</B></TD>
+<TD> for Windows 95 and Windows NT systems (using long filenames).
+</TD></TR>
+
+<TR><TD><B>DOS</B></TD>
+<TD> for MS-DOS systems or Windows 3.x (using short filenames, with 8.3 scheme).
+</TD></TR>
+
+<TR><TD><B>Macintosh</B></TD>
+<TD> for Macintosh systems (68K and PPC)
+</TD></TR>
+
+<TR><TD><B>BeOS</B></TD>
+<TD> for the BeOS system
+</TD></TR>
+
+<TR><TD><B>Amiga</B></TD>
+<TD> for the Amiga system
+</TD></TR>
+
+<TR><TD><B>OS2</B></TD>
+<TD> for IBM OS/2 systems
+</TD></TR>
+
+<TR><TD><B>VMS</B></TD>
+<TD> for the VMS systems
+</TD></TR>
+
+</TABLE>
+
+
+<P>
+You must choose the appropriate system name in the previous list and update
+file <code>"system.se"</code>.
+To be sure that the previous list is up-to-date, just put a bad system name
+in the file <code>"system.se"</code> and then run for example command
+<TT>compile</TT>.
+</P><P>
+The system name will then be used to access various files corresponding
+to the system you chose.
+For example, if you declared "Windows",
+only files with extension "Windows" will be considered (e.g. files
+like <code>"loadpath.Windows"</code>,
+<code>"compiler.Windows"</code>,
+<code>"linker.Windows"</code>,
+ etc...).
+</P>
+
+
+<TABLE BORDER=0 COLS=1 WIDTH="100%" BGCOLOR="#3366FF" NOSAVE >
+<TR NOSAVE>
+<TD NOSAVE><FONT COLOR="#FFFFFF" SIZE="+2">File <code>compiler.se</code></I></FONT></TD>
+</TR>
+</TABLE>
+<P>
+This file is used to select the default C compiler that will be used to compile
+the generated C code.
+Only the first line of this file is considered; it must contain the name of
+one of the  supported compilers, which at the current time are:
+
+<TABLE COLUMNS=2>
+
+<TR><TD><B>gcc</B></TD><TD>The free and open-source GNU C Compiler and its variants
+(egcs, mingw32, etc.) on several platforms (Linux and other UNIXes, Windows).
+</TD></TR>
+
+<TR><TD><B>cc</B></TD><TD>The standard cc compiler, as provided by vendors of most UNIX
+and VMS systems.</TD></TR>
+
+<TR><TD><B>lcc-win32</B></TD><TD>The free port of lcc for Windows platforms.</TD></TR>
+
+<TR><TD><B>bcc32</B></TD><TD>The Borland (now Inprise) C/C++ compiler on Windows platforms.</TD></TR>
+
+<TR><TD><B>bcc32i</B></TD><TD>A variant (?) of the previous one.</TD></TR>
+
+<TR><TD><B>wcl386</B></TD><TD>The Watcom C/C++ compiler for Windows plaforms.</TD></TR>
+
+<TR><TD><B>cl</B></TD><TD>The MicroSoft C/C++ compiler for Windows platforms.</TD></TR>
+
+<TR><TD><B>sas_c</B></TD><TD>The SAS C compiler, sc on Amiga platforms.</TD></TR>
+
+<TR><TD><B>dice</B></TD><TD>The dice C compiler.</TD></TR>
+
+<TR><TD><B>vbcc</B></TD><TD>The vbcc C compiler.</TD></TR>
+
+<TR><TD><B>ccc</B></TD><TD>The Compaq C compiler for AlphaLinux.</TD></TR>
+
+</TABLE>
+
+</P>
+<P>
+SmallEiffel will automatically generate the correct system call to this C compiler,
+with the appropriate linker and adequate object files suffix.
+</P>
+In case an unknown compiler name is supplied, SmallEiffel generates an error message
+listing the supported compiler names.
+In case the compiler specified is a correct one but can't be found, SmallEiffel
+won't be able to detect it, but there will be an error message from the system.
+In <code>-verbose</CODE> mode, the systems calls to the C compiler are displayed,
+thus making it easy to find such errors.
+
+</P>
+
+
+<TABLE BORDER=0 COLS=1 WIDTH="100%" BGCOLOR="#3366FF" NOSAVE >
+<TR NOSAVE>
+<TD NOSAVE><FONT COLOR="#FFFFFF" SIZE="+2">Changing the default loading path</FONT></TD>
+</TR>
+</TABLE>
+<P>
+All the commands use the same algorithm to search for Eiffel source files.
+The default global loading path is set using contents of file
+<code>loadpath.<I>&lt system_name &gt</I></code>, in the <CODE>sys</CODE> directory
+of your SmallEifel installation, where <I>&lt system_name &gt</I> is one of the
+systems symbols mentioned <A HREF="system.html#systems">above</A>.
+</P>
+
+<P>
+
+To change this default loading path, you need to add a special
+file which name is <code>"loadpath.se"</code> in the directory in which you
+type a <A HREF="commands/commands.html">command</A> of SmallEiffel
+(<TT>compile</TT>, <TT>finder</TT>,
+<TT>pretty</TT>, <TT>compile_to_c</TT>, <TT>compile_to_jvm</TT>, <TT>short</TT>,
+<TT>clean</TT>).
+</P>
+<P>
+Each line of the file <code>"loadpath.se"</code> must be an
+existing directory path or the absolute path of another
+<code>"loadpath.se"</code> file to include recursively.
+Environment variable may be used in these lines, with the syntax
+<CODE>${MY_VAR}</CODE>.
+</P>
+<P>
+All directories of the local <code>"loadpath.se"</code> file are
+added <I>ahead of</I> the default loading path.
+All directories are searched in the order in which they appear.
+The current directory is not included in the search path unless it is
+explicitely specified in one of the <code>loadpath.se</code> or
+<code>loadpath.<I>system</I></code> files.
+Also note that an empty line in a <code>loadpath.se</code> file may
+add the current working directory in a place you don't want.
+</P>
+
+<P>To check that your loading path is correctly set, just
+type command <code>finder</code> using an unknown class name as
+argument.
+</P>
+
+<P>
+<FONT COLOR="#a000a0"><B>Sample loadpath.se file under UNIX</B></FONT>
+
+<BR><BR>
+<CODE>
+/users/myself/one_dir/<BR>
+../../another_dir/<BR>
+${MY_LIB}/goodies/<BR>
+/users/${MY_BUDDY}/common/loadpath.se<BR>
+./
+</CODE>
+<BR><BR>
+
+The first line is an absolute path to some directory.<BR>
+The second one is a relative path to some directory.<BR>
+The third line shows the use of an environment variable to point to some directory.<BR>
+The fourth line also features an environment variable, but points to a second loadpath
+file, that will be included before the general <code>loadpath.UNIX</code> file.<BR>
+The fifth line adds the current directory to the loadpath.
+</P>
+
+<P>
+<FONT COLOR="#a000a0"><B>Sample loadpath.se file under Windows</B></FONT>
+
+<BR><BR>
+<CODE>
+C:\myself\one_dir\<BR>
+..\..\another_dir\<BR>
+${MY_LIB}\goodies\<BR>
+\users\${MY_BUDDY}\common\loadpath.se<BR>
+.\
+</CODE>
+<BR><BR>
+Same explanations as above, except of course that this file is prepended in front
+of the <code>loadpath.Windows</code> file.
+
+</P>
+
+
+
+<CENTER><P><IMG SRC="se-line.gif" ALT="[Line]" HEIGHT=16 WIDTH=550>
+<BR>
+<I><FONT SIZE=-1>Copyright &copy; Dominique COLNET and Suzanne COLLIN -
+<A HREF="mailto:colnet@loria.fr">&lt;colnet@loria.fr&gt;</A>
+<BR>
+Last update: 05 June 1999, by DC & OZ.
+</FONT></I><BR></P></CENTER>
+

@@ -1,0 +1,85 @@
+อออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+ INSTRUCTIONS ON HOW TO INSTALL SMALLEIFFEL ON YOUR COMPUTER      16-APR-1997
+อออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+
+
+INTRODUCTION:
+-------------
+
+In order to install SmallEiffel under OS/2, you need:
+
+- the emx/gcc package installed on your harddisk. The latest version is
+ emx0.9c / gcc2.7.2.
+You may find it on ftp.cdrom.com (/pub/os2/emx), or on any mirror.
+
+- an OS/2 HPFS partition
+4 of free space are enough if you decide to keep the sources
+otherwise 1.5 Mb will make it.
+
+
+PRELIMINARY TASKS:
+------------------
+
+If you have an older version of SmallEiffel installed, please
+remove it, or rename the old SmallEiffel directory.
+
+
+INSTALLATION:
+-------------
+
+1: Extract the file SExxxOS2.ZIP in your root directory.
+Don't use pkunzip. Most of the files come with long names, so you'd
+better using unzip (use the version for OS/2, you can get it on
+ftp.cdrom.com too)
+  c:
+  cd \
+  unzip SExxxOS2
+
+2: Edit your config.sys, and add the following line:
+  SET SMALLEIFFEL=C:\SMALLEIFFEL\ (the number of backslashes is important)
+(of course, if you have decided to install it in another directory,
+replace the path by the correct one, but this is not recommended)
+Add C:\SMALLEIFFEL\BIN to your path line.
+
+3: In the directory EMX\BIN, you should find a binary named strip.exe,
+delete it or rename it to strip.old .
+Create a file named strip.cmd containing the line:
+@emxbind -qs %1
+
+4: In the directory SMALLEIFFEL\SYS, please check the presence of the
+file system.se.
+It must contain the single word OS2
+
+5: In the directory SMALLEIFFEL\SYS, please check the presence of the 
+file loadpath.os2.
+loadpath.os2 contains:
+
+-------------- Cut Here ----------------
+c:.
+c:\smalleiffel\lib_std\
+c:\smalleiffel\lib_rand\
+c:\smalleiffel\lib_show\
+c:\smalleiffel\lib_test\
+-------------- Cut Here ----------------
+
+6: Reboot your machine.
+
+That's all.
+
+
+UPGRADING YOUR VERSION:
+-----------------------
+Current version is -0.86.
+Since SmallEiffel is still under development, you may want to
+get the lastest version. It's available on
+ftp.loria.fr in /pub/loria/genielog/SmallEiffel
+
+
+GETTING LOST?:
+--------------
+
+For more information, please feel free to e-mail at:
+Andre.Doherty@scinfo.u-nancy.fr
+
+
+

@@ -1,0 +1,143 @@
+
+                          SmallEiffel Contributors
+
+   *** Frank ARNAUD: bug report of test_tag1.e. Reported a problem with
+   Windows NT / Microsoft C / empty struct. Reported a bug about
+   renaming/redefinition of Eiffel externals. New maintainer of the
+   Eiffel FAQ.
+   *** Eric BEZAULT: lots of really good (short!) bug reports:
+   rename/select, statically computed expressions, weird uses of
+   inheritance clause, insisted to give SmallEiffel a -case_insensitive
+   flag...
+   *** Xavier CREGUT: has been using SmallEiffel for a long time. Many
+   bug reports. Reported in a very small program a tricky bug dealing
+   with inheritance/genericity and VNCG rule.
+   *** Geoff Eldridge: since many years, Geoff is one of the best
+   SmallEiffel's supporter thanks to the excellent elj-win32
+   distribution. Keep up the good work Geoff ! As a sidenote, Geoff is
+   also the initial designer of the BASIC_TIME class.
+   *** Fabrice FRANCESCHI: initial sketch of the SmallEiffel Web site.
+   *** Enrico GOBBETTI: many (excellent) bug reports and many good
+   bug-fixes .
+   *** James GRAVES: initial design of exception handling, on which we
+   based our final implementation. Maintainer of SmallEiffel's RPMs for
+   RedHat Linux.
+   *** Alain LE GUENNEC: many well-isolated bug reports plus some very
+   good bug-fixes.
+   *** Philippe RIBET: fixed a bug in the ensure clause of
+   INTEGER/append_in_format. Optimized INTEGER/gcd. Prepared the first
+   precompiled DOS version. Debugging of class BIT_N. (Worked with
+   Antoine GUARRIGUES).
+   *** S.u.S.E. GNU/Linux: since mid-1998, the S.u.S.E. GNU/Linux
+   distribution is our main development OS. Indeed, we have already
+   received for free all versions from 4.3 to 6.2. Also note that
+   SmallEiffel The GNU Eiffel Compiler is part of the S.u.S.E. GNU/Linux
+   distribution. We are grateful to S.u.S.E for being very supportive to
+   us. We hope the S.u.S.E. GNU/Linux team will keep up the good work,
+   being succesful and providing us with free copies of their
+   distribution ;-)
+                    ___________________________________
+
+   ** Cyril ADRIAN: fixed some bugs in STD_FILE_READ (read_character,
+   read_integer). Found bug of test_req2.e. Found problem with xor.
+   Author of spread_illness. Found a bug in character constants, etc.
+   (Worked with Antony LE LABOUSSE).
+   ** Reimer BEHRENDS: isolated a bug about once precomputed functions
+   and many other bugs.
+   ** Nigel BREE: fixed a tricky bug in the runtime stack. Improved
+   portability for Windows95/NT. Wrote the install script for
+   Windows95/NT.
+   ** Thierry DE CARVALHO: found a bug in inspect/when. Fixed a bug in
+   STD_FILE_READ.connect_to.
+   ** Emmanuel CECCHET: updates of the Linux executable. Found some bugs
+   in creation calls. Provided a lot of useful comments.
+   ** Valery CROIZIER: reported bugs (in very numerous mails :-).
+   Provided hints to optimize the C code.
+   ** Andre DOHERTY: used to maintain the SmallEiffel ready for OS2
+   version.
+   ** Antoine GUARRIGUES: worked with Philippe RIBET (see above).
+   ** Jean-Marc JEZEQUEL: reported some bugs on ARRAY inheritance.
+   Isolated a bug on VNCG. Beta testing.
+   ** Alexander KJELDAAS: fixed a bug in INSTALL.CSH. Reported a problem
+   with mixed rename/redefine and a problem with run time stack.
+   ** Philippe LAHIRE: reported some bugs with repeated inheritance.
+   Isolated some problems with select.
+   ** Antony LE LABOUSSE: worked with Cyril ADRIAN (see above).
+   ** Jean-Lin PACHERIE: many bug reports.
+   ** Marc SCALZOLARO: reported some bugs and added some tests for
+   expanded class types.
+   ** Fridtjof SIEBERT: for some well isolated bug reports.
+   ** Glen STONE: improved the type inference score as well as code
+   generation (more dispatch functions are now removed). Also sent some
+   good bug reports.
+   ** Brian STRELIOFF: reported some bugs. Gave me some good hints about
+   compatibility with C++ and warning messages of gcc.
+   ** Jerome THOEN: author of some (optimized) features to avoid memory
+   leaks.
+   ** Dan WILDER: uploads new versions of SmallEiffel to sunsite (for
+   Linux).
+   ** Alan Zimmerman: clear bug report with an excellent fix for the
+   exception trace. For one aspect, the problem was specific to the
+   CYGWIN compiler and its implementation of longjmp. The second bug was
+   related to the unwinding of exception trace immediately before a
+   polymorphic call.
+                    ___________________________________
+
+   * Thomas AGLASSINGER: implementation of the low level C code to make
+   BASIC_DIRECTORY available on Amiga.
+   * Christophe ALEXANDRE: found a bug in REAL.put_real_format.
+   * Wilfried BERGER: done some tuning of the GC for Windows platforms.
+   * Oscar N. BRIA: reported a bug for mixed rename/redefine.
+   * Emmanuel BOUYER: was the first one to use SmallEiffel for his PhD
+   Thesis. He is also a good bug reporter.
+   * Robert W. Brewer: a good bug report about inlining of $ operator.
+   * Lars BRUECKNER: wrote some code for STD_FILE_READ.
+   * Romaric CHARTON: find two bugs in ifthenelse expression, and
+   argument checking of external feature.
+   * Grant CHESTON: reported a bug with attribute renaming.
+   * Frank CHIRON: fixed a bug in class BIT_N.
+   * Vincent CROIZIER: good work to fix the priority of operator infix
+   "^" and for Precursor implementation.
+   * Stephane D'ALU: added some features in STRING (split, ...). Reported
+   some bugs for class BIT.
+   * Oliver ELPHICK: fixed a bug in misc/INSTALL.SH and help us to make
+   our decision about Eiffel source distribution.
+   * Joel FAEDI: (not yet) solved some problems using gcc.
+   * Wai-Ming HO: many well-isolated bug reports.
+   * Brigitte JARAY: one of the first beta testing girls.
+   * Zahi Al JAMOUS: found a syntaxical bug, and some others. First
+   Lebanese user of SmallEiffel.
+   * Stephane JANTZEN: beta testing of externals.
+   * Patrice KHAWAM: reported some bugs.
+   * Mostefa KASSAB: reported a bug about deferred features.
+   * Frédéric LEJAL: provides us precompiled versions for several
+   platforms.
+   * Nicole LEVY: found some syntactical bugs producing a core dump.
+   * Masato MOGAKI: reported a bug with $ operator.
+   * Jean-Louis NeBUT: reported bug about renaming.
+   * Steve NORMAN: fixed a bug in floating-point constants.
+   * Francois PENNANEACH: a good bug report.
+   * Todd PLESSEL: a good bug report.
+   * Francois RAGUIN: isolated a bug of REAL.infix "^"
+   * Philippe REITZ: bug report dealing with inheritance.
+   * Christophe REMY: isolated a bug about argument passing.
+   * Claude SANCHEZ: allowed me to use some more memory (256Mb...) to be
+   able to do the very first bootstrap.
+   * Gregoire SCHNAKENBOURG: fixed a bug in REAL/DOUBLE keybord input.
+   * Adrian SIEBER: for some good bug reports.
+   * Brian STEFANISH: patch for assertion tags.
+   * John TYRREL: comments and some bug reports.
+   * Johannes WEHRLI: done some beta testing on VMS.
+   * Bruce WIELINGA: first author of SmallEiffel/lib_rand.
+   * Dietmar WOLZ: beta testing and information of SmallEiffel with
+   Boehm-Demers-Weiser garbage collector. Also gave me some hints to
+   optimize ARRAY add_last. Provided a very interesting benchmark
+   comparing SmallEiffel to other C/C++/Eiffel compilers.
+
+                                   [Line]
+   Copyright © Dominique COLNET and Suzanne COLLIN - [1]<colnet@loria.fr>
+                  Last update: 24 september 1999, by DC.
+
+References
+
+   1. mailto:colnet@loria.fr

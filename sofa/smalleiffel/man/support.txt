@@ -1,0 +1,64 @@
+
+                                  Support
+
+   The SmallEiffel FAQ
+
+   The first place you should look at when you have a question about
+   SmallEiffel is [1]the SmallEiffel FAQ. We try to keep it short but
+   precise in order to maximize its usefulness. Please tell us if you do
+   feel something important is really missing.
+
+   If you have questions which are related to Eiffel, but not specific to
+   SmallEiffel, you are likely to find your answer in our [2]Eiffel
+   resources.
+
+   The SmallEiffel mailing list
+
+   The SmallEiffel FAQ is complemented by the [3]SmallEiffel mailing
+   list.
+   Whenever one of your questions related to SmallEiffel was not answered
+   by the SmallEiffel FAQ, you are welcome to ask it in the mailing list.
+
+   Consulting and premium support
+
+   Basically, SmallEiffel The GNU Eiffel compiler does not come with any
+   warranty or support. However, if you do want a warranty and/or an
+   extended support, it's easy to get. You just have to pay a reasonable
+   fee. The higher the fee, the better the support :-)
+
+   Consulting and courses are also available to discuss specific needs
+   you have in your business. Here are samples of the covered areas:
+     * Object-oriented design
+     * Object-oriented technologies
+     * Computer languages
+     * Compiler technology and implementation
+     * Audit
+
+   Corporations interested either by consulting or by premium support can
+   [4]contact us for further information.
+
+   Donations
+
+   Donations of money are also accepted. If you use SmallEiffel at work
+   to do your job or for teaching, perhaps you would consider it
+   appropriate for your company (or for your university) to make a
+   donation.
+   Donations Status :
+     * Total number of donations: 1
+     * Total amount of donations: US $100
+     * Maximum amount in a single donation: US $100
+     * Minimum amount in a single donation: US $100
+     * Date of the first donation: Tuesday September 1st, 1998
+     * Date of the last donation: Tuesday September 1st, 1998
+
+                                   [Line]
+   Copyright © Dominique COLNET and Suzanne COLLIN - [5]<colnet@loria.fr>
+                     Last update: 22 June 1999, by OZ.
+
+References
+
+   1. file://localhost/home/colnet/SmallEiffel/man/man/SmallEiffelFAQ.html
+   2. file://localhost/home/colnet/SmallEiffel/man/general/resources.html
+   3. file://localhost/home/colnet/SmallEiffel/man/support/mailing-list.html
+   4. mailto:colnet@loria.fr
+   5. mailto:colnet@loria.fr

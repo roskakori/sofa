@@ -1,0 +1,8 @@
+; compile it for once and for all
+echo "compiling..."
+compile -boost -no_split -no_style_warning gepp execute
+echo "done."
+copy quiet clone gepp //bin
+clean gepp
+delete quiet gepp
+

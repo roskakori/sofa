@@ -1,0 +1,87 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html><head>
+<title>Sofa - Sofa Library</title>
+</head>
+
+<body>
+<h1>Sofa Library</h1>
+
+
+<p>The purpose of Sofa Library is to allow accessing Amiga specific
+features using Eiffel. It consists of some Eiffel classes, a static
+link library <tt>sofa.lib</tt> and some additional tools.</p>
+
+<h2>Using the Sofa Library</h2>
+
+<p>To use the Eiffel classes, you have to extend the path for the <tt>compile</tt>
+command. This can be done by creating a file <tt>loadpath.se</tt> in the same
+directory where you start the compiler from (if such a file does not exist yet).
+Then, add the line (without leading or trailing blanks)</p>
+
+<blockquote><tt>sofa:library/sofa/library/</tt></blockquote>
+
+<p>Next, you have to tell the linker to link with
+<tt>sofa:lib/sofa.lib</tt>. Generally, you can do this by adding the
+option <tt>-l&nbsp;sofa:lib/sofa.lib</tt> when calling the Eiffel
+compiler using <tt>compile</tt>. The <tt>-l</tt> options will simply
+be passed on to the C compiler.</p>
+
+<p>The only exception is SAS/c because it uses a different schema for
+command line options (based on <tt>ReadArgs()</tt> instead of the
+silly <tt>-something</tt>). Instead, create the file
+<tt>SCOPTIONS</tt> (in the same directory as <tt>loadpath.se</tt>) and
+add the line</p>
+
+<blockquote><tt>LIBRARY=sofa:lib/sofa.lib</tt></blockquote>
+
+<p>to it.</p>
+
+<p>If you find this a bit confusing, just look at one of the examples
+coming with Sofa.</p>
+
+<h2>Interesting Classes</h2>
+
+<ul>
+<li><tt>SIMPLE_REXX_CLIENT</tt> to send Rexx commands to some host
+<li><tt>SIMPLE_REXX_SERVER</tt> for simple Rexx servers without GUI (based on SimpleRexx)
+<li><tt>SHARED_AMIGA_DOS</tt> to access via a shared symbol <tt>Amiga_dos</tt> some DOS functions and DOS error reporting (<tt>IoErr()</tt>, <tt>Fault()</tt> etc)
+<li><tt>SOFA_ARGUMENT_PARSER</tt> for simple command line argument parsing (using on <tt>ReadArgs()</tt>)
+<li><tt>SOFA_PATTERN</tt> to compare text with AmigaDOS pattern (based on <tt>ParsePattern()</tt> and <tt>MatchPattern()</tt>)
+
+</ul>
+
+<h2>Tools</h2>
+
+<ul>
+
+<li><a href="example/make_sofa_version/welcome.html">make_sofa_version</a> - make Eiffel class containing version information
+
+<li><a href="example/readarghh/welcome.html">readarghh</a> - make command ling argument wrapper class
+
+</ul>
+
+<p>The following tools are merely interesting for people who want to
+contribute to Sofa or interface to C code:</p>
+
+<ul>
+
+<li><a href="example/make_export_header/welcome.html">make_export_header</a> - extract exported prototypes from C source codes
+
+<li><a href="example/make_rename_se/welcome.html">make_rename_se</a> - make rename.se file for Eiffel classes with too long names stored in a ZIP archive
+
+
+</ul>
+
+<h2>Examples</h2>
+
+<p>You can find the source code for the sofa tools in <a
+href="example">sofa:library/sofa/example/</a> folder.</p>
+
+<h2>Copyright</h2>
+
+Copyright 2000 Thomas Aglassinger and others, see file "<a
+href="../../manual/license/forum.html">forum.txt</a>".
+
+
+</body></html>
+

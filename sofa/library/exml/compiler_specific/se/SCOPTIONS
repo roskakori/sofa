@@ -1,0 +1,14 @@
+DATA=FAR
+CODE=FAR
+MATH=STANDARD
+ERRORREXX
+NOVERSION
+NOICONS
+BATCH
+INCLUDEDIR=sofa:library/exml/expat/xmltok
+INCLUDEDIR=sofa:library/exml/expat/xmlparse
+INCLUDEDIR=sofa:library/exml/expat/gennmtab
+INCLUDEDIR=sofa:library/exml/compiler_specific/se
+DEFINE BYTEORDER=21
+IGNORE=85
+IGNORE=93

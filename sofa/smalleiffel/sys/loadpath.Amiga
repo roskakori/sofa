@@ -1,0 +1,7 @@
+
+sofa:SmallEiffel/lib_std/
+sofa:SmallEiffel/lib_iterator/
+sofa:SmallEiffel/lib_random/
+sofa:SmallEiffel/lib_number/
+sofa:SmallEiffel/lib_show/
+sofa:SmallEiffel/lib_se/

@@ -1,0 +1,169 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html><head>
+<title>Sofa Library - Readarghh</title>
+</head>
+
+<body>
+<h1>Readarghh</h1>
+
+
+<h2>Description</h2>
+
+<p>Readarghh simplifies the usage of the sofa library class
+SOFA_ARGUMENT_PARSER. It creates a wrapper class for a given
+<tt>dos.library/ReadArgs()</tt> template that allows to access
+argument values via Eiffel attributes instead of cryptic indeces.
+Additionally, it declares the attributes of the proper type (BOOLEAN,
+INTEGER, STRING, ARRAY[STRING]) depending on the modifier in the
+template.</p>
+
+<h2>Template</h2>
+
+<blockquote><kbd>readarghh to/k/a,template/a,description,quiet/s</kbd></blockquote>
+
+<h2>Usage</h2>
+
+<p>The command line arguments have the following meaning:</p>
+
+<ul>
+
+<li><kbd>to</kbd> - file where the the wrapper class should be stored,
+e.g. <tt>my_tool_arguments</tt>. If the "<tt>.e</tt>" suffix is
+missing, it is appended, and the letters are converted to lower/upper
+case conforming to the Eiffel naming conventions. It is also possible
+to specify a directory preceeding the actual class name (e.g.
+<tt>automatic/my_tool_arguments</tt>).
+
+<li><kbd>template</kbd> - ReadArgs template.
+
+<li><kbd>description</kbd> - description of the class to be used in
+the source within <tt>indexing</tt>.
+
+<li><kbd>quiet</kbd> - act quietly
+
+</ul>
+
+<h2>Example</h2>
+
+<p>Invoking readarghh like</p>
+
+
+<blockquote><tt>readarghh to=eiffel/copy_arguments.e file/m/a,to/a,quiet/s "Arguments for copy"</tt></blockquote>
+
+<p>gives a class source with the following short form:</p>
+
+<PRE>class interface COPY_ARGUMENTS
+
+creation
+
+   make
+
+feature(s) from COPY_ARGUMENTS
+   --  Initialization
+
+   make
+
+feature(s) from COPY_ARGUMENTS
+   --  Access
+
+   file: ARRAY[STRING]
+         -- value of argument "file"
+
+   to: STRING
+         -- value of argument "to"
+
+   quiet: BOOLEAN
+         -- value of argument "quiet"
+
+feature(s) from COPY_ARGUMENTS
+   --  Status change
+
+   parse
+         -- Parse arguments from CLI and set corresponding attributes.
+      require
+         not_yet_parsed: not is_parsed
+
+   reset
+         -- Prepare for another `parse'.
+      ensure
+         not_parsed: not is_parsed
+
+feature(s) from COPY_ARGUMENTS
+   --  Status report
+
+   is_parsed: BOOLEAN
+         -- Has `parse' been called already ?
+
+   has_error: BOOLEAN
+         -- Did `parse' cause an error ?
+
+   error_description: STRING
+         -- description of last error to be shown to end user
+
+invariant
+
+   consistent_parsed: is_parsed implies not has_error;
+   consistent_error: has_error implies error_description /= Void;
+
+end of COPY_ARGUMENTS
+</PRE>
+
+<p>The attributes <tt>file</tt>, <tt>to</tt> and <tt>quiet</tt> give
+access to the command line arguments. To set the values, use
+<tt>parse</tt> like this:</p>
+
+<pre>
+options: COPY_ARGUMENTS
+...
+!!options.make
+options.parse
+</pre>
+
+<p>After parsing, check for errors and either go on and use the
+argument values, or display an error message:</p>
+
+<pre>
+if not options.has_error then
+   ...
+   -- Use `options.file', `options.to' and
+   -- `options.quit' for whatever purpose.
+   ...
+else
+   print(options.error_description)
+   print('%N')
+end;
+</pre>
+
+
+<h2>Problems</h2>
+
+<ul>
+
+<li>Short names in the template, separated by "=", are not supported.
+For example, the template "quiet=q/s" causes an error message, though
+the original <tt>ReadArgs</tt> would accept it.
+
+<li>A possibility to explicitely specify the attribute names is
+missing. This would be useful if an attribute name clashes with an
+Eiffel keyword (e.g. <tt>from</tt>).
+
+</ul>
+
+<h2>History</h2>
+
+<ul>
+
+<li>Version 1.0, 7-Apr-2000
+
+   <ul>
+   <li>initial release
+   </ul>
+
+</ul>
+
+
+
+</body></html>
+
+
+

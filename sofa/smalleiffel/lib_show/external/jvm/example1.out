@@ -1,0 +1,6 @@
+Calling java/lang/Math.max : Math.max(1,2);
+Result = 2
+Calling java/lang/Math.max : Math.max(1.0,2.0);
+Result = 2.000000
+Calling java/lang/Math.max : Math.max(1.0,2.0);
+Result = 2.000000

@@ -86,7 +86,7 @@ Why don't you <B>post more messages</B> in newsgroups and/or mailing lists?</A>&
 <TR>
 <TD><B>Q12:</B></TD>
 <TD><A HREF="SmallEiffelFAQ.html#Q12">
-It is possible to create <B>applets</B> with <TT>compile_t_jvm</TT>?</A>&nbsp;</TD>
+It is possible to create <B>applets</B> with <TT>compile_to_jvm</TT>?</A>&nbsp;</TD>
 </TR>
 
 <TR>
@@ -120,9 +120,29 @@ What <B>documentation</B> is provided with SmallEiffel?
 <BR>
 Where can I find <B>Eiffel documentation</B>?</A>&nbsp;</TD>
 </TR>
-</TABLE>
 
-</P>
+<TR>
+<TD><B>Q18:</B></TD>
+<TD><A HREF="SmallEiffelFAQ.html#Q18">
+Does SmallEiffel compile the <B>whole Eiffel language</B> ?</A>&nbsp;</TD>
+</TR>
+
+<TR>
+<TD><B>Q19:</B></TD>
+<TD><A HREF="SmallEiffelFAQ.html#Q19">
+<B>How can I help </B> ?</A>&nbsp;</TD>
+</TR>
+
+<TR>
+<TD><B>Q20:</B></TD>
+<TD><A HREF="SmallEiffelFAQ.html#Q20">
+Why don't you <B>change this and add that</B>?! It would be much
+better/cooler/whatever !</TD>
+</TR>
+
+
+</TABLE>
+ </P>
 
 <TABLE BORDER=0 COLS=1 WIDTH="100%" BGCOLOR="#3366FF" NOSAVE >
 <TR NOSAVE>
@@ -324,7 +344,7 @@ with SmallEiffel.ARRAY because ISE.LINKED_LIST do not inherit ISE.COLLECTION
 </TR>
 
 <TR>
-<TD><A NAME="Q010"></A><B>Q10:</B></TD>
+<TD><A NAME="Q10"></A><B>Q10:</B></TD>
 
 <TD>Is it possible to use the <B>Boehm-Demers-Weiser garbage collector</B>
 with SmallEiffel?&nbsp;</TD>
@@ -402,7 +422,7 @@ to overflood, we generally choose the latter :)
 <TR>
 <TD><A NAME="Q12"></A><B>Q12:</B></TD>
 
-<TD>It is possible to create <B>applets</B> with <TT>compile_t_jvm</TT>?</TD>
+<TD>It is possible to create <B>applets</B> with <TT>compile_to_jvm</TT>?</TD>
 </TR>
 
 <TR>
@@ -422,14 +442,58 @@ or Java bytecode, but not applets.
 <TR>
 <TD><A NAME="Q13"></A><B>Q13:</B></TD>
 
-<TD>Where do I send <B>bug reports</B>?</TD>
+<TD>Where and how do I send <B>bug reports</B>?</TD>
 </TR>
 
 <TR>
 <TD VALIGN=TOP><B>A13:</B></TD>
-<TD>You can send them either to <A HREF="mailto:Dominique.Colnet@loria.fr,
+<TD>
+<B>Before</B> sending any bug report, please:
+<OL>
+<LI>Compile your application <B>with</B> the <CODE>-verbose</CODE>
+    flag, <B>without</B> the <CODE>-no_warning</CODE> flag, and with
+    all assertions on (default mode, or <CODE>-all_check</CODE> flag). This may
+    reveal a problem in the code you're trying to compile rather than in
+    SmallEiffel...</LI>
+<LI>Check that you've got the
+    <A HREF="../misc/HISTORY.html"> latest version of SmallEiffel</A>.</LI>
+<LI>Check that the bug has not been fixed in our <A HREF="../misc/HISTORY.html">latest
+    (beta or working) version</A></LI>
+<LI>Verify that is it not a known problem by
+    <A HREF="../misc/NOT_YET_IMPLEMENTED.html">looking at our "not yet implemented" page</A></LI>
+<LI>Check whether the problem has not already been reported in
+    <A HREF="Mailing-list/threads.html"> the SmallEiffel mailing-list</A></LI>
+</OL>
+
+A good and useful bug report -- that is, one that is more likely to be fixed -- is one that
+respects the following <B>simple guideline: BE PRECISE </B>. More
+precisely ;-) :
+<OL>
+<LI>Which hardware architecture do you use ? What
+    operating system and which version of it ? What is your version of
+    SmallEiffel ? Your C compiler or JVM, and its version ? </LI>
+<LI>Tell us <B>how to reproduce the problem. Try to isolate it </B>on a small
+    program and send us the latter with all instructions necessary in order for us to
+    reproduce the problem. Don't forget to tell us the compilation
+    command you used.</LI>
+<LI>If for any reason you can't send us the small program mentionned
+    above, things may be much more difficult for us. So give us all
+    the releavant information you have. The
+    compilation command line that creates the problem (once again,
+    preferably, <B>with</B> the <CODE>-verbose</CODE>
+    flag, <B>without</B> the <CODE>-no_warning</CODE> flag, and with
+    all assertions on -- default mode, or <CODE>-all_check</CODE>
+    flag) and its verbose output. The execution stack trace you get in
+    case of a crash. Whether the problem occurs with any assertion
+    level or not. Whether the GC is concerned (try with and w/o the
+    <CODE>-no_gc</CODE> flag).</LI>
+</OL>
+
+Bug reports can be sent either
+to <A HREF="mailto:Dominique.Colnet@loria.fr,
 Olivier.Zendra@loria.fr"> Dominique.Colnet@loria.fr and Olivier.Zendra@loria.fr</A>,
-or to <A HREF="http://SmallEiffel.loria.fr/support/mailing-list.html"> the SmallEiffel mailing-list</A>.<BR>
+or to <A HREF="http://SmallEiffel.loria.fr/support/mailing-list.html"> the SmallEiffel mailing-list</A>.
+<BR>
 Don't worry if you don't get an ack: we don't send them because it takes time,
 but we store all the bug reports we receive. And we even try to fix them ASAP! :)
 </TD>
@@ -509,7 +573,7 @@ People who want detailed information may also decide to stay tuned to
 </TR>
 
 <TR>
-<TD><A NAME="Q17"></A><B>Q17:</B><BR>&nbsp</TD>
+<TD><A NAME="Q17"></A><B>Q17:</B></TD>
 
 <TD>
 What <B>documentation</B> is provided with SmallEiffel?
@@ -537,7 +601,103 @@ freely available on the Web (yet?).
 
 <!-------------------------------------------------------------------------->
 
+<TR>
+<TD>&nbsp;</TD>
+</TR>
 
+<TR>
+<TD><A NAME="Q18"></A><B>Q18:</B></TD>
+
+<TD>
+Does SmallEiffel compile the <B>whole Eiffel language</B> ?
+</TD>
+</TR>
+
+<TR>
+<TD VALIGN=TOP><B>A18:</B></TD>
+<TD>Yes. "Small" in SmallEiffel does <I>not</I> mean that a subset of the
+language is used. See the <A
+HREF="SmallEiffelFAQ.html#Q01">question about the SmallEiffel name.</A>
+</TD>
+</TR>
+
+
+<!-------------------------------------------------------------------------->
+
+<TR>
+<TD>&nbsp;</TD>
+</TR>
+
+<TR>
+<TD><A NAME="Q19"></A><B>Q19:</B></TD>
+
+<TD>
+<B>How can I help </B> ?
+</TD>
+</TR>
+
+<TR>
+<TD VALIGN=TOP><B>A19:</B></TD>
+<TD>
+The best way to help SmallEiffel and its users is probably to <B>pick up
+some area you're interested in, and develop</B> with SmallEiffel your own library,
+application, tool, extension, etc., releasing it to other
+users.
+<BR>
+To avoid duplicate efforts, we suggest you have a look to
+<A HREF="http://SmallEiffel.loria.fr/general/repository.html">what other people are already doing
+around SmallEiffel</A> and help them if something
+that's of interest to you is already under work.
+There are actually very good things in there, some we were not even
+aware of, when they were under development ! :)
+<BR>
+Another very good way to help us is to follow the
+<A HREF="SmallEiffelFAQ.html#Q13">bug report guidelines</A> when you
+find some problem with SmallEiffel :))
+<BR>
+Finally, you may also consider funding the development of particular
+features you wouls like to have.
+</TD>
+</TR>
+
+<!-------------------------------------------------------------------------->
+
+<TR>
+<TD>&nbsp;</TD>
+</TR>
+
+<TR>
+<TD><A NAME="Q20"></A><B>Q20:</B></TD>
+
+<TD>
+Why don't you <B>change this and add that</B>?! It would be much
+better/cooler/whatever !
+</TD>
+</TR>
+
+<TR>
+<TD VALIGN=TOP><B>A20:</B></TD>
+<TD>
+People must understand that we can't always do everything. We simply
+can't. Because we don't have the time. Whether we like it or not, we
+also have other things to do than provide free stuff, modify our
+compiler and/or libraries to please everybody. We do as much as we
+can, but we don't do miracles, sorry.
+<BR>
+Since SmallEiffel is free of charge and open-source, people who do
+need things we don't provide can always implement them and have them
+benefit everybody. A good way to do this is to start working on it,
+and ask other people (i.e. not the SmallEiffel team ;) ) to join and
+help. See the <A HREF="SmallEiffelFAQ.html#Q19">"How can I help ?" question</A>.
+<BR>
+Alternatively, someone or some company who does need us to implement
+something may always consider funding a bit the development of
+SmallEiffel... After all, we've even heard that some people were
+selling sofware and making a bit of money with it... ;)))
+</TD>
+</TR>
+
+<!-------------------------------------------------------------------------->
 
 
 </TR>
@@ -549,5 +709,5 @@ freely available on the Web (yet?).
 
 <CENTER><I><FONT SIZE=-1>Copyright &copy; Dominique COLNET and Suzanne
 COLLIN - <A HREF="mailto:colnet@loria.fr">&lt;colnet@loria.fr></A><BR>
-Last update: 14 May 1999, by OZ.
+Last update: 30 June 1999, by OZ.
 </FONT></I></CENTER>

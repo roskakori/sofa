@@ -1,0 +1,93 @@
+-- Begin WeNeedFeedback.txt --
+
+Yes, we need some feedback to know more about people who are using
+SmallEiffel The GNU Eiffel Compiler.
+
+If you have 2 minutes, please fill out this form and send it to
+zendra@loria.fr with subject a subject like "Re: We Need Feedback".
+
+Please fill only the parts you want and/or that apply to you.
+This information will NOT be made public without your explicit consent.
+
+----------------------------------------------------------------------
+First Name :
+Last Name :
+E-Mail :
+----------------------------------------------------------------------
+For what purpose(s) do you use SmallEiffel ?
+
+[ ] Business or commercial usage.
+    Company (name and location):
+    Type of applications developped with SmallEiffel:
+
+[ ] Research project.
+    Lab. identification:
+    Type of applications developped with SmallEiffel:
+
+[ ] As a teacher to teach OOP in my school.
+    School (name and location):
+    Approx. number of students using SmallEiffel:
+
+[ ] As a student of some school for assignments.
+    School (name and location):
+    Approx. number of students using SmallEiffel:
+
+[ ] At home.
+
+[ ] Other:
+----------------------------------------------------------------------
+On what system(s) do you SmallEiffel ?
+
+[ ] GNU/Linux.
+    Which distribution ?:
+[ ] other Unix.
+    Which one ?:
+[ ] FreeBSD
+[ ] Windows 95.
+[ ] Windows 98.
+[ ] Windows NT.
+[ ] BeOS.
+[ ] VMS.
+[ ] MacOS.
+[ ] Amiga.
+[ ] Other:
+
+----------------------------------------------------------------------
+
+Between the Eiffel->C and the Eiffel->Java bytecode compilers,
+
+[ ] you use compile/compile_to_c.
+[ ] you use compile_to_jvm.
+
+----------------------------------------------------------------------
+
+How did you hear about SmallEiffel ?
+
+[ ] Internet newsgroup.
+    Please precise:
+
+[ ] Internet Website.
+    Please precise:
+
+[ ] Was provided with other software (Linux distribution, etc.).
+    Please precise:
+
+[ ] Was provided by my company/university/lab.
+
+[ ] Read about it.
+    Please precise:
+
+[ ] Other.
+    Please precise:
+
+----------------------------------------------------------------------
+
+
+Additional information, comments and suggestions :
+
+
+
+
+
+
+-- End WeNeedFeedback.txt --

@@ -1,0 +1,15 @@
+boolean_ref.e bool_ref.e
+character.e char.e
+character_ref.e char_ref.e
+comparable.e compar.e
+dictionary.e dictnry.e
+double_ref.e dou_ref.e
+integer_ref.e int_ref.e
+std_error.e stderr.e
+std_file.e sf.e
+std_file_read.e sf_read.e
+std_file_read_write.e sf_rw.e
+std_file_write.e sf_write.e
+std_input.e stdin.e
+std_input_output.e stdinout.e
+std_output.e stdout.e

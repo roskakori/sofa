@@ -1,0 +1,225 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html><head>
+<title>Sofa Library - Make_rename_se</title>
+</head>
+
+<body>
+<h1>Make_rename_se</h1>
+
+
+
+<h2>Description</h2>
+
+Create "rename.se" by examining the classes stored in a ZIP file.
+
+
+<h2>Motivation</h2>
+
+<p>All file systems have a limited length for filenames. Descriptive
+Eiffel class names often exceed such limits. For that, SmallEiffel
+allows to provide a file "rename.se", in which every line contains the
+real (short) name of the file for a certain class. For example:</p>
+
+<blockquote>
+yy_compressed_scanner_skeleton.e yy_compressed_scanner_skelet.e<br>
+yy_interactive_scanner_skeleton.e yy_interactive_scanner_skele.e
+</blockquote>
+
+   The only bad thing about that: somebody has to create the
+   "rename.se", which is very boring. Fortunately, this tool does it
+   automatically.
+
+
+<h2>Requirements</h2>
+
+<p>`Make_rename_se' assumes that you have a ZIP archive, where the
+classes are stored with their long names. Furthermore, `unzip'
+available from the Info-ZIP homepage must be within the search
+path.</p>
+
+<p>Both `make_rename_se' and `unzip' should work on all systems
+supported by SmallEiffel. However, output redirection has to be
+supported by the OS.</p>
+
+
+<h2>Compiling</h2>
+
+<p>As this is a developer tool without any use for sensible human
+beings, you have to compile it yourself. Simply type</p>
+
+<blockquote><kbd>compile -boost -clean make_rename_se</kbd></blockquote>
+
+<p>This should create an optimized version.</p>
+
+
+<h2>Usage</h2>
+
+<p>Possible command line options are:</p>
+
+<ul>
+<li><i>archive.zip</i>   - path of the ZIP archive containing the classes
+<li><kbd>length</kbd> <i>number</i> - maximum length of filenames (&gt;2)
+<li><kbd>amiga</kbd>           - same as "length 30"
+<li><kbd>mac</kbd>             -  same as "length 31"
+<li><kbd>dos</kbd>             - same as "length 10"
+<li><kbd>quiet</kbd>           - act quietly
+</ul>
+
+<p>Order and case of option names don't matter. And no silly "-",
+"--" or "/" prefix is needed.</p>
+
+<p>If you don't specify a length, an internal default with a
+ridiculously low value is used, which guarantees pretty useless
+filenames. So you better specify one.</p>
+
+
+<h2>Example</h2>
+
+   <p>Usage is simple. All you have to know is the name of the ZIP
+   archive and the maximum length of filenames on your system.</p>
+
+   <p>Here is an example on how to create "rename.se" files for the
+   popular Gobo library under AmigaOS.</p>
+
+   <ol>
+
+   <li>Create a directory to avoid clutter
+
+      <blockquote><kbd>makedir gobo<br>
+      cd gobo</kbd></blockquote>
+
+   <li>Download the ZIP archive containing Gobo and copy it to the
+      current directory. After that, you should have a file called
+      "gobo15.zip" (or something similar, depending on the current
+      version).
+
+   <li>Extract the archive, ignoring the fact that some filenames will
+      be cut
+
+      <blockquote><kbd>unzip gobo15.zip</kbd></blockquote>
+
+      Now the directory tree of gobo has been created. Furthermore,
+      you can be sure that `unzip' is in the search path.
+      If it didn't work out, get `unzip' as mentioned above.
+
+   <li>Figure out the maximum length of filenames for Eiffel classes:
+
+      <ul>
+      <li>AmigaOS: 30
+      <li>MacOS:   31
+      <li>MS-DOS:  10 (because two characters are unused in the extension)
+      </ul>
+
+   <li>Start `make_rename_se':
+
+         <blockquote><kbd>make_rename_se length 30 gobo15.zip</kbd></blockquote>
+
+      Alternatively, you could also have typed
+
+         <blockquote><kbd>make_rename_se amiga gobo15.zip</kbd></blockquote>
+
+   </ol>
+
+      <p>After pressing RETURN, you see what is going on. Basically, the
+      tool first creates a listing of the ZIP file contents to find
+      out the real, possibly too long, names of the classes. It then
+      analyzes directories in the archive and generates unique short
+      names for every class. By doing that it ensures that every file
+      gets a ".e" suffix and does not have the same name as another
+      class in the same directory (which could easily happen if it
+      would just cut the name).</p>
+
+      <p>After that, it extracts all classes with too long names and
+      renames them to the unique short name. While doing that, it also
+      generates the "rename.se" for every directory where files had to
+      be renamed.</p>
+
+      <p>The output should look something like this:</p>
+
+<pre>
+         unzip -l &gt;t:make_rename_se.tmp "sofa_archive:gobo15.zip"
+         read archive list
+         analyze
+            src/geyacc/
+            library/structure/sort/
+            library/structure/list/
+            library/structure/base/
+            library/parse/yacc/
+         ...
+         rename library/kernel/spec/ve/
+            kl_imported_fixed_array_rout.e &lt;- kl_imported_fixed_array_routines.e
+            kl_imported_string_buffer_ro.e &lt;- kl_imported_string_buffer_routines.e
+            kl_imported_output_stream_ro.e &lt;- kl_imported_output_stream_routines.e
+            kl_imported_input_stream_rou.e &lt;- kl_imported_input_stream_routines.e
+            kl_imported_fixed_array_type.e
+         rename library/kernel/spec/se/
+            kl_imported_fixed_array_rout.e &lt;- kl_imported_fixed_array_routines.e
+            kl_imported_string_buffer_ro.e &lt;- kl_imported_string_buffer_routines.e
+            kl_imported_output_stream_ro.e &lt;- kl_imported_output_stream_routines.e
+            kl_imported_input_stream_rou.e &lt;- kl_imported_input_stream_routines.e
+            kl_imported_fixed_array_type.e
+         ...
+</pre>
+
+      <p>Only classes with filenames longer than 30 characters are
+      extracted from the ZIP archive and renamed.</p>
+
+      <p>Classes with exactly 30 characters are just extracted, for
+      example "kl_imported_fixed_array_type.e ". This is to make sure
+      that they didn't get lost during the renaming and extracting of
+      all the other classes. Without going too much into detail, file
+      systems behave differently when having to deal with too long
+      names, and this avoids all sorts of trouble.</p>
+
+      <p>If a directory contains many ".e" files, but all of them have
+      names shorter or equal than 30 characters, no "rename.se" is
+      created.</p>
+
+
+<h2>Problems</h2>
+
+   <ul>
+
+   <li>If you can't run `make_rename_se' on the target OS, you can do the
+   job on a different OS. For example, nobody prevents you from invoking
+
+      <blockquote><kbd>make_rename_se dos gobo15.zip</kbd></blockquote>
+
+   on a Unix box.
+
+   <li>The syntax "length=30" is not supported. Use "length 30" instead.
+
+   <li>All other files like documentation and executables are not
+   considered by "make_rename_se", so if they have too long filenames,
+   you have to do something else about them.
+
+   <li>Only ZIP archives are supported. This makes sense as the Info-ZIP
+   tools are Open Source and have been ported to almost all systems
+   still in use - and even seem to work on all of them (different to
+   for instance "tar.gz" and ".lha", which usually come with a huge
+   pile of idiosyncracies and implementation problems).
+
+   </ul>
+
+<h2>Author</h2>
+
+   Thomas Aglassinger &lt;agi@sbox.tu-graz.ac.at&gt;
+
+
+<h2>History</h2>
+
+   <ul>
+
+   <li>Version 1.0, 8-Oct-1999
+       <ul>
+       <li>initial release
+       </ul>
+
+   </ul>
+
+
+
+</body></html>
+
+
+

@@ -1,0 +1,136 @@
+
+<TABLE BORDER=0 CELLSPACING=5 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#3366FF" NOSAVE >
+<TR NOSAVE>
+<TD NOSAVE>
+<CENTER><FONT COLOR="#FFFFFF" SIZE=+3><B>The <TT>pretty</TT> command</B></FONT></CENTER>
+</TD>
+</TR>
+</TABLE>
+
+<BR><BR><BR>
+
+<TABLE BORDER=0 COLS=1 WIDTH="100%" BGCOLOR="#3366FF" NOSAVE >
+<TR NOSAVE>
+<TD NOSAVE><FONT COLOR="#FFFFFF" SIZE="+2">Usage</FONT></TD>
+</TR>
+</TABLE>
+
+
+<P>
+<TT>pretty [options] &lt;Class_names&gt; ...</TT>
+</P><P>
+Command <TT>pretty</TT> is the SmallEiffel Pretty Printer for Eiffel
+source files. For all classes given as arguments, pretty
+looks for the corresponding file using the same algorithm as
+command <TT>finder</TT>. All the corresponding files are reprinted
+in a <TT>pretty</TT> way.
+</P><P>
+For example, if you are allowed to write the corresponding
+file, you can reprints the source file of class HELLO_WORLD
+using command :
+<DL COMPACT><DT><DD><TT>
+   pretty hello_world
+</TT></DL>
+There are four modes of pretty printing <I>-zen</I>, <I>-default</I>, <I>-end</I>
+and <I>-parano</I> mode. Only one mode can be selected and mode
+<I>-default</I> is the default mode.
+</P>
+
+<TABLE BORDER=0 COLS=1 WIDTH="100%" BGCOLOR="#3366FF" NOSAVE >
+<TR NOSAVE>
+<TD NOSAVE><FONT COLOR="#FFFFFF" SIZE="+2">Options for pretty printing</FONT></TD>
+</TR>
+</TABLE>
+<P>
+<DL COMPACT>
+
+<DT><I>
+-zen</I>:<BR><DD>
+ The less you can print. Pseudo variable <I>Current</I> is
+   never printed (unless it is necessary). No end mark comment
+   for routines. No end comments for constructs (if, inspect,
+   debug, ...). Very compact printing.
+<BR><BR>
+
+<DT><I>
+-default</I>:<BR><DD>
+the default mode. Don't change printing of pseudo
+   variable <I>Current</I> (if Current is in the input, Current is
+   in the output). Print end comment of routines.
+   Don't print end comments for constructs (if, inspect,
+   debug, ...).
+<BR><BR>
+
+<DT><I>
+-end</I>:<BR><DD>
+Same printing as previous mode but print ends of all
+   constructs (if, inspect, debug, ...).
+<BR><BR>
+
+<DT><I>
+-parano</I>:<BR><DD>
+Same printing as previous mode but prints <I>Current</I>
+   everywhere you can.
+<BR><BR>
+
+<DT>
+<I>-no_style_warning</I>:<BR><DD>
+Suppress output for warning messages related to non respect of standard Eiffel
+style guidelines (for example <CODE>ItEm</CODE> will not trigger a warning).
+<BR><BR>
+
+
+<DT><I>
+-no_warning</I>:<BR><DD>
+Suppress output for all warning messages (error messages
+   are still printed).
+<BR><BR>
+
+<DT>
+<I>-version</I>:<BR><DD>
+Show the number of the <A HREF="SmallEiffelFAQ.html#Q02">version of SmallEiffel</A>
+you're using.
+<BR><BR>
+
+
+
+
+</DL>
+</P>
+
+<TABLE BORDER=0 COLS=1 WIDTH="100%" BGCOLOR="#3366FF" NOSAVE >
+<TR NOSAVE>
+<TD NOSAVE><FONT COLOR="#FFFFFF" SIZE="+2">Security and BackUp file</FONT></TD>
+</TR>
+</TABLE>
+<P>
+For the security of sources files, a backup file is created
+before writting the new file (system or command <TT>pretty</TT> may
+crash during printing of the new file).
+The backup file name is "foo.bak" when source file name is
+"foo.e". Backup file is written in the same directory as
+source file.
+<BR><BR>
+If an old backup file already exists before pretty printing,
+command <TT>pretty</TT> exit with an error message.
+To be sure that the pretty printing is well done, the output
+file is parsed again.
+<BR><BR>
+Even if second parsing gives no errors, backup file is NOT
+removed. Thus you can recompile your Eiffel code to check
+new file before removing backup file by yourself.
+</P>
+
+<!-- BL START -->
+<!-- BL1 START -->
+<CENTER>
+<IMG SRC="se-line.gif" ALT="[Line]">
+<BR>
+<FONT SIZE="-1"><I>
+Copyright &copy; Dominique COLNET and Suzanne COLLIN -
+<A HREF="mailto:colnet@loria.fr">&lt;colnet@loria.fr&gt;</A>
+<BR>
+Last update: 05 June 1999, by DC & OZ.
+</I></FONT>
+<BR>
+</CENTER>

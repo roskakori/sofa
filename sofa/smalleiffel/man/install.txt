@@ -1,0 +1,45 @@
+
+                            The install command
+
+   Usage
+
+   install [-interactive] [-debug]
+
+   Command install is the installation program for SmallEiffel The GNU
+   Eiffel Compiler.
+   This command (class install.e) is entirely written in Eiffel and is
+   the recommanded one to install SmallEiffel The GNU Eiffel Compiler.
+
+   The install.e source code as well as the generated C code install.c
+   are in the SmallEiffel directory.
+
+   If you are under some UNIX (including GNU Linux) system and if you
+   want to use the gcc compiler like we do, simply type make in the
+   SmallEiffel directory (the Makefile which is in the SmallEiffel
+   directory C-compile and launch automatically the install command).
+
+   If you are using a Windows system, a precompiled install.exe is
+   available too in the SmallEiffel directory, you just have to run it.
+
+   On other systems, the very first step for installation is to C compile
+   the install.c file in order to run it.
+
+   Options
+
+   -interactive:
+          By default, the install command tries to determinate
+          automatically the system name as well as the C compiler name.
+          When the flag -interactive is used, the user is interactively
+          prompted for the system name and the C compiler to select.
+   -debug:
+          Displays a lot of information useful to debug the installation
+          process. It is also interresting if you are curious to see what
+          the install command is really doing (or trying to do ;) ).
+
+                                   [Line]
+   Copyright © Dominique COLNET and Suzanne COLLIN - [1]<colnet@loria.fr>
+                     Last update: 13 Feb. 2000, by OZ.
+
+References
+
+   1. mailto:colnet@loria.fr

@@ -1,0 +1,172 @@
+
+                          The compile_to_c command
+
+   Usage
+
+   compile_to_c [options] <Root-Class> [<Root-Procedure>] [*.c] [*.o]
+   [-l*]
+
+   Command compile_to_c is the SmallEiffel ANSI C code generator. Usualy
+   this command is automatically called by command [1]compile but you can
+   use it separately to produce C code.
+
+   Command compile_to_c must have at least one argument to indicate the
+   starting execution point of the system. Thus your program will start
+   in <Root-Procedure> of <Root-Class>. The default <Root-Procedure> is
+   make.
+
+   Command compile_to_c produces all the required C files as well as a
+   script file. The name of this script file changes with the operating
+   system used (*.make on Unix or *.BAT on DOS for example).
+
+   Loading path for Eiffel source files
+
+   compile_to_c uses the technique described in the documentation for
+   command [2]finder to locate the Eiffel source files it tries to
+   compile.
+
+   Options to select Eiffel compilation modes
+
+   There are 8 modes of compilation given by the following options names:
+   -debug_check -all_check -loop_check -invariant_check -ensure_check
+   -require_check -no_check and -boost option. Only one mode can be
+   selected for the whole system to compile. Mode -all_check is the
+   default one.
+   -boost:
+          Compilation mode with the highest degree of optimization.
+          There is no target's existence test, no system-level validity
+          checking. Some routines are inlined. No code is generated to
+          get an execution trace in case of failure. No assertion is
+          checked.
+   -no_check:
+          Compilation mode in which no Eiffel assertion is checked.
+          The target's existence test is performed. Some code is
+          generated for the system-level validity checking, and to
+          produce an execution trace (an execution stack is managed).
+          There is no inlining and no assertion check.
+   -require_check:
+          Compilation mode in which Eiffel preconditions are checked.
+          The generated code is similar to the previous one, but also
+          includes code to test preconditions (require).
+   -ensure_check:
+          The generated code is similar to the previous one, but also
+          includes code to test postconditions (ensure).
+   -invariant_check:
+          The generated code is similar to the previous one, but also
+          includes code to test class invariants.
+   -loop_check:
+          The generated code is similar to the previous one, but also
+          includes code to test loop variants and loop invariants.
+   -all_check:
+          The default mode. The generated code is similar to the previous
+          one, but also includes code for the check instruction.
+   -debug_check:
+          The generated code is similar to the previous one, but also
+          includes code for debug instructions. All debugs are checked
+          regardless of the optional string key.
+
+   Other options
+
+   -verbose:
+          Print system information during the compilation (full path of
+          loaded files, type inference score, removed files, etc.).
+   -version:
+          Show the number of the [3]version of SmallEiffel you're using.
+   -cc <c_compiler>:
+          Call <c_compiler> instead of the default C compiler. See the
+          READ_ME file of directory sys to set the default C compiler as
+          well as the default linker.
+   -no_gc:
+          No Garbage Collector.
+          When this option is selected, no GC is produced and (at least)
+          one actual malloc is perform for each object creation. This
+          option is useful when one prefers to use another GC provided by
+          an external library (such as the Boehm-Demers-Weiser
+          conservative GC), or when no GC is needed. Whithout flag
+          -no_gc, SmallEiffel computes a customized GC for each system.
+          It is important to rememeber that some architecture-dependent
+          code may be required for the proper operation of the GC (see
+          file SmallEiffel/sys/gc for details).
+   -no_split:
+          Produce only one C file for the whole Eiffel system.
+          This may enable the C compiler to inline more functions calls.
+          This option is useful only to finalize an application (the
+          incremental C compiling mode is switched off with -no_split).
+   -no_strip:
+          Do not remove symbol information from the generated executable
+          file.
+          This option is useful only when finalizing an application
+   -o <output_name>:
+          Name the executable file output_name.
+          This has the same meaning as the -o option of many C compilers.
+   -cecil <cecil_file>:
+          Allow some Eiffel features to be called from C (see the
+          [4]cecil file for details). To call C functions/macros from
+          Eiffel see the [5]external file.
+   -no_main:
+          Avoid generation of the C main function: thus, the root
+          procedure is not started. This is useful when one prefers to
+          start execution from outside before calling Eiffel routines via
+          the cecil interface. Before calling the first Eiffel routine
+          one has to call once a predefined C function in order to
+          initialize internal runtime information for the Eiffel world
+          (see example in directory SmallEiffel/lib_show/cecil/example7
+          for details).
+   -no_style_warning:
+          Suppress output for warning messages related to non respect of
+          standard Eiffel style guidelines (for example ItEm will not
+          trigger a warning).
+   -case_insensitive:
+          Switch case insensitive mode on.
+          For example, when this mode is selected, the Eiffel parser
+          considers that the following identifiers refer to the same
+          feature: item, ITEM, ItEm, ...
+   -no_warning:
+          Suppress output for all warning messages (error messages are
+          still printed).
+   -trace:
+          This option may be useful to debug your program or to realize
+          some profiling.
+          When selected, this option allows the user either to generate a
+          "trace.se" file at execution time, or to enter the interactive
+          debugger.
+          + When one interactively chooses the generation of the trace
+            file, a (usually huge) file "trace.se" is created in the
+            launching directory which shows the code the program is
+            executing: which line, which column, in which Eiffel source
+            file. Because all classes are traced, "trace.se" is a huge
+            file even for a small program.
+            Feature GENERAL.trace_switch allows to dynamically turn
+            on/off trace generation. At run time, when argument of
+            trace_switch is true, trace printing is switched on
+            (conversely, false is to switch off trace printing). When
+            option -trace is not selected, calls to trace_switch are not
+            taken in account by compile_to_c (no C code is produced). The
+            -trace mode is not available with mode -boost. Using at the
+            same time -trace with -boost as the same effect as using
+            -trace with -no_check. Also keep in mind that very simple
+            instructions (as for example "i := i + 1;") may not be
+            traced.
+          + When the interactive debugger is chosen, the user enters a
+            gdb like interface. Please note that currently just an embryo
+            of debugger is implemented. It is only possible to display
+            the execution stack and step into the code.
+            Command ? displays a short help message.
+
+   Options passed to the C compiler
+
+   Remaining options, *.c files, *.o files, library -l* are passed to the
+   C compiler/linker.
+
+                                   [Line]
+   Copyright © Dominique COLNET and Suzanne COLLIN - [6]<colnet@loria.fr>
+                  Last update: 05 June 1999, by DC & OZ.
+
+References
+
+   1. file://localhost/home/colnet/SmallEiffel/man/man/compile.html
+   2. file://localhost/home/colnet/SmallEiffel/man/man/finder.html
+   3. file://localhost/home/colnet/SmallEiffel/man/man/SmallEiffelFAQ.html#Q02
+   4. file://localhost/home/colnet/SmallEiffel/man/man/cecil.html
+   5. file://localhost/home/colnet/SmallEiffel/man/man/external.html
+   6. mailto:colnet@loria.fr

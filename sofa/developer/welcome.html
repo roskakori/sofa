@@ -1,0 +1,53 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html><head>
+<title>Sofa - Developer Material</title>
+</head>
+
+<body>
+<h1>Developer Material</h1>
+
+
+<p>The developer material not needed to develop applications with
+Sofa. It is only helpful if you want to contribute to Sofa
+yourself.</p>
+
+
+<h2>Requirements</h2>
+
+   Some of the scripts require certain assigns and directories to exist:
+
+<ul>
+<li>sofa:archive      - where created archives like "gobo.lha" end up
+
+<li>sofa_archive:     - where original archives like "gobo15.zip" are stored
+
+<li>release:          - where sofa.(lha|readme) end up
+
+<li>release:backup/   - where <tt>sofa_XY.lha</tt> ends up (X=version, Y=release)
+
+</ul>
+
+<p>Open some CLI, create the directories wherever you want, and add
+appropriate assigns to your user-startup.</p>
+
+<p>ARexx must be installed.</p>
+
+<h2>Contents</h2>
+
+<ul>
+
+<li>script/  - Various scripts and their support files
+
+<li>rebuild/ - Material needed to rebuild optimized SmallEiffel with
+SAS/c
+
+</ul>
+
+<p>Note that "sofa:Readme" is generated automatically by
+"script/make_sofa.rexx". If you want to change its content, you have
+to modify "script/readme.#?" or the script itself.</p>
+
+</body></html>
+
+
+

@@ -1,0 +1,46 @@
+
+                        The print_jvm_class command
+
+   Usage
+
+   print_jvm_class [options] <Path>[.class]
+
+   Command print_jvm_class prints a human readable version of the <Path>
+   class file. Printing is done on standard output. This command was
+   developed to check the byte code produced by command compile_to_jvm.
+   It is useful only if you want to have a close look at the generated
+   Java byte code.
+
+   This command may also be used to print Java byte code you obtained
+   with Java compilers, such as javac. We find the output of
+   print_jvm_class more readable than the output of javap.
+
+   Options
+
+   -version:
+          Show the number of the [1]version of SmallEiffel you're using.
+
+   Examples
+
+   First, you have to produce some class files using command
+   compile_to_jvm:
+   compile_to_jvm -boost hello_world
+
+   Then, using command print_to_jvm_class you can print on standard
+   output a readable view of any produced class file. The following
+   command prints the main class :
+   print_jvm_class hello_world.class
+
+   You can also print any class file of the hello_world directory. For
+   example, under Unix, you can print the byte code produced for class
+   INTEGER using command :
+   print_jvm_class hello_world/integer.class
+
+                                   [Line]
+   Copyright © Dominique COLNET and Suzanne COLLIN - [2]<colnet@loria.fr>
+                  Last update: 05 June 1999, by DC & OZ.
+
+References
+
+   1. file://localhost/home/colnet/SmallEiffel/man/man/SmallEiffelFAQ.html#Q02
+   2. mailto:colnet@loria.fr

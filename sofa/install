@@ -1,4 +1,4 @@
-; $VER: install 1.4 (10.10.99)
+; $VER: install 1.6 (7.4.2000)
 ;
 ; An Amiga Installer script for Sofa.
 ;
@@ -15,55 +15,56 @@
 (set #minimum-installer-version 43)
 (set #minimum-installer-revision 3)
 (set #minimum-installer-id
-   (+ #minimum-installer-revision
-       (* #minimum-installer-version 65536)
-   )
+	(+ #minimum-installer-revision
+		 (* #minimum-installer-version 65536)
+	)
 )
 (debug "  minimum-installer-id = " #minimum-installer-id)
 (debug "  current-installer-id = " @installer-version)
+
+(set #minimum-os-version 39)
+(set #minimum-disk-space 20) ; in MB
+(set #minimum-memory-left 4) ; in MB
+(set #recommended-memory-left 8) ; in MB
 
 ;----------------------------------------------------------------------------
 ; Setup messages, prompts and help text
 ;----------------------------------------------------------------------------
 (set #message-wrong-installer
 (cat "You have an old version of the program `Installer' on your Amiga.\n\n"
-     "The installation procedure needs at least Installer "
-     #minimum-installer-version "." #minimum-installer-revision ".\n\n"
-     "Obtain a newer version and try again.\n\n"
-     "(Check Aminet or the WWW site of the current owner of the rights for "
-     "Amiga - whoever that might be right now.)"
+	  "The installation procedure needs at least Installer "
+	  #minimum-installer-version "." #minimum-installer-revision ".\n\n"
+	  "Obtain a newer version and try again.\n\n"
+	  "(Check Aminet or the WWW site of the current owner of the rights for "
+	  "Amiga - whoever that might be right now.)"
 ))
+
+(set #message-wrong-os-version
+(cat "You need at least AmigaOS version " #minimum-os-version " for Sofa." )
+)
 
 (set #message-welcome
-(cat "Welcome to the Amiga Installer for Sofa\n\n"
-     "This installs the Sofa distribution of the SmallEiffel compiler "
-     "on your Amiga."
-     ;"\n\n"
-     ;"It lets you choose you preferred C compiler to create native code, "
-     ;"copies all required files (if you choose a target directory different "
-     ;"from the current one), adds a few lines to your User-Startup and "
-     ;"setups the files in the Sofa/SmallEiffel/sys directory."
+(cat "Welcome to the Amiga Installer to install the Sofa distribution "
+     "of the SmallEiffel compiler on your Amiga."
 ))
 
-(set #message-welcome-change-compiler
-(cat "Welcome to the Amiga Installer for Sofa\n\n"
-     "This lets you choose a different C compiler when creating "
-     "native code."
+(set #message-welcome-setup
+(cat "Welcome to the Amiga Installer to setup an existing Sofa installation."
 ))
 
 (set #message-exit
-(cat "\nSofa has been installed.\n\n"
-     "Please reboot before using it."
+(cat "\nSuccessfully installed Sofa.\n\n"
+	  "Please reboot before using it."
 ))
 
 (set #message-exit-change-compiler
-(cat "\nThe C compiler for Sofa has been changed. It will be used "
-     "the next time you invoke the \"compile\" command."
+(cat "\nChanged the C compiler for Sofa.\n\n"
+	  "The next time you invoke the \"compile\" command, %s will be used."
 ))
 
 (set #prompt-ask-sofa-directory
 (cat "Select where to install Sofa.\n"
-     "A directory named \"sofa\" is created automatically"
+	  "A directory named \"sofa\" is created automatically"
 ))
 
 (set #prompt-ask-c-compiler
@@ -71,22 +72,13 @@
 ))
 
 (set #help-ask-c-compiler
-(cat "Sofa does not compile to Amiga native code directly but rather "
-     "translates a Eiffel source into a C source. To actually create an "
-     "executable, you need a C compiler.\n\n"
-     "The following compilers are known to work with Sofa:\n\n"
-     "� SAS/c - commercial but meanwhile abandoned by SAS Institute; "
-       "if you don't own it by now, you probably won't get it anywhere.\n"
-     "� EGCS/GCC - the freely distributable GNU C/C++ compiler; "
-       "stable, efficient code but horribly slow.\n"
-     ;"� DICE - former commercial but meanwhile freely distributable; "
-     ;  "does not even support ANSI C, but is good enough for Sofa "
-     ;  "and very fast.\n"
-     "� Other - none of the above; you have to specify it manually as "
-       "described in the documentation.\n"
-     "\n"
-     "Naturally, the compiler selected has to be installed and within "
-     "the Workbench search path.\n\n"
+(cat "Sofa does not compile to Amiga native code directly rather than "
+	  "translates Eiffel source to C source. To actually create an "
+	  "executable, you need a C compiler.\n\n"
+	  "Naturally, the compiler selected has to be installed and within "
+	  "the Workbench search path.\n\n"
+     "Refer to the manual for more details and where you can get "
+     "freely distributable C compilers."
 ))
 
 (set #prompt-update-user-startup
@@ -95,56 +87,139 @@
 
 (set #help-update-user-startup
 (cat "These lines are necessary for Sofa to find its classes.\n\n"
-     "You can however skip this part and perform it manually later on "
-     "according to the documentation."
+	  "You can however skip this part and perform it manually later on "
+	  "according to the documentation."
 ))
 
 (set #prompt-copy-support-files "Copy additional documentation")
 (set #help-copy-support-files
 (cat "These files are not needed to run Sofa. Still they contain documentation "
-     "you might find useful."
+	  "you might find useful."
 ))
 
 (set #working-user-startup "Updating user-startup")
 (set #working-set-smalleiffel "Updating SmallEiffel settings")
-(set #working-extract-archive "Extracting \"%s\"\n(%s)\n\nThis may take a while.")
+(set #working-compile-sofa-lib "Recompiling sofa.lib")
+
+; Setup messages
+(set #prompt-setup "Select item to setup or change")
+(set #help-setup
+(cat "" ; TODO: better help
+	  @askchoice-help
+))
+
+
+; Various error messages and warnings
+(set #warning-wrong-cpu
+(cat "Warning: You need at least a 68020 CPU to use the included executables.\n\n"
+     "You can continue with the installation, but the SmallEiffel compiler "
+     "won't work if you try to start it.\n\n"
+    "If you really want 68000 executables, contact Sofa Support or bootstrap "
+    "the compiler yourself using the \"sofa:SmallEiffel/install\" tool. Refer "
+    "to \"Sofa:SmallEiffel/\" for more information."
+))
+
+
+(set #warning-low-disk-space
+(cat "Warning: The volume you are about to install Sofa should have about "
+     #minimum-disk-space " MB left.\n\n"
+     "If you continue, installation will probably fail, or you will experience "
+     "problems pretty soon when using Sofa.\n\n"
+     "It is recommended that you free some space or choose a different volume."
+))
+
+(set #warning-low-memory
+(cat "Warning: To use the SmallEiffel compiler, "
+     "you need at least " #minimum-memory-left " MB of free memory ("
+     #recommended-memory-left " MB recommended)\n\n"
+))
 
 (set #message-manual-compiler-setup
 (cat "As you did not specify a certain compiler, you have to perform some "
-     "steps manually.\n\n"
-     "In particular, the files \"compiler.Amiga\" and \"linker.Amiga\" "
-     "have to be set. Refer to \"man/system.txt\" in the SmallEiffel "
-     "directory for more information."
+	  "steps manually.\n\n"
+	  "In particular, the files \"compiler.Amiga\" and \"linker.Amiga\" "
+	  "have to be set. Refer to \"man/system.txt\" in the SmallEiffel "
+	  "directory for more information."
 ))
 
 (set #message-binaries-missing
 (cat "Note that the compiler binaries are available in a different "
-     "archive depending on your CPU. You can obtain them from Aminet, "
-     "look out for a file dev/lang/sofa*.lha with \"*\" "
-     "indicating your CPU.\n\n"
-     "Then simply copy the included binaries to \"%s\"."
+	  "archive depending on your CPU. You can obtain them from Aminet, "
+	  "look out for a file dev/lang/sofa*.lha with \"*\" "
+	  "indicating your CPU.\n\n"
+	  "Then simply copy the included binaries to \"%s\"."
 ))
 
-(set #message-extract-failed
-(cat "Cannot extract \"%s\".\n\nPlease submit the file \"%s\" to Sofa support."
+(set #message-install-se-failed
+(cat "Cannot setup SmallEiffel.\n\nAn error log has been stored in \"%s\"."
+	  "Please submit this file to Sofa support."
 ))
 
+(set #message-compile-sofa-lib-failed
+(cat "Warning: Cannot compile sofa.lib.\n\n"
+	  "Probably your C compiler is not supported or not installed correctly. "
+     "Retry to compile sofa.lib again with \"sofa:setup\" with the log file "
+     "enabled. If it still doesn't work, submit the log to Sofa Support."
+))
+
+(set #message-not-implemented "This feature has not been implemented yet.")
+
+(set #message-amiga-includes-missing
+(cat "Warning: The AmigaOS includes don't seem to be installed on your system.\n"
+	  "(The file \"%s\" must exist.)\n\n"
+	  "You will not be able to use certain low-level class of SmallEiffel, or any "
+	  "part of the sofa library.\n\n"
+	  "It is recommended to abort installation now, install the AmigaOS includes, "
+	  "and install Sofa only after that."
+))
+
+(set #message-c-compiler-missing
+(cat "Warning: None of the supported C compilers seems to be installed on your system\n\n"
+	  "You probably will not be able to do anything with Sofa.\n\n"
+	  "It is recommended to abort installation now, install a C compiler "
+	  "and install Sofa only after that."
+))
+
+(set #message-c-support-sucks
+(cat "Warning: The support for the C compiler you selected somewhat sucks.\n\n"
+	  "Consider aborting the installation and retrying with a different choice."
+))
 
 ;----------------------------------------------------------------------------
 ; Some global constants and defaults
 ;----------------------------------------------------------------------------
 (set #env-appendix "sys/system.se")
 
-(set #compiler-sas-name  "SAS/c")
+(set #compiler-sas-name   "SAS/c")
+(set #compiler-sas-se     "sc")
 (set #compiler-sas-id     0)
-(set #compiler-gcc-name  "gcc/egcs")
-(set #compiler-gcc-id     1)
-;(set #compiler-dice-name "vbcc") ; TODO: Support VBCC
-;(set #compiler-dice-id    2)
-;(set #compiler-dice-name "Dice") ; TODO: Support DICE
-;(set #compiler-dice-id    3)
+(set #compiler-dice-name  "Dice")
+(set #compiler-dice-se    "dice")
+(set #compiler-dice-id    1)
+(set #compiler-vbcc-name  "Vbcc")
+(set #compiler-vbcc-se    "vbcc")
+(set #compiler-vbcc-id    2)
+(set #compiler-gcc-name   "gcc/egcs")
+(set #compiler-gcc-se     "gcc")
+(set #compiler-gcc-id     3)
 (set #compiler-other-name "Other")
-(set #compiler-other-id   2) ; TODO: Change to 3/4 for VBCC/DICE
+(set #compiler-other-se   "")
+(set #compiler-other-id   4)
+
+(set #setup-compiler-name  "Change C compiler used by SmallEiffel")
+(set #setup-compiler-id    0)
+(set #setup-sofa-lib-name  "Recompile sofa.lib")
+(set #setup-sofa-lib-id    1)
+(set #setup-cpu-name       "Recompile SmallEiffel") ; TODO: support this
+(set #setup-cpu-id         2)
+
+(set #includes "sofa:SmallEiffel/sys sofa:library/sofa/include")
+(set #libs "sofa:lib")
+
+(set #install-se-log "t:sofa_install_se.log")
+(set #compile-sofa-lib-log "t:sofa_compile_sofa_lib.log")
+(set #execute-log "t:sofa_execute.log")
+(set #execute-temp "t:sofa_execute.tmp")
 
 ;----------------------------------------------------------------------------
 ; Check requirements
@@ -154,32 +229,70 @@
 ; download a new one or forget about the whole thing - He he he.
 ; (The script should work with older versions, but how am I
 ; supposed to test this?)
+;
+; Check OS version and memory left.
 
 (procedure P-check-requirements
 (
-   (debug "check installer version")
-   (if (< @installer-version #minimum-installer-id)
+	(debug "check installer version")
+	(if (< @installer-version #minimum-installer-id)
+	  (
+		 (debug "installer too old")
+		 (abort #message-wrong-installer)
+	  )
+	)
+
+   (if (< (/ (getversion) 65536) #minimum-os-version)
      (
-       (debug "installer too old")
-       (abort #message-wrong-installer)
+       (debug "OS too old")
+       (abort #message-wrong-os-version)
      )
    )
+
 ))
 
+
+(procedure P-check-disk-space
+(
+   (debug "check disk space")
+
+   (if (< (/ (getdiskspace #sofa-directory) 1048576) #minimum-disk-space)
+      (
+         (debug "low diskspace")
+         (message #warning-low-disk-space (all))
+      )
+   )
+
+   (if (< (/ (database "total-mem") 1048576) #minimum-memory-left)
+      (
+         (debug "low memory")
+         (message #warning-low-memory (all))
+      )
+   )
+
+   (set #cpu (database "cpu"))
+   (debug "cpu =" #cpu)
+   (if (or (= "68000" #cpu) (= "68010" #cpu))
+      (
+         (debug "wrong CPU")
+         (message #warning-wrong-cpu  (all))
+      )
+   )
+))
 
 ;----------------------------------------------------------------------------
 ; Welcome user
 ;----------------------------------------------------------------------------
 (procedure P-welcome
 (
-   (debug "welcome")
-   (welcome #message-welcome)
+	(debug "welcome")
+	(welcome #message-welcome)
 ))
 
-(procedure P-welcome-change-compiler
+(procedure P-welcome-setup
 (
-   (debug "welcome")
-   (welcome #message-welcome-change-compiler)
+	(debug "welcome")
+	(welcome #message-welcome-setup)
 ))
 
 ;----------------------------------------------------------------------------
@@ -187,45 +300,45 @@
 ;----------------------------------------------------------------------------
 (procedure P-ask-sofa-directory
 (
-   (debug "ask-sofa-directory")
+	(debug "ask-sofa-directory")
 
-   (if (exists "sofa:" (noreq))
-      (
-         ; Update existing installation. Use parent of "Sofa:" as default
-         (set #default-sofa-directory "sofa:/")
-      )
-      (
-         ; New installation. Use parent of current directory as default
-         (set #default-sofa-directory "/")
-      )
-   )
+	(if (exists "sofa:" (noreq))
+		(
+			; Update existing installation. Use parent of "Sofa:" as default
+			(set #default-sofa-directory "sofa:/")
+		)
+		(
+			; New installation. Use parent of current directory as default
+			(set #default-sofa-directory "/")
+		)
+	)
 
-   (set #default-sofa-directory (expandpath #default-sofa-directory))
+	(set #default-sofa-directory (expandpath #default-sofa-directory))
 
-   (set #sofa-directory
-   (askdir
-      (prompt #prompt-ask-sofa-directory)
-      (default #default-sofa-directory)
-      (help @askdir-help)
-   ))
+	(set #sofa-directory
+	(askdir
+		(prompt #prompt-ask-sofa-directory)
+		(default #default-sofa-directory)
+		(help @askdir-help)
+	))
 
-   ; Compute name of Sofa directory
-   (set #sofa-directory (tackon #sofa-directory "sofa"))
-   (debug "  #sofa-directory =" #sofa-directory)
+	; Compute name of Sofa directory
+	(set #sofa-directory (tackon #sofa-directory "sofa"))
+	(debug "  #sofa-directory =" #sofa-directory)
 
-   ; Compute name of library directory
-   (set #library-directory (tackon #sofa-directory "library"))
-   (debug "  #library-directory =" #library-directory)
+	; Compute name of library directory
+	(set #library-directory (tackon #sofa-directory "library"))
+	(debug "  #library-directory =" #library-directory)
 
-   ; Compute name of SmallEiffel's "bin" and "sys" directory
-   (set #smalleiffel-directory (tackon #sofa-directory "SmallEiffel"))
-   (set #smalleiffel-directory-bin (tackon #smalleiffel-directory "bin"))
-   (set #smalleiffel-directory-sys (tackon #smalleiffel-directory "sys"))
-   (debug "  #smalleiffel-directory =" #smalleiffel-directory)
+	; Compute name of SmallEiffel's "bin" and "sys" directory
+	(set #smalleiffel-directory (tackon #sofa-directory "SmallEiffel"))
+	(set #smalleiffel-directory-bin (tackon #smalleiffel-directory "bin"))
+	(set #smalleiffel-directory-sys (tackon #smalleiffel-directory "sys"))
+	(debug "  #smalleiffel-directory =" #smalleiffel-directory)
 
-   ; Set target directory used in standard message during (exit)
-   (set @default-dest #sofa-directory)
-   (debug " @default-dest =" @default-dest)
+	; Set target directory used in standard message during (exit)
+	(set @default-dest #sofa-directory)
+	(debug " @default-dest =" @default-dest)
 
 ))
 
@@ -234,110 +347,109 @@
 ;----------------------------------------------------------------------------
 (procedure P-ask-c-compiler
 (
-   (debug "ask-c-compiler")
+	(debug "ask-c-compiler")
 
-   ; Figure out default selection of compiler: If DCC: exists, use DICE,
-   ; if SC: exists use SAS/c, if ADE: or GG: exists, use EGCS/GCC
-   (set #compiler-choice #compiler-other-id)
-   (if (exists("sc:" (noreq)))
-      (set #compiler-choice #compiler-sas-id)
-      (if (exists("dcc:" (noreq)))
-         (set #compiler-choice #compiler-other-id) ; TODO: Support DICE
-         (if (OR (<> "" (exists("ade:" (noreq))) (<> "" (exists("gg:" (noreq))))))
-             (set #compiler-choice #compiler-gcc-id)
-         )
-      )
-   )
+	; Figure out default selection of compiler:
+	; if sc: exists use SAS/c
+	; if dcc: exists, use DICE
+	; if vbcc: exists, use vbcc
+	; if ADE: or GG: exists, use egcs/GCC
+	(set #compiler-choice #compiler-other-id)
+	(set #compiler-se #compiler-others-se)
+	(if (exists("sc:" (noreq)))
+		(
+			(set #compiler-choice #compiler-sas-id)
+		)
+		(if (exists("dcc:" (noreq)))
+			(
+				(set #compiler-choice #compiler-dice-id)
+			)
+			(if (exists("vbcc:" (noreq)))
+				(
+					(set #compiler-choice #compiler-vbcc-id)
+				)
+				(if (OR (<> "" (exists("ade:" (noreq))) (<> "" (exists("gg:" (noreq))))))
+					(
+						 (set #compiler-choice #compiler-gcc-id)
+					)
+				)
+			)
+		)
+	)
 
-   (debug "  default compiler: " #compiler-choice)
+	(debug "  default compiler: " #compiler-choice)
 
-   (set #compiler-dice-name "") ; TODO: Support DICE by removing this line
+	(if (= #compiler-choice #compiler-other-id)
+		(
+			(message #message-c-compiler-missing )
+		)
+	)
 
-   (set #compiler-choice
-   (askchoice
-      (prompt #prompt-ask-c-compiler)
-      (help #help-ask-c-compiler)
-      (default #compiler-choice)
-      (choices
-         #compiler-sas-name
-         #compiler-gcc-name
-         #compiler-dice-name
-         #compiler-other-name
-      )
-   ))
+	(set #compiler-choice
+	(askchoice
+		(prompt #prompt-ask-c-compiler)
+		(help #help-ask-c-compiler)
+		(default #compiler-choice)
+		(choices
+			#compiler-sas-name
+			#compiler-dice-name
+			#compiler-vbcc-name
+			#compiler-gcc-name
+			#compiler-other-name
+		)
+	))
 
-   (debug "  choice = " #compiler-choice)
+	; compiler name as known by SE's install
+	(set #compiler-se #compiler-other-se)
+	(set #compiler-name #compiler-other-name)
+	(if (= #compiler-choice #compiler-sas-id)
+		(
+			(set #compiler-se #compiler-sas-se)
+			(set #compiler-name #compiler-sas-name)
+			(P-check-includes-exist "include:")
+		)
+		(if (= #compiler-choice #compiler-dice-id)
+			(
+				(set #compiler-se #compiler-dice-se)
+				(set #compiler-name #compiler-dice-name)
+				(P-check-includes-exist "dinclude:")
+			)
+			(if (= #compiler-choice #compiler-vbcc-id)
+				(
+					(set #compiler-se #compiler-vbcc-se)
+					(set #compiler-name #compiler-vbcc-name)
+					(P-check-includes-exist "vincludem68k:")
+				)
+				(if (= #compiler-choice #compiler-gcc-id)
+					(
+						(set #compiler-se #compiler-gcc-se)
+						(set #compiler-name #compiler-gcc-name)
+					)
+				)
+			)
+		)
+	)
+
+	(set #use-other-compiler (= #compiler-other-se #compiler-se))
+
+
+	(debug "  choice = " #compiler-choice "(" #use-other-compiler ")")
+
+	(if (= #compiler-choice #compiler-gcc-id)
+		(
+			(message #message-c-support-sucks)
+		)
+	)
 ))
 
-;----------------------------------------------------------------------------
-; Set a variable in SmallEiffel/sys
-;----------------------------------------------------------------------------
-(procedure P-set-smalleiffel-variable #variable #value
+(procedure P-check-includes-exist #assign
 (
-   (debug "  set" #variable "to" #value)
-   (if (<> "debug" @app-name)
-      (
-         (textfile
-            (dest (tackon #smalleiffel-directory-sys #variable))
-            (append #value)
-         )
-      )
-      (debug "  debug-skip")
-   )
-))
-
-;----------------------------------------------------------------------------
-; Set stuff in sofa/SmallEiffel/sys
-;----------------------------------------------------------------------------
-(procedure P-set-smalleiffel-sys
-(
-   (working #working-set-smalleiffel)
-
-   (set #sys-gc       "m68k-amigaos.c")
-   (set #sys-system   "Amiga")
-
-   (select (+ 0 #compiler-choice)
-      (
-         ; SAS/c
-         (set #sys-compiler "sc")
-      )
-      (
-         ; gcc/egcs
-         (set #sys-compiler "gcc")
-      )
-      (
-         ; DICE
-         (set #sys-compiler "") ; TODO: support DICE
-      )
-      (
-         ; Other
-         (set #sys-compiler "")
-      )
-   )
-
-   ; Reset loadpath to current directory
-   (set #sys-loadpath "\n")
-
-   ; Add additional libraries to loadpath
-   (set #sys-loadpath
-   (cat #sys-loadpath
-        "${GOBO}/library/loadpath.se" "\n"
-        "${EXML}/compiler_specific/se/loadpath.se" "\n"
-   ))
-
-   ; Add SmallEiffel to loadpath
-   (set #sys-loadpath
-   (cat #sys-loadpath
-        "sofa:SmallEiffel/lib_std/"  "\n"
-        "sofa:SmallEiffel/lib_rand/" "\n"
-        "sofa:SmallEiffel/lib_show/" "\n"
-        "sofa:SmallEiffel/lib_se/"   "\n"
-   ))
-
-   (P-set-smalleiffel-variable "system.se"      #sys-system )
-   (P-set-smalleiffel-variable "compiler.se"    #sys-compiler)
-   (P-set-smalleiffel-variable "gc"             #sys-gc)
-   (P-set-smalleiffel-variable "loadpath.Amiga" #sys-loadpath)
+	(set #include-name (tackon #assign "exec/types.h"))
+	(if (not (exists #include-name (noreq)))
+		(
+			(message (#message-amiga-includes-missing #include-name))
+		)
+	)
 ))
 
 ;----------------------------------------------------------------------------
@@ -345,32 +457,159 @@
 ;----------------------------------------------------------------------------
 (procedure P-update-user-startup
 (
-   ; Simply adds a SetEnv and Path command
-   (debug "update user-startup")
+	; Simply adds a SetEnv and Path command
+	(debug "update user-startup")
 
-   (working #working-user-startup)
+	(working #working-user-startup)
 
-   (set #command-user-startup
-   (cat ("Assign sofa: \"%s\"\n" #sofa-directory)
-        ("SetEnv SmallEiffel \"%s\"\n" (tackon "sofa:SmallEiffel" #env-appendix ))
-        ("SetEnv GOBO \"%s\"\n" "sofa:library/gobo")
-        ("SetEnv EXML \"%s\"\n" "sofa:library/exml")
-        "Path Add \"sofa:SmallEiffel/bin\" \"${GOBO}/bin\"\n"
-   ))
+	(set #command-user-startup
+	(cat ("Assign sofa: \"%s\"\n" #sofa-directory)
+		  ("SetEnv SmallEiffel \"%s\"\n" (tackon "sofa:SmallEiffel" #env-appendix ))
+		  ("SetEnv GOBO \"%s\"\n" "sofa:library/gobo")
+		  ("SetEnv EXML \"%s\"\n" "sofa:library/exml")
+		  "Path Add \"sofa:SmallEiffel/bin\" \"sofa:tool\" \"${GOBO}/bin\"\n"
+	))
 
-   (debug "---")
-   (debug #command-user-startup)
-   (debug "---")
+	(P-add-assign-command "sc:" "include:" "lib:")
+	(P-add-assign-command "dcc:" "dinclude:" "dlib:")
+	(P-add-assign-command "vbcc:" "vincludem68k:" "vlibm68k:")
+	; TODO: consider gcc
 
-   (if (<> "debug" @app-name)
-      (startup "Sofa"
-         (confirm)
-         (prompt  (cat #prompt-update-user-startup #command-user-startup))
-         (help    #help-update-user-startup)
-         (command #command-user-startup)
-      )
-      (debug "  debug-skip")
-   )
+	(debug "---")
+	(debug #command-user-startup)
+	(debug "---")
+
+	; execute startup already, so that "sofa:" exists
+	(textfile
+		(dest #execute-temp)
+		(append #command-user-startup)
+      (safe)
+	)
+	(if (= 0 (execute #execute-temp (safe)))
+		(
+			(delete #execute-temp)
+		)
+		(
+			(abort ("Error while executing \"%s\" (code %s)\n\nPlease submit the file \"%s\" to Sofa Support" #execute-temp @ioerr #execute-log))
+		)
+	)
+
+	(if (<> "debug" @app-name)
+		(startup "sofa"
+			(confirm)
+			(prompt  (cat #prompt-update-user-startup #command-user-startup))
+			(help    #help-update-user-startup)
+			(command #command-user-startup)
+		)
+		(debug "  debug-skip")
+	)
+))
+
+(procedure P-add-assign-command #assign-check #include #lib
+(
+	(set #command-user-startup
+	(cat #command-user-startup
+		  ("Assign Exists \"%s\"\n" #assign-check)
+		  "if not warn\n"
+		  ("   Assign Add \"%s\" %s\n" #include #includes)
+		  ("   Assign Add \"%s\" %s\n" #lib #libs)
+		  "endif\n"
+	))
+))
+
+;----------------------------------------------------------------------------
+; Ask setup main choices
+;----------------------------------------------------------------------------
+(procedure P-ask-setup-choice
+(
+	(debug "ask-setup-choice")
+	(set #setup-choice
+		 (askchoice
+			  (prompt "Select item to setup or change")
+			  (help @askchoice-help)
+			  (choices
+				  #setup-compiler-name
+				  #setup-sofa-lib-name
+			  )
+			  (default 0)
+		 )
+	)
+))
+
+;----------------------------------------------------------------------------
+; Setup SmallEiffel
+;----------------------------------------------------------------------------
+(procedure P-setup-smalleiffel
+(
+	(debug "P-setup-smalleiffel")
+
+	(if (<> #compiler-se #compiler-other-se)
+		(
+			(working #working-set-smalleiffel)
+			(set #command-install
+				  ("\"%s\" >\"%s\" -no_compile -compiler %s"
+					  (tackon #smalleiffel-directory "install")
+					  #install-se-log
+					  #compiler-se
+				  )
+			)
+
+			(debug "---")
+			(debug #command-install)
+			(debug "---")
+
+			(set #run-result (run #command-install))
+			(if (= 0 #run-result)
+				(
+					; extracted successfully
+					(delete #install-se-log)
+				)
+				(
+					; error installation
+					(abort (#message-install-se-failed  #install-se-log))
+				)
+			)
+		)
+		(
+			(debug "   no compiler specified")
+		)
+	)
+))
+
+;----------------------------------------------------------------------------
+; Compile sofa.lib
+;----------------------------------------------------------------------------
+(procedure P-compile-sofa-lib
+(
+	(debug "P-compile-sofa-lib")
+
+	(if (<> #compiler-se #compiler-other-se)
+		(
+			(working #working-compile-sofa-lib)
+
+			(set #rexx-command "sofa:library/sofa/source/rebuild.rexx")
+
+			(debug "---")
+			(debug #rexx-command)
+			(debug "---")
+
+			(set #run-result (rexx #rexx-command))
+
+			(if (= 0 #run-result)
+				(
+					; extracted successfully
+					(delete #compile-sofa-lib-log)
+				)
+				(
+					; error
+					(message #message-compile-sofa-lib-failed)
+				)
+			)
+		)
+		(
+			(debug "   no compiler specified")
+		)
+	)
 ))
 
 ;----------------------------------------------------------------------------
@@ -378,17 +617,17 @@
 ;----------------------------------------------------------------------------
 (procedure P-create-directories
 (
-   ; Create Sofa directory and SmallEiffel/bin because they are needed in any case
-   (makedir #sofa-directory            (safe))
-   (copyfiles
-       (source "/sofa.info")
-       (dest (tackon #sofa-directory "/"))
-   )
+	; Create Sofa directory and SmallEiffel/bin because they are needed in any case
+	(makedir #sofa-directory            (safe))
+	(copyfiles
+		 (source "/sofa.info")
+		 (dest (tackon #sofa-directory "/"))
+	)
 
-   (makedir #library-directory         (safe))
-   (makedir #smalleiffel-directory     (safe))
-   (makedir #smalleiffel-directory-bin (safe))
-   (makedir #smalleiffel-directory-sys)
+	(makedir #library-directory         (safe))
+	(makedir #smalleiffel-directory     (safe))
+	(makedir #smalleiffel-directory-bin (safe))
+	(makedir #smalleiffel-directory-sys)
 ))
 
 ;----------------------------------------------------------------------------
@@ -396,124 +635,69 @@
 ;----------------------------------------------------------------------------
 (procedure P-check-already-in-sofa
 (
-   (debug "P-check-already-in-sofa")
+	(debug "P-check-already-in-sofa")
 
-   ; Check, if target directory is current directory. If so, no files have
-   ; to be copied later on
-   (set #expanded-current (expandpath ""))
-   (set #expanded-sofa    (expandpath #sofa-directory))
-   (debug "  expanded-current = " #expanded-current)
-   (debug "  expanded-sofa    = " #expanded-sofa)
+	; Check, if target directory is current directory. If so, no files have
+	; to be copied later on
+	(set #expanded-current (expandpath ""))
+	(set #expanded-sofa    (expandpath #sofa-directory))
+	(debug "  expanded-current = " #expanded-current)
+	(debug "  expanded-sofa    = " #expanded-sofa)
 
-   (set #already-in-sofa (= #expanded-current #expanded-sofa))
+	(set #already-in-sofa (= #expanded-current #expanded-sofa))
 
-   (debug "  already-in-sofa = " #already-in-sofa)
+	(debug "  already-in-sofa = " #already-in-sofa)
 ))
 
 ;----------------------------------------------------------------------------
-; Copy support files (Readme etc)
+; Create setup script from install script
 ;----------------------------------------------------------------------------
-(procedure P-copy-support-files
+(procedure P-create-setup
 (
-   (debug "copy-support-files")
+	(debug "create-setup")
 
-   ; Copy all files in the root directory
-   (if (<> "debug" @app-name)
-      (
-         (debug "  copy files")
-         (copyfiles
-            (prompt #prompt-copy-support-files)
-            (help #help-copy-support-files)
-            (source "")
-            (choices "Readme" "Welcome.html" "SmallEiffel" "library")
-            (dest #sofa-directory)
-            (infos)
-         )
-      )
-      (debug "  debug-skip")
-   )
+	(set #setup-script (tackon #sofa-directory "setup"))
+	(set #setup-script-info (cat #setup-script ".info"))
+	(set #install-script (tackon #sofa-directory "install"))
+	(set #install-script-info (cat #install-script ".info"))
+	(rename #install-script #setup-script)
+	(rename #install-script-info #setup-script-info)
+	(tooltype
+		(dest #setup-script)
+		(settooltype "APPNAME" "setup")
+	)
 ))
 
-;----------------------------------------------------------------------------
-; Copy generic files
-;----------------------------------------------------------------------------
-(procedure P-copy-generic-files
-(
-   (debug "copy-generic-files")
-
-   ; template to fill in for more stuff to copy
-))
-
-;----------------------------------------------------------------------------
-; Extract lha archive to relative target directory using c/lhex
-;----------------------------------------------------------------------------
-(procedure P-extract-archive #archive-name #relative-target #description (
-   (working (#working-extract-archive #archive-name #description))
-
-   (set #script-name "t:sofa-lhex.bat")
-
-   (set #lhex (expandpath "c/lhex"))
-   (set #expanded-target (expandpath (tackon #sofa-directory #relative-target)))
-   (set #expanded-archive (expandpath (tackon "archive" #archive-name)))
-
-   (set #command-extract-archive
-   (cat ("cd \"%s\"\n" #expanded-target)
-        ("\"%s\" >\"con:///100/Extract %s/AUTO\" -qaf x \"%s\"\n" #lhex #archive-name #expanded-archive)
-   ))
-
-   (debug "---")
-   (debug #command-extract-archive)
-   (debug "---")
-
-   (textfile
-      (dest #script-name)
-      (append #command-extract-archive)
-   )
-
-   (set #execute-result (execute #script-name))
-   (if (= 0 #execute_result)
-      (
-         ; extracted successfully
-         (delete #script-name)
-      )
-      (
-         ; error during extraction
-         (abort (#message-extract-failed #archive-name #script-name))
-      )
-   )
-))
 ;----------------------------------------------------------------------------
 ; Exit
 ;----------------------------------------------------------------------------
 (procedure P-exit
 (
-   (debug "exit")
+	(debug "exit")
 
+	; If no specific compiler was specified, give the user a hint
+	(complete 98)
+	(if #use-other-compiler (message #message-manual-compiler-setup))
 
-   ; If no specific compiler was specified, give the user a hint
-   (if (= #compiler-other-id #compiler-choice)
-      (message #message-manual-compiler-setup)
-   )
+	; If no binaries have been found, tell the user where he can get them from
+	; (complete 99)
+	; (if (= 0 (exists(tackon #target-directory-bin "compile")))
+	;    (message (#message-binaries-missing #target-directory-bin) (all))
+	; )
 
-   ; If no binaries have been found, tell the user where he can get them from
-   ; (complete 95)
-   ; (if (= 0 (exists(tackon #target-directory-bin "compile")))
-   ;    (message (#message-binaries-missing #target-directory-bin) (all))
-   ; )
-
-   ; Say "good bye"
-   (complete 100)
-   (message (#message-exit) (all))
-   (exit (quiet))
+	; Say "good bye"
+	(complete 100)
+	(exit #message-exit)
 ))
 
 (procedure P-exit-change-compiler
 (
-   (debug "exit")
+	(debug "exit")
 
-   ; Just say "good bye"
-   (message (#message-exit-change-compiler) (all))
-   (exit (quiet))
+	; Just say "good bye"
+	; (message (#message-exit-change-compiler #compiler-name) (all))
+	; (exit (quiet))
+	(exit (#message-exit-change-compiler #compiler-name) (quiet))
 ))
 
 ;----------------------------------------------------------------------------
@@ -522,40 +706,76 @@
 
 (complete 0) (P-check-requirements)
 
-(if (<> @app-name "Settings")
-   (
-      ; Install the package
-      (complete  0) (P-welcome)
+(debug "@app-name = " @app-name)
+(if (<> @app-name "setup")
+	(
+		; Install the package
+		(complete  0) (P-welcome)
 
-      (complete 20) (P-ask-sofa-directory)
-      (complete 30) (P-ask-c-compiler)
+		(complete 10) (P-ask-sofa-directory)
+                    (P-check-disk-space)
+		(complete 20) (P-ask-c-compiler)
 
-;      (complete 35) (P-check-already-in-sofa)
+		(complete 30) (P-check-already-in-sofa)
 
-      (complete 35) (P-create-directories)
-      (complete 40) (P-copy-support-files)
+		(if (not #already-in-sofa)
+			(
+				(complete 33) (P-create-directories)
 
-      (complete 50) (P-extract-archive "SmallEiffel.lha" ""        "Compiler and base library")
-      (complete 60) (P-extract-archive "gobo.lha"        "library" "Portable kernal, data structures library and parser tools")
-      (complete 70) (P-extract-archive "exml.lha"        "library" "XML parsing library")
-      (complete 75) (P-extract-archive "other.lha"       ""        "Various other material")
-      (complete 77) (P-extract-archive "developer.lha"   ""        "Sofa Team developer material")
+				(if (<> @app-name "debug")
+					(
+						(complete 35) (copyfiles (pattern "#?") (files) (infos) (source "") (dest #sofa-directory))
 
-      (complete 80) (P-update-user-startup)
-      (complete 85) (P-set-smalleiffel-sys)
+						(complete 37) (copyfiles (all) (source "developer")   (dest (tackon #sofa-directory "developer")))
+						(complete 40) (makedir "lib" (safe)) ; just in case
+										  (copyfiles (all) (source "lib")         (dest (tackon #sofa-directory "lib")))
+						(complete 45) (copyfiles (all) (source "manual")      (dest (tackon #sofa-directory "manual")))
+						(complete 48) (copyfiles (all) (source "tool")        (dest (tackon #sofa-directory "tool")))
 
-      (complete 90) (P-exit)
-   )
-   (
-      ; Only change the C compiler used by Sofa
-      (complete   0) (P-welcome-change-compiler)
-      (set #sofa-directory (expandpath ""))
-      (set #smalleiffel-directory (expandpath "SmallEiffel"))
-      (set #smalleiffel-directory-bin (tackon #smalleiffel-directory "bin"))
-      (set #smalleiffel-directory-sys (tackon #smalleiffel-directory "sys"))
-      (complete  30) (P-ask-c-compiler)
-      (complete  60) (P-set-smalleiffel-sys)
-      (complete 100) (P-exit-change-compiler)
-   )
+						(complete 50) (copyfiles (all) (source "SmallEiffel") (dest (tackon #sofa-directory "SmallEiffel")))
+						(complete 70) (copyfiles (all) (source "library")     (dest (tackon #sofa-directory "library")))
+					)
+				)
+			)
+		)
+		(complete 85) (P-update-user-startup)
+		(complete 87) (P-setup-smalleiffel)
+		(complete 90) (P-compile-sofa-lib)
+		(complete 99) (P-create-setup)
+
+   	(set @app-name "Sofa")
+      (set @default-dest #sofa-directory)
+		(P-exit)
+	)
+	(
+		; setup
+		(set #sofa-directory (expandpath ""))
+		(set @default-dest #sofa-directory)
+
+		(complete 10) (P-welcome-setup)
+		(complete 20) (P-ask-setup-choice)
+		(select #setup-choice
+			(
+				; Change C compiler
+				(set #smalleiffel-directory (expandpath "SmallEiffel"))
+				(set #smalleiffel-directory-bin (tackon #smalleiffel-directory "bin"))
+				(set #smalleiffel-directory-sys (tackon #smalleiffel-directory "sys"))
+				(complete  30) (P-ask-c-compiler)
+				(complete  40) (P-setup-smalleiffel )
+				(complete  60) (P-compile-sofa-lib)
+				(complete 100) (P-exit-change-compiler)
+			)
+			(
+				(complete 50) (P-compile-sofa-lib)
+			)
+			(
+            (abort #message-not-implemented)
+			)
+			(
+            (abort #message-not-implemented)
+			)
+		)
+		(set @app-name "Sofa")
+	)
 )
 

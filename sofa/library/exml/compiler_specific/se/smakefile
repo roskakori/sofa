@@ -1,0 +1,72 @@
+#
+# smakefile for exml.library
+#
+# This makefile only creates exml.lib in Sofa's library drawer. Different
+# to the other makefiles you can find here, it should not be included into
+# other makefiles.
+#
+# For an example project using the library look at the smakefile in
+# ${EXML}/examples/se_test.
+#
+# Type
+#
+#    "smake"         to create exml.lib in Sofa's library drawer
+#    "smake clean"   to remove everything but the library
+#    "smake sterile" to remove really everything
+#    "smake rebuild" to rebuild the library from scratch
+#
+# NOTE: the expat source is pretty crappy and will vomit several warnings
+# 100 and 161 about missing prototypes. Nevertheless, it seems to work.
+#
+
+# relevant paths
+SOFA=/////sofa
+EXML=///exml
+EXPAT=//expat
+
+# compiler objects
+LIBRARY=$(SOFA)/lib/exml.lib
+
+OBJS=\
+  $(EXPAT)/xmltok/xmltok.o \
+  $(EXPAT)/xmltok/xmlrole.o \
+  $(EXPAT)/xmlparse/xmlparse.o \
+  $(EXPAT)/xmlparse/hashtable.o
+
+#
+# object rules
+#
+
+all : $(LIBRARY)
+
+$(EXPAT)/xmltok/nametab.h : $(EXPAT)/gennmtab/gennmtab
+	-delete quiet $@
+	$(EXPAT)/gennmtab/gennmtab >$@
+
+$(EXPAT)/gennmtab/gennmtab : $(EXPAT)/gennmtab/gennmtab.c
+	sc link $< to $@ stackextend
+
+$(LIBRARY) : $(OBJS)
+	oml $@ r $(OBJS)
+
+$(EXPAT)/xmltok/xmltok.o : $(EXPAT)/xmltok/xmltok.c $(EXPAT)/xmltok/nametab.h
+
+$(EXPAT)/xmltok/xmlrole.o : $(EXPAT)/xmltok/xmlrole.c
+
+$(EXPAT)/xmlparse/xmlparse.o : $(EXPAT)/xmlparse/xmlparse.c
+
+$(EXPAT)/xmlparse/hashtable.o : $(EXPAT)/xmlparse/hashtable.c
+
+#
+# cleanup and rebuilding rules
+#
+clean :
+	-delete quiet $(OBJS) $(EXPAT)/xmltok/nametab.h \
+		$(EXPAT)/gennmtab/gennmtab $(EXPAT)/gennmtab/gennmtab.lnk
+
+sterile : clean
+	-delete quiet $(LIBRARY)
+
+rebuild : sterile
+	smake
+

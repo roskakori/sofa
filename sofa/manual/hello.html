@@ -1,0 +1,75 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html><head>
+<title>Sofa - First Steps</title>
+</head>
+
+<body>
+<h1>First Steps</h1>
+
+
+<h2>Hello.e</h2>
+
+<p>Once Sofa is installed and you have rebooted (to enable the new
+Workbench search path), start your editor and create a file
+<tt>hello.e</tt> with the following content:
+
+<pre>
+class HELLO
+
+creation make
+
+feature
+   make is
+   do
+      print("hello.%N")
+   end
+
+end -- class HELLO
+</pre>
+
+<p>To compile it, open a CLI and type</p>
+
+<pre>
+compile hello
+</pre>
+
+<p>Then you might have to wait for quite some while. Eventually, you
+should end up with a program <tt>hello</tt> that, when invoked,
+displays the text "<tt>hello.</tt>".</p>
+
+<p>If not, request <a href="support.html">support</a>.</p>
+
+<p>If so, congratulations, you just created a debugging version of
+<tt>hello</tt>. To get rid of all the junk files the compiler created,
+type</p>
+
+<pre>
+clean hello
+</pre>
+
+<p>To create an optimised version without the garbage collector (GC),
+type</p>
+
+<pre>
+compile -boost -no_gc hello
+</pre>
+
+<p>This reduces the size of the executable from about 50K to about
+14K, which should be quite acceptable. I mention this just because
+early Eiffel compilers created 2MB <tt>hello</tt> programs, and some
+people still have this misconception in their mind.</p>
+
+<h2>What next?</h2>
+
+<p>You can find some more plain Eiffel examples in the
+<tt>sofa:SmallEiffel/lib_show</tt> directory. For Amiga specific
+stuff, take a look at the <a href="../library/sofa/welcome.html">sofa
+library</a>.</p>
+
+<p>If you take a look at the <a href="faq.html">questions &amp;
+answers</a> section, you will find lots of interesting pointers and
+solutions to common problems.</p>
+
+</body></html>
+
+

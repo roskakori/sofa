@@ -1,0 +1,74 @@
+
+                             The finder command
+
+   Usage
+
+   finder [options] <Class>
+
+   Command finder tells you which file is loaded when searching for an
+   Eiffel <Class>.
+   When an Eiffel file is found, finder prints the full path name on
+   standard output.
+   The exit status is set GENERAL.exit_success_code only when an existing
+   file is found (thus allowing usage of command finder in shell
+   scripts).
+
+   To see the loading path used by SmallEiffel, you can for example type
+   the finder command using a bad (inexistant) class name. The default
+   loading path may be updated (see READ_ME file of the sys directory).
+
+   When invoked without any argument, the finder command prints this
+   help.
+
+   Options
+
+   -version:
+          Show the number of the [1]version of SmallEiffel you're using.
+   -verbose:
+          Print system information during the compilation (full path of
+          loaded files, type inference score, removed files, etc.).
+
+   Where does finder search ?
+
+   The algorithm used by SmallEiffel to look for an Eiffel source file is
+   the following:
+
+   1. Lower case filenames - SmallEiffel looks all along the loading path
+   using <class> name in lower case as tail. If needed, the Eiffel suffix
+   (".e") is added automatically. SmallEiffel only looks for suffixed
+   files on the disk. Only the first file encountered according to the
+   order of the path is taken in account. File is always supposed to have
+   the same name as the inside class definition.
+
+   2. Renamed files - When the above search has failed to find a file,
+   SmallEiffel tries to search for files "rename.se" in all directories
+   of the path.
+   A file "rename.se" allows the user to put in file "foo" the class
+   "bar" for example.
+   Such renaming facilities has been added especially for DOS (file names
+   are limited to 8 characters).
+   Each line of a "rename.se" file is a renaming directive containing two
+   names, first the full name and then the short name to use in the
+   directory where the "rename.se" file is.
+   File "SmallEiffel/misc/rename.se" is an example of a "rename.se" file
+   to put in SmallEiffel/lib_std/ for DOS.
+
+   Thus, knowing the algorithm of SmallEiffel to find a class file, it is
+   better not to use the renaming facilities to speed up class loading.
+
+   3. Upper case filenames - Finally, when both previous steps did not
+   find the required Eiffel class file, SmallEiffel looks along the
+   loading path for a file bearing the class name upper in upper case
+   letters. If needed, the Eiffel suffix ".e" is added automatically.
+   One must note that the overhead to find an upper case file name is not
+   negligeable at all and that a lower case file name may hide some upper
+   case name.
+
+                                   [Line]
+   Copyright © Dominique COLNET and Suzanne COLLIN - [2]<colnet@loria.fr>
+                  Last update: 05 June 1999, by DC & OZ.
+
+References
+
+   1. file://localhost/home/colnet/SmallEiffel/man/man/SmallEiffelFAQ.html#Q02
+   2. mailto:colnet@loria.fr

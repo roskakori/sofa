@@ -1,6 +1,7 @@
+
 Archive-name: eiffel-faq
 Posting-Frequency: approximately monthly
-Last-modified: 09 October 1998
+Last-modified: 05 July 1999
 
  EIFFEL: FREQUENTLY ASKED QUESTIONS
  ----------------------------------
@@ -9,7 +10,7 @@ This question-and-answer list is posted monthly to the Usenet
 newsgroups comp.lang.eiffel, comp.answers and news.answers.
 
 Please send corrections, additions and comments to Franck Arnaud
-(franck_arnaud@stratus.com).
+(franck_arnaud@tcam.com).
 
 This information is abstracted and condensed from the posts of many
 contributors to comp.lang.eiffel, supplemented by information from
@@ -35,11 +36,12 @@ WHAT'S NEW?
 
 Changes since the last posting:
 
-   QCOM  Visual Eiffel current version is 2.5
-   QCOM  TowerEiffel moved to historical section
-   QCOM  SmallEiffel -0.80
-   QGRP  Rio de la Plata Eiffel Group added
-   LPRC  Consensus shift on feature objects
+   QCOM  Updated Halstenbach's entry.
+   QSTD  Nice membership free for 1999.
+   QCOM  SmallEiffel -0.78/
+   QWEB  Cetus Links and Smalleiffel site added
+   QLIB  Library questions added
+   QTGV  Rewritten
 
  --------------------
 
@@ -50,6 +52,7 @@ Frequently Asked Questions:
    QEIF  What is Eiffel?
    QORI  Where did Eiffel come from?
    QCOM  What Eiffel compilers are available?
+   QLIB  What Eiffel libraries are available?
    QFRE  Is Eiffel available for free or as shareware?
    QARC  Is there an archive of the comp.lang.eiffel newsgroup?
    QBOK  What books are available for learning about Eiffel?
@@ -154,7 +157,7 @@ pages.
 
 
  Vendor: Interactive Software Engineering Inc, USA
- Product: ISE Eiffel (current version: 4.2)
+ Product: ISE Eiffel (current version: 4.3)
  Licensing conditions: Commercial; free time-limited evaluation version
  Target: C
  Platforms: Win32, Unix
@@ -174,11 +177,11 @@ pages.
 
 
  Vendor: Dominique Colnet et al
- Product: SmallEiffel the GNU Eiffel compiler (current version: -0.80)
+ Product: SmallEiffel the GNU Eiffel compiler (current version: -0.78)
  Licensing conditions: Freeware (GPL)
  Target: ANSI C / Java Virtual Machine
  Platforms: Any ANSI C machine
- Web: http://www.loria.fr/SmallEiffel/
+ Web: http://smalleiffel.loria.fr/
 
  Brief description:
   SmallEiffel is intended to be a complete, though small and very fast,
@@ -194,8 +197,9 @@ pages.
 
 
  Vendor: Halstenbach ACT GmbH, Germany
- Product: iss-base (current version: 2.0cl1)
- Licensing conditions: Commercial; 90-day free evaluation version
+ Product: iss-base (current version: 3.0)
+ Licensing conditions: Commercial; 90-day free evaluation version, free
+                       private version for noncomercial use (Win32, Linux)
  Target: ANSI C
  Platforms: Win32, Unix
  Web: http://www.halstenbach.com/ or http://www.halstenbach.de/
@@ -205,8 +209,7 @@ pages.
   critical applications with a strong focus on software quality.
   As an independent developer of Eiffel technology, Halstenbach has
   created a development environment covering the whole software life
-  cycle. Major strenghs of iss-base are robustness, speed of
-compilation,
+  cycle. Major strenghs of iss-base are robustness, speed of compilation,
   a sophisticated UIMS with full Windows'95/NT support and corresponding
   GUI builder, reliable ODBC support, portability between Unix and
   Windows, many libraries especically for writing commercial
@@ -219,7 +222,7 @@ compilation,
 
 
  Vendor: Object Tools GmbH, Germany
- Product: Visual Eiffel (current version: 2.5)
+ Product: Visual Eiffel (current version: 2.6)
  Licensing conditions: Commercial; free feature-limited eval. version
  Target: Native Intel x86
  Platforms: Win32 only
@@ -254,8 +257,7 @@ may be far from complete.
  - FEC is a native Eiffel compiler for SUN SPARC machines. An early
    beta version (including the full source code) can be downloaded
    from Fridtjof Siebert's page at
-  
-http://www.informatik.uni-stuttgart.de/ifi/ps/siebert/fridi_eiffel.html
+   http://www.informatik.uni-stuttgart.de/ifi/ps/siebert/fridi_eiffel.html
 
  - SIG Eiffel/S, version 1.3: Eiffel/S was the first Eiffel 3
    compiler, and the first Eiffel compiler available on the PC
@@ -274,13 +276,21 @@ http://www.informatik.uni-stuttgart.de/ifi/ps/siebert/fridi_eiffel.html
  - EON Eiffel: An Eiffel to C++ compiler, written in C++,
    not actively maintained.
 
- - TowerEiffel was a commercial compiler with an emphasis on the
-performance of
-   generated code. It is not actively maintained or sold as Tower
-Technology
+ - TowerEiffel was a commercial compiler with an emphasis on the performance of
+   generated code. It is not actively maintained or sold as Tower Technology
    has moved on to write a static Java compiler using the same kinds of
    system-wide optimisations found in most Eiffel compilers.
 
+ --------------------
+
+QLIB: What Eiffel libraries are available?
+
+Eiffel vendors usually supply a large set of libraries with their
+compilers, and provide others as additions.
+
+Many libraries, usually open source, are available from third
+parties and are too numerous to list here. See QWEB for reference
+websites which have listings of available libraries.
 
  --------------------
 
@@ -288,11 +298,12 @@ QFRE: Is Eiffel available for free or as shareware?
 
 SmallEiffel is a freeware compiler, provided as a highly
 portable C package that can compile on most ANSI C platforms.
-The full Eiffel source code of the compiler itself (in Eiffel)
-is included.
+The full Eiffel source code of the compiler itself (in
+Eiffel) is included. The official website is at
+http://smalleiffel.loria.fr/
 
 A ready-to-run package for Windows, including a freeware C
-compiler, is available at http://www.elj.com/elj-win32/ .
+compiler, is available at http://www.elj.com/elj-win32/
 
 Many commercial vendors offer free evaluation versions, with
 some limitations. Commercial vendors often also have cheap
@@ -309,7 +320,7 @@ or at the following FTP sites:
   ftp://wuarchive.wustl.edu/usenet/comp.lang.eiffel/
 
 The newsgroup is also archived at the usual places on the web
-(DejaNews, AltaVista, etc).
+(Deja.com, AltaVista, etc).
 
  --------------------
 
@@ -393,8 +404,7 @@ Author: Jacob Gore -- ISBN: 0-201-63480-5 -- AW 1996
 Author: John Tyrrell -- ISBN: 0-333-64554-5 -- 1995
  Short: This is an inexpensive and very approachable book.
 
- Title: Software Development Using Eiffel: There can be life other than
-C++
+ Title: Software Development Using Eiffel: There can be life other than C++
 Author: Richard Wiener -- ISBN: 0-13-100686-X -- PH 1995
  Short: This is a useful book with a lot of code examples for those
         with a grounding in another OO language.
@@ -472,11 +482,16 @@ http://www.eiffel.tm/
   A directory of Eiffel resources maintained by Roger Browne of
   Everything Eiffel.
 
+http://www.cetus-links.org/
+  Cetus Links is a directory of resources on object-oriented
+  programming, including useful Eiffel pages.
+
 The main vendors websites are:
 
  Halstenbach ACT   http://www.halstenbach.de/
  ISE               http://www.eiffel.com/
  Object Tools      http://www.object-tools.com/
+ SmallEiffel       http://smalleiffel.loria.fr/
 
  --------------------
 
@@ -545,29 +560,40 @@ the Eiffel Library Kernel Standard (ELKS). Those parts of an Eiffel
 application that use only the standard classes and features should
 run with minimal change on any compiler supporting ELKS-95.
 
-The NICE board members for 1998 are Eric Bezault (Chairman), James
-McKim (Secretary), Frieder Monninger (Treasurer), Bertrand Meyer
-and Christine Mingins.
+The NICE board members for 1999 are Christine Mingins (Chair),
+Geoff Eldridge (Secretary) and Frieder Monninger (Treasurer).
 
+NICE website: http://www.eiffel-nice.org/
 NICE email: nice@atlanta.twr.com
+
+For 1999, NICE has made membership free. People interested in
+the standardisation and promotion of Eiffel can join from the web
+site. An open email list is available for discussion on topics that
+are of interest to the Eiffel community and NICE at:
+http://www.egroups.com/list/eiffel-nice-discuss/
 
  --------------------
 
 QTGV: How fast do Eiffel applications run?
 
-Early implementations of Eiffel were slow. Recent implementations have
-improved dramatically. However, to achieve maximum performance under
-any Eiffel implementation, run-time assertion monitoring must be
-switched off.
+Eiffel is a statically typed object-oriented language using
+automatic memory management.
 
-It's hard to generalise, but compared to C++, simple
-computation-intensive applications will run perhaps 15% slower. Large
-applications are often dominated by memory management rather than
-computation. The effect of garbage collection is an oft-debated point,
-generally the overhead is quite low (10%) and in principle a style of
-programming assuming a GC could be more efficient than typical manual
-memory management. This also depends on the kind of application, the
-implementation of the garbage collector, etc.
+Many Eiffel compilers make use of the static typing and perform
+extensive global optimisations producing performance comparable
+to other well-optimised statically typed languages like C++.
+
+Eiffel's assertions are normally enabled during development,
+and inevitably slow down execution. Assertions are not usually
+compiled in production binaries and so have no impact on the
+performance of optimised code.
+
+The cost of garbage collection is an often debated point, and
+large applications are often dominated by memory management rather
+than computation. In principle a style of programming assuming a GC
+could be more efficient than typical manual memory management. In
+any case, there is nothing in Eiffel making garbage collection less
+efficient than any other language where it is used.
 
  --------------------
 
@@ -612,10 +638,10 @@ Advanced Media Technology Ltd.
  EMAIL jukka.haukijarvi@eiffel.fi
  WEB http://www.eiffel.fi/
 
-Cap Gemini France, ITMI APTOR, Eiffel Group
- POST 86-90 rue Thiers, F-92513 Boulogne-Billancourt Cedex, France
- TEL +33 1 4910 5300           FAX +33 1 4910 5102
- EMAIL eiffel@capgemini.fr
+Cap Gemini France, Division ITMI
+ POST Grande Arche - Paroi Nord, F-92044 Paris-la-Defense cedex, France
+ TEL +33 149018657             FAX +33 149018650
+ EMAIL jnerson@capgemini.fr
 
 Eiffel Software Iberica
  POST Isabel II, 4, 1D; 20011 San Sebastian, Spain
@@ -706,11 +732,6 @@ Object Tools, Inc.
       Langhorne, PA 19047, USA
  TEL/FAX +1 215 504 0854
  EMAIL info@object-tools.com   WEB http://www.object-tools.com/
-
-Tower Technology Corporation
- POST 1501 Koenig Lane, Austin, TX 78756, USA
- TEL +1 512 452 9455           FAX +1 512 452 1721
- EMAIL tower@twr.com           WEB ttp://www.twr.com/
 
 
  --------------------
@@ -1030,30 +1051,31 @@ used validly).
 
 LCAT: Is it true that there are "holes" in the Eiffel type system?
 
-No. The design of Eiffel makes it possible to catch all type errors at
-compile time, so that an Eiffel program cannot abort with a run time
+Eiffel was designed to makes it possible to catch all type errors at
+compile time, so that an Eiffel program could not abort with a run time
 type error.
 
-However, to catch a class of certain more obscure type errors at
-compile time, the compiler must analyse the way that classes interact
-within the entire system, rather than just looking at each class one
-by one.
+However, there are some more complex cases where the type checking
+is more difficult. The solution in Eiffel the Language, system level
+validity checking, requires a global analysis of the whole system,
+which has proven too complex and too impractical to implement.
 
-The main types of errors that cannot be checked easily are:
+Object Oriented Software Construction, second edition, offers a new
+simpler way to check for those errors that may, if refined, provide
+effective type checking but it has been questionned whether it is
+too drastic so that it will make many common patterns invalid.
+
+The main system-level type errors are:
  (a) restriction of exports in a descendant class.
- (b) covariant redefinition of routines parameters as in question LDBC.
+ (b) covariant redefinition of routines parameters as in question LCON.
  (c) covariant signatures in conforming types of a generic class
      (like 'put' in LIST[ANY] and LIST[STRING])
+ (d) more obscure cases like selection of a feature that returns a
+     precursor type in a multiple inheritance hierarchy, or
+     indirect assignment of references to an expanded ancestor.
 
-There is a proposal underway that, if accepted, will allow compilers
-to incrementally check this class of errors by looking at classes
-and not at the whole system every time.
-
-Because system-wide compile-time validity checking can be complex,
-no compiler available today implements full static type checking. Some
-insert run-time checks. On the other hand, the cases where system
-level validity problems can occur are not too frequent so this is not
-a major annoyance in practice.
+No compiler currently available implements these checks and behaviour
+in those cases range from run-time type errors to system crashes.
 
  --------------------
 
@@ -1236,8 +1258,7 @@ and other languages. It is at the following URL:
 http://www.progsoc.uts.edu.au/~geldridg/cpp/cppcv3.html
 
 You can also find a comparison of Eiffel, C++, Java, and Smalltalk at
-ISE's Web site,
-http://www.eiffel.com/doc/manuals/technology/oo_comparison/
+ISE's Web site, http://www.eiffel.com/doc/manuals/technology/oo_comparison/
 
  --------------------
 
@@ -1344,6 +1365,6 @@ replicated features on each path of the inheritance. The mechanism
 is not intended to scale to more complex cases where the replication
 do not occur in a single inheritance clause.
 
-The opinions are divided on whether this feature should be discarded
+There is no consensus on whether this feature should be discarded
 completely because of the the conceptual complexity and odd
 side-effects or better defined and actually implemented.

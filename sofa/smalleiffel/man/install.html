@@ -1,0 +1,94 @@
+<TABLE BORDER=0 CELLSPACING=5 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#3366FF" NOSAVE >
+<TR NOSAVE>
+<TD NOSAVE>
+<CENTER><FONT COLOR="#FFFFFF" SIZE=+3><B>The <TT>install</TT> command</B></FONT></CENTER>
+</TD>
+</TR>
+</TABLE>
+
+<BR><BR><BR>
+
+<TABLE BORDER=0 COLS=1 WIDTH="100%" BGCOLOR="#3366FF" NOSAVE >
+<TR NOSAVE>
+<TD NOSAVE><FONT COLOR="#FFFFFF" SIZE="+2">Usage</FONT></TD>
+</TR>
+</TABLE>
+<P>
+<TT>install [-interactive] [-debug]</TT>
+</P><P>
+Command <TT>install</TT> is the installation program for SmallEiffel
+The GNU Eiffel Compiler.
+<BR>
+This command (class <TT>install.e</TT>) is entirely written in Eiffel
+and is the recommanded one to install SmallEiffel The GNU Eiffel Compiler.
+</P><P>
+The <TT>install.e</TT> source code as well as the generated C code
+<TT>install.c</TT> are in the SmallEiffel directory.
+
+</P><P>
+If you are under some <B>UNIX</B> (including GNU Linux) system and if you want
+to use the <TT>gcc</TT> compiler like we do, simply type <TT>make</TT>
+in the SmallEiffel directory (the <TT>Makefile</TT> which is in the
+SmallEiffel directory C-compile and launch automatically the
+<TT>install</TT> command).
+
+</P><P>
+If you are using a <B>Windows</B> system, a precompiled <TT>install.exe</TT>
+is available too in the SmallEiffel directory, you just have to run it.
+</P><P>
+On <B>other systems</B>, the very first step for installation is to C compile
+the <TT>install.c</TT> file in order to run it.
+
+</P>
+
+<TABLE BORDER=0 COLS=1 WIDTH="100%" BGCOLOR="#3366FF" NOSAVE >
+<TR NOSAVE>
+<TD NOSAVE><FONT COLOR="#FFFFFF" SIZE="+2">Options</FONT></TD>
+</TR>
+</TABLE>
+<P>
+<DL COMPACT>
+<DT>
+<I>-interactive</I>:<BR>
+<DD> By default, the <TT>install</TT> command tries to determinate
+	automatically the system name as well as the C compiler name.
+	When the flag <I>-interactive</I> is used, the user is interactively
+	prompted for the system name and the C compiler to select.
+<BR><BR>
+<DT>
+
+<I>-debug</I>:<BR>
+<DD>
+Displays a lot of information useful to debug the installation
+process.
+It is also interresting if you are curious to see what the
+<TT>install</TT> command is really doing (or trying to do ;) ).
+
+<dt><i>-no_compile</i>:
+<dd>Assumes that all commands are already compiled and their executables
+	 exist. This is useful only for binary distributions.
+
+<dt><i>-compiler name</i>:
+<dd>By default, <tt>install</tt> interactively asks for the C compiler to use.
+	 With this option specified, is skips this query and uses the C compiler <i>name</i>.
+	 <i>Name</i> must be one of the available compilers (e.g. <tt>gcc</tt>).
+	 This is mostly useful for system-specific installation scripts that
+	 execute <tt>install</tt> as part of it.
+
+</DL>
+</P>
+
+
+<!-- BL START -->
+<!-- BL1 START -->
+<CENTER>
+<IMG SRC="se-line.gif" ALT="[Line]">
+<BR>
+<FONT SIZE="-1"><I>
+Copyright &copy; Dominique COLNET and Suzanne COLLIN -
+<A HREF="mailto:colnet@loria.fr">&lt;colnet@loria.fr&gt;</A>
+<BR>
+Last update: 13 Feb. 2000, by OZ.
+</I></FONT>
+<BR>
+</CENTER>

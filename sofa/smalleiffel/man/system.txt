@@ -1,0 +1,146 @@
+
+                            System configuration
+
+   System customization is performed thanks to the "system.se" file which
+   must be in the sub-directory "sys" of the installation directory.
+
+   When the system name is correctly set in the file "system.se",
+   SmallEiffel performs some automatic customizations. For example, if
+   the "system.se" file contains the string "DOS", SmallEiffel uses the
+   suffix ".BAT" for script files and the suffix ".EXE" for executables
+   files.
+
+   The "sys" directory contains various files to customize SmallEiffel
+   with the system, the C compiler and the linker used as well as the
+   default loadpath used to look for Eiffel source code.
+
+   The SmallEiffel environment variable
+
+   Environment variable SmallEiffel must be set with the absolute path of
+   the file "system.se" which is in the sub-directory "sys" of the
+   installation directory.
+   Under a UNIX-like system, the value of the SmallEiffel environment
+   variable may be for example: /usr/lib/SmallEiffel/sys/system.se
+   The contents of the file "system.se" indicate the [1]system you are
+   running.
+
+   File system.se
+
+   The first word of file "system.se" is used by SmallEiffel to know
+   which operating system is running. Currently supported values are:
+
+   UNIX for all UNIX-like systems, GNU/Linux, HP-UX, Solaris, SunOS,
+   Irix, XENIX, etc.
+   Windows for Windows 95 and Windows NT systems (using long filenames).
+   DOS for MS-DOS systems or Windows 3.x (using short filenames, with 8.3
+   scheme).
+   Macintosh for Macintosh systems (68K and PPC)
+   BeOS for the BeOS system
+   Amiga for the Amiga system
+   OS2 for IBM OS/2 systems
+   VMS for the VMS systems
+
+   You must choose the appropriate system name in the previous list and
+   update file "system.se". To be sure that the previous list is
+   up-to-date, just put a bad system name in the file "system.se" and
+   then run for example command compile.
+
+   The system name will then be used to access various files
+   corresponding to the system you chose. For example, if you declared
+   "Windows", only files with extension "Windows" will be considered
+   (e.g. files like "loadpath.Windows", "compiler.Windows",
+   "linker.Windows", etc...).
+
+   File compiler.se
+
+   This file is used to select the default C compiler that will be used
+   to compile the generated C code. Only the first line of this file is
+   considered; it must contain the name of one of the supported
+   compilers, which at the current time are:
+
+   gcc The free and open-source GNU C Compiler and its variants (egcs,
+   mingw32, etc.) on several platforms (Linux and other UNIXes, Windows).
+   cc The standard cc compiler, as provided by vendors of most UNIX and
+   VMS systems.
+   lcc-win32 The free port of lcc for Windows platforms.
+   bcc32 The Borland (now Inprise) C/C++ compiler on Windows platforms.
+   bcc32i A variant (?) of the previous one.
+   wcl386 The Watcom C/C++ compiler for Windows plaforms.
+   cl The MicroSoft C/C++ compiler for Windows platforms.
+   sas_c The SAS C compiler, sc on Amiga platforms.
+   dice The dice C compiler.
+   vbcc The vbcc C compiler.
+   ccc The Compaq C compiler for AlphaLinux.
+
+   SmallEiffel will automatically generate the correct system call to
+   this C compiler, with the appropriate linker and adequate object files
+   suffix.
+   In case an unknown compiler name is supplied, SmallEiffel generates an
+   error message listing the supported compiler names. In case the
+   compiler specified is a correct one but can't be found, SmallEiffel
+   won't be able to detect it, but there will be an error message from
+   the system. In -verbose mode, the systems calls to the C compiler are
+   displayed, thus making it easy to find such errors.
+
+   Changing the default loading path
+
+   All the commands use the same algorithm to search for Eiffel source
+   files. The default global loading path is set using contents of file
+   loadpath.< system_name >, in the sys directory of your SmallEifel
+   installation, where < system_name > is one of the systems symbols
+   mentioned [2]above.
+
+   To change this default loading path, you need to add a special file
+   which name is "loadpath.se" in the directory in which you type a
+   [3]command of SmallEiffel (compile, finder, pretty, compile_to_c,
+   compile_to_jvm, short, clean).
+
+   Each line of the file "loadpath.se" must be an existing directory path
+   or the absolute path of another "loadpath.se" file to include
+   recursively. Environment variable may be used in these lines, with the
+   syntax ${MY_VAR}.
+
+   All directories of the local "loadpath.se" file are added ahead of the
+   default loading path. All directories are searched in the order in
+   which they appear. The current directory is not included in the search
+   path unless it is explicitely specified in one of the loadpath.se or
+   loadpath.system files. Also note that an empty line in a loadpath.se
+   file may add the current working directory in a place you don't want.
+
+   To check that your loading path is correctly set, just type command
+   finder using an unknown class name as argument.
+
+   Sample loadpath.se file under UNIX
+   /users/myself/one_dir/
+   ../../another_dir/
+   ${MY_LIB}/goodies/
+   /users/${MY_BUDDY}/common/loadpath.se
+   ./
+   The first line is an absolute path to some directory.
+   The second one is a relative path to some directory.
+   The third line shows the use of an environment variable to point to
+   some directory.
+   The fourth line also features an environment variable, but points to a
+   second loadpath file, that will be included before the general
+   loadpath.UNIX file.
+   The fifth line adds the current directory to the loadpath.
+
+   Sample loadpath.se file under Windows
+   C:\myself\one_dir\
+   ..\..\another_dir\
+   ${MY_LIB}\goodies\
+   \users\${MY_BUDDY}\common\loadpath.se
+   .\
+   Same explanations as above, except of course that this file is
+   prepended in front of the loadpath.Windows file.
+
+                                   [Line]
+   Copyright © Dominique COLNET and Suzanne COLLIN - [4]<colnet@loria.fr>
+                  Last update: 05 June 1999, by DC & OZ.
+
+References
+
+   1. file://localhost/home/colnet/SmallEiffel/man/man/system.html
+   2. file://localhost/home/colnet/SmallEiffel/man/man/system.html#systems
+   3. file://localhost/home/colnet/SmallEiffel/man/commands/commands.html
+   4. mailto:colnet@loria.fr

@@ -1,0 +1,4 @@
+How to perform external calls (see external.hlp)
+Directory C is for C calls.
+Directory JVM is for Java access.
+

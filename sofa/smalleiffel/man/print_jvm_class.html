@@ -1,0 +1,91 @@
+
+
+<TABLE BORDER=0 CELLSPACING=5 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#3366FF" NOSAVE >
+<TR NOSAVE>
+<TD NOSAVE>
+<CENTER><FONT COLOR="#FFFFFF" SIZE=+3><B>The <TT>print_jvm_class</TT> command</B></FONT></CENTER>
+</TD>
+</TR>
+</TABLE>
+
+<BR><BR><BR>
+
+<TABLE BORDER=0 COLS=1 WIDTH="100%" BGCOLOR="#3366FF" NOSAVE >
+<TR NOSAVE>
+<TD NOSAVE><FONT COLOR="#FFFFFF" SIZE="+2">Usage</FONT></TD>
+</TR>
+</TABLE>
+
+<P>
+<TT>print_jvm_class [options] &lt;Path&gt;[.class]</TT>
+</P><P>
+Command <TT>print_jvm_class</TT> prints a human readable version of
+the &lt;Path&gt; class file. Printing is done on standard output.
+This command was developed to check the byte code produced
+by command <TT>compile_to_jvm</TT>. It is useful only if you want to
+have a close look at the generated Java byte code.
+</P>
+<P>
+   This command may also be used to print Java byte code you
+   obtained with Java compilers, such as <TT>javac</TT>. We find the output of
+   <TT>print_jvm_class</TT> more readable than the output of <TT>javap</TT>.
+</P>
+
+
+<TABLE BORDER=0 COLS=1 WIDTH="100%" BGCOLOR="#3366FF" NOSAVE >
+<TR NOSAVE>
+<TD NOSAVE><FONT COLOR="#FFFFFF" SIZE="+2">Options</FONT></TD>
+</TR>
+</TABLE>
+<P>
+
+<DL COMPACT>
+
+<DT>
+<I>-version</I>:<BR><DD>
+Show the number of the <A HREF="SmallEiffelFAQ.html#Q02">version of SmallEiffel</A>
+you're using.
+<BR><BR>
+
+</DL>
+
+<TABLE BORDER=0 COLS=1 WIDTH="100%" BGCOLOR="#3366FF" NOSAVE >
+<TR NOSAVE>
+<TD NOSAVE><FONT COLOR="#FFFFFF" SIZE="+2">Examples</FONT></TD>
+</TR>
+</TABLE>
+<P>
+   First, you have to produce some class files using command
+   <TT>compile_to_jvm</TT>:
+<DL COMPACT><DT><DD><TT>
+      compile_to_jvm -boost hello_world
+</TT></DL>
+   Then, using command <TT>print_to_jvm_class</TT> you can print on
+   standard output a readable view of any produced class
+   file. The following command prints the main class :
+<DL COMPACT><DT><DD><TT>
+      print_jvm_class hello_world.class
+</TT></DL>
+   You can also print any class file of the hello_world
+   directory. For example, under Unix, you can print the
+   byte code produced for class INTEGER using command :
+<DL COMPACT><DT><DD><TT>
+      print_jvm_class hello_world/integer.class
+</TT></DL>
+
+
+</P>
+
+<!-- BL START -->
+<!-- BL1 START -->
+<CENTER>
+<IMG SRC="se-line.gif" ALT="[Line]">
+<BR>
+<FONT SIZE="-1"><I>
+Copyright &copy; Dominique COLNET and Suzanne COLLIN -
+<A HREF="mailto:colnet@loria.fr">&lt;colnet@loria.fr&gt;</A>
+<BR>
+Last update: 05 June 1999, by DC & OZ.
+</I></FONT>
+<BR>
+</CENTER>

@@ -1,0 +1,28 @@
+Begin3
+Title:          SmallEiffel The GNU Eiffel Compiler
+Version:        -0.77
+Entered-date:   12FEB2000
+Description:    Eiffel toolbox including an Eiffel to C compiler, an Eiffel 
+		to Java	bytecode compiler, an Eiffel pretty printer, a Java
+                bytecode viewer, commands short and finder.
+		Please note: version numbers are negative; -0.89, for 
+		example, is newer than -0.91
+Keywords:       SmallEiffel The GNU Eiffel Compiler
+Author:         colnet@loria.fr (Dominique COLNET)
+Maintained-by:  colnet@loria.fr (Dominique COLNET)
+Primary-site:	ftp://ftp.loria.fr/pub/loria/genielog/SmallEiffel
+		1071878 se.tgz
+		1098    se.lsm
+		3524    READ_ME
+Alternate-site: metalab.unc.edu /pub/Linux/devel/lang/eiffel
+		1071878 se-0.77.tar.gz
+		955     se-0.77.lsm
+Original-site:  ftp.loria.fr /pub/loria/genielog/SmallEiffel
+		1071878 se.tgz
+		1098    se.lsm
+		3524    READ_ME
+Platforms:      SmallEiffel is already portable on UNIX, Linux, GNU Hurd,
+                BSD, HP-UX, IRIX, XENIX, Solaris, DOS, OS2, WINDOWS NT/95,
+		Macintosh, NeXT, Amiga, VMS and BeOS.
+Copying-policy: GPL
+End

@@ -1,0 +1,79 @@
+--          This file is part of SmallEiffel The GNU Eiffel Compiler.
+--          Copyright (C) 1994-98 LORIA - UHP - CRIN - INRIA - FRANCE
+--            Dominique COLNET and Suzanne COLLIN - colnet@loria.fr 
+--                       http://SmallEiffel.loria.fr
+-- SmallEiffel is  free  software;  you can  redistribute it and/or modify it 
+-- under the terms of the GNU General Public License as published by the Free
+-- Software  Foundation;  either  version  2, or (at your option)  any  later 
+-- version. SmallEiffel is distributed in the hope that it will be useful,but
+-- WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+-- or  FITNESS FOR A PARTICULAR PURPOSE.   See the GNU General Public License 
+-- for  more  details.  You  should  have  received a copy of the GNU General 
+-- Public  License  along  with  SmallEiffel;  see the file COPYING.  If not,
+-- write to the  Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+-- Boston, MA 02111-1307, USA.
+--
+-- 
+-- SmallEiffel is not Smalltalk. Is it still Eiffel ?
+--
+1 - What is SmallEiffel ? -
+SmallEiffel is The GNU Eiffel compiler, free software distributed 
+under the terms of the GNU General Public License as published 
+by the Free Software Foundation.
+You can download SmallEiffel at :
+
+   http://SmallEiffel.loria.fr
+
+For more information about commercial applications written in
+SmallEiffel, please read the file SmallEiffelFAQ included in
+the distribution.
+
+2 - Brief Description of SmallEiffel -
+
+It is intended to be a complete, though small and very fast, 
+free Eiffel compiler. It is available for a very wide range 
+of platforms: UNIX (Linux, BSD, HP-UX, IRIX, XENIX, Solaris...), 
+DOS, OS2, WINDOWS NT/95, Macintosh, NeXT, Amiga and VMS. 
+ In fact, SmallEiffel should run on any platform for which 
+an ANSI C - POSIX compiler exists.
+
+The current distribution includes an Eiffel to C compiler, an Eiffel 
+to Java bytecode compiler, a documentation tool, a
+pretty printer and various other tools. 
+
+SmallEiffel is the result of a research project of the LORIA, a join
+computer science research center in Nancy, France.
+It has been developed by Dominique Colnet, of the ECOO team. 
+
+This project began in 1994, and since the very first public release 
+in September 1995, SmallEiffel has been used worldwide by increasingly 
+numerous individuals and Universities. 
+
+3 - Contents of the SmallEiffel directory -
+
+3.1 - directory misc : Miscellaneous files, including the 
+      INSTALL files.
+3.2 - directory man : Miscellaneous help files. 
+3.3 - directory bin : The place where executable files will be
+      put by the installation process.
+3.4 - directory bin_c : C source code for tools of the bin 
+      directory.
+3.5 - directory lib_std : Standard Eiffel Library (string.e, 
+      integer.e, general.e, array.e, ...).
+3.6 - directory lib_rand : Random number generator library.
+3.7 - directory lib_show : Demonstration and examples Eiffel 
+      programs.
+3.8 - directory lib_se : source code of SmallEiffel (commands
+      'compile', 'compile_to_c', 'pretty', 'short', 
+      'compile_to_jvm', 'print_jvm_class', ...).
+3.8 - directory contrib : Useful software not written by 
+      the SmallEiffel team.
+
+4 - Bug Reports -
+Thank in advance for bug reports. Don't forget to have a look
+first in the misc/NOT_YET_IMPLEMENTED.txt file.
+Please, try to isolate the bug as much as possible.
+The best is to be able to create a single file, as small a
+possible (which includes the bug).
+
+D.Colnet - colnet@loria.fr

@@ -1,0 +1,70 @@
+
+                             The pretty command
+
+   Usage
+
+   pretty [options] <Class_names> ...
+
+   Command pretty is the SmallEiffel Pretty Printer for Eiffel source
+   files. For all classes given as arguments, pretty looks for the
+   corresponding file using the same algorithm as command finder. All the
+   corresponding files are reprinted in a pretty way.
+
+   For example, if you are allowed to write the corresponding file, you
+   can reprints the source file of class HELLO_WORLD using command :
+   pretty hello_world
+
+   There are four modes of pretty printing -zen, -default, -end and
+   -parano mode. Only one mode can be selected and mode -default is the
+   default mode.
+
+   Options for pretty printing
+
+   -zen:
+          The less you can print. Pseudo variable Current is never
+          printed (unless it is necessary). No end mark comment for
+          routines. No end comments for constructs (if, inspect, debug,
+          ...). Very compact printing.
+   -default:
+          the default mode. Don't change printing of pseudo variable
+          Current (if Current is in the input, Current is in the output).
+          Print end comment of routines. Don't print end comments for
+          constructs (if, inspect, debug, ...).
+   -end:
+          Same printing as previous mode but print ends of all constructs
+          (if, inspect, debug, ...).
+   -parano:
+          Same printing as previous mode but prints Current everywhere
+          you can.
+   -no_style_warning:
+          Suppress output for warning messages related to non respect of
+          standard Eiffel style guidelines (for example ItEm will not
+          trigger a warning).
+   -no_warning:
+          Suppress output for all warning messages (error messages are
+          still printed).
+   -version:
+          Show the number of the [1]version of SmallEiffel you're using.
+
+   Security and BackUp file
+
+   For the security of sources files, a backup file is created before
+   writting the new file (system or command pretty may crash during
+   printing of the new file). The backup file name is "foo.bak" when
+   source file name is "foo.e". Backup file is written in the same
+   directory as source file.
+   If an old backup file already exists before pretty printing, command
+   pretty exit with an error message. To be sure that the pretty printing
+   is well done, the output file is parsed again.
+   Even if second parsing gives no errors, backup file is NOT removed.
+   Thus you can recompile your Eiffel code to check new file before
+   removing backup file by yourself.
+
+                                   [Line]
+   Copyright © Dominique COLNET and Suzanne COLLIN - [2]<colnet@loria.fr>
+                  Last update: 05 June 1999, by DC & OZ.
+
+References
+
+   1. file://localhost/home/colnet/SmallEiffel/man/man/SmallEiffelFAQ.html#Q02
+   2. mailto:colnet@loria.fr

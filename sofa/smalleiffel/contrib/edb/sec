@@ -1,0 +1,120 @@
+#!/usr/local/bin/perl
+#
+#$gc =   "";      #-- No GC
+$gc =   "b";      #-- SmallEiffel builtin gc
+#$gc =   "c";     #-- Conservative gc lib
+
+$HOME = $ENV{'HOME'};
+$ENV{'SmallEiffel'} = "$HOME/SmallEiffel/";
+$ENV{'PATH'} = "$HOME/SmallEiffel/bin:/usr/local/bin:/bin:/usr/bin:$HOME/bin";
+$e_flags  = "-require_check";
+$dbg_flags = "-g";
+
+if ($gc eq "b") {
+    $ld_flags = "-z";
+    $gc_flags = "";
+
+} elsif($gc eq "c") {
+    $c_flags  = "-I/usr/local/include";
+    $ld_flags = "-z /user/local/lib/libgc.a";
+    $gc_flags  = " -no_gc";
+
+} else {
+    $gc_flags  .= " -no_gc";
+}
+
+mkdir("A",0755); #prepare boost souce dir
+mkdir("B",0755); #prepare orginal source dir
+mkdir("C",0755); #prepare converted source dir
+$debug = 1;
+$target = shift(@ARGV);
+$root   = shift(@ARGV);
+if(!$target) {
+    $help++;
+} else {
+    if(!$root) {
+        $root = $target;
+    }
+    if(@ARGV) {
+	$e_flags = "";
+	while($fl = shift(@ARGV)) {
+	    if($fl =~ /^-?hel/) {$help++;}
+	    elsif($fl =~ /^-?deb/) {$e_flags = "-debug_check";}
+	    elsif($fl =~ /^-?all/) {$e_flags = "-all_check";}
+	    elsif($fl =~ /^-?loo/) {$e_flags = "-loop_check";}
+	    elsif($fl =~ /^-?inv/) {$e_flags = "-invariant_check";}
+	    elsif($fl =~ /^-?ens/) {$e_flags = "-ensure_check";}
+	    elsif($fl =~ /^-?req/) {$e_flags = "-require_check";}
+	    elsif($fl =~ /^-?no/)  {$e_flags = "-no_check";}
+	    elsif($fl =~ /^-?boo/) {$e_flags = "-boost";}
+	    elsif($fl =~ /^-?opt/) {$e_flags = "-boost";$dbg_flags = "-g -O";}
+	    elsif($fl =~ /^-?ver/) {$e_flags .= " -verbose";}
+	    elsif($fl =~ /^-c/)    {$c = shift(@ARGV); $e_flags .= " -cecil $c.ce"; $extra .= " $c.c";}
+	    elsif($fl =~ /^[^\/].*.o$/) {$rest .= " ../$fl";}
+	    else {$rest .= " $fl";}
+	}
+    }
+}
+if($help) {
+    print "Usage: sec target root [-daliernbO]\n";
+    exit;
+}
+if(-f $target) {
+    $target_age = -M $target;
+} else {
+    $target_age = 10000000;
+}
+
+
+chomp($cwd = `pwd`);
+opendir(DIR,$cwd);
+@sources = grep(/.e$/,readdir(DIR));
+@new_sources = grep {(-M $_) < $target_age} @sources;
+closedir(DIR);
+
+if(@new_sources) {
+    do_command("compile_to_c $e_flags $gc_flags -o $target $root make");
+    opendir(DIR,$cwd);
+    @cfiles = grep {(-M $_) < $target_age} grep(/^$root\d*.[ch]$/,readdir(DIR));
+    closedir(DIR);
+    if(!@cfiles) { exit; }
+    if($e_flags ne "-boost") {
+        $dir = "C";
+	do_command("add-line-directive $gc @cfiles");
+    } else {
+        $dir = "A";
+	do_command("cat /usr/local/include/gc-inc >>$root.h");
+	do_command("move-if-changed @cfiles A");
+	unlink @cfiles;
+    }
+    if($extra) {
+	do_command("gcc -ansi -c $extra");
+	$extra =~ s?(\S+).c?../$1.o?;
+    }
+    chdir $dir;
+    @new_cfiles = grep(/^$root\d+.c$/,@cfiles);
+    @new = ();
+    foreach $s (@new_cfiles) {
+	$o = $s;
+	$o =~ s/\.c$/.o/;
+	if(!-f $o || (-M $o) > (-M $s)) {
+	    push(@new,$s);
+	}
+    }
+    $ret = 0;
+    if(@new) {
+	$ret = do_command("gcc -ansi $dbg_flags $c_flags -c @new");
+    }
+
+    if(!$ret) {
+	@objects = grep{s/(.*)\.c$/$1.o/} @cfiles;
+	do_command("gcc -o ../$target $dbg_flags @objects $extra $ld_flags $rest -lm");
+    }
+}
+
+sub do_command {
+    my($com) = @_;
+    print "$com\n" if $debug;
+    $ret = system($com);
+    return $ret;
+}

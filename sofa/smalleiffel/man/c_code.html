@@ -1,0 +1,133 @@
+<TABLE BORDER=0 CELLSPACING=5 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#3366FF" NOSAVE >
+<TR NOSAVE>
+<TD NOSAVE>
+<CENTER><FONT COLOR="#FFFFFF" SIZE=+3><B>About the generated C code</B></FONT></CENTER>
+</TD>
+</TR>
+</TABLE>
+
+<BR><BR><BR>
+<P>
+People who want or have to code part of their applications and/or libraries in C
+should really limit themselves to the clean interfaces provided by
+<A HREF="cecil.html">Cecil</A> or the <A HREF="external.html">external</A>
+mechanism. This page mentions some facts you should be aware of before you start.
+</P>
+
+<TABLE BORDER=0 COLS=1 WIDTH="100%" BGCOLOR="#3366FF" NOSAVE >
+<TR NOSAVE>
+<TD NOSAVE><FONT COLOR="#FFFFFF" SIZE="+2">
+<A NAME="generated-type-ids">Generated type names</A></FONT></TD>
+</TR>
+</TABLE>
+<P>
+First and above all, SmallEiffel generates one unique type name in the C code for each
+living type present in the Eiffel code. This type is of the form <TT>Txyz</TT> where
+<TT>xyz</TT> represents the number corresponding to the name of the type,
+including its parameters in the case of generic types. (More details about this in our
+<A HREF="http://SmallEiffel.loria.fr/papers/papers.html">research papers</A>). When you compile your application,
+you can find them in a mangling table, somewhere in the C code, which looks like this:
+</P>
+<PRE>
+D 2  T1489 R BOOLEAN_CONSTANT 210,253
+A 1  T945  R BIT_CONSTANT 945
+A*1  T218  R TAG_NAME 218
+A 1  T602  R TYPE_BIT_1 602
+</PRE>
+<P>
+But don't use this information ! The mangling table is only valid for
+one specific compilation of one specific application with one specific
+compiler and specific libraries...
+</P>
+<P>
+Indeed, when computing a type code, collisions may occur, and affect this process.
+Thus, the number (and name) corresponding to each type depends not only on the type
+name, but also on the order in which they are compiled. That is, on the application
+and libraries compiled... They also depend on the compilation mode used, and
+the version of the compiler you're using. So what is <TT>T145</TT> now may
+become <TT>T234</TT> the next time you compile...
+</P>
+<P>
+Consequently, <B>do not, ever, rely on the type numbers  in the
+generated C code, because they are not constant !</B> (Except for a few ones
+which have a fixed, hard-coded name). So don't bother writing in your own C code
+things such as <TT>new123</TT> or <TT>T456</TT>, because the only thing we guarantee
+in this case is that your code shall break one day or another...
+</P>
+
+<TABLE BORDER=0 COLS=1 WIDTH="100%" BGCOLOR="#3366FF" NOSAVE >
+<TR NOSAVE>
+<TD NOSAVE><FONT COLOR="#FFFFFF" SIZE="+2">
+<A NAME="mangling-table">The mangling table</A></FONT></TD>
+</TR>
+</TABLE>
+<P>
+OK, so now you understand why you cannot use type numbers, but you
+still want
+to know what those things in the mangling table mean. :)
+</P>
+<P>
+First, a big caveat. Although it hasn't changed a lot
+and has been very stable for quite some time now, <B> the mangling table coding
+may change </B> in the future ! As I'm writing these lines, we have no
+plans to change it, and we prefer keeping it the way it is. But once
+again, we do not commit ourselves to the current representation.
+</P>
+
+Here is excerpts of a mangling table which cover all the possible
+cases (taken from some <TT>compile_to_c.h</TT>):
+<PRE>
+A 1  T220  R E_DEBUG 220
+A 6  T326  R FIXED_ARRAY[RUN_FEATURE] 389,384,367,352,326,53
+D 2  T166  R BOOLEAN_CONSTANT 169,168
+A*1  T215  R E_ENSURE 215
+A 1  T37   E NATIVE_ARRAY[STRING] 37
+</PRE>
+
+Each mangling table entry comprises 7 fields:
+
+<DL>
+
+<DT><EM>Liveness</EM></DT>
+<DD>The first field shows whether the type is
+<B>D</B>ead or (<B>A</B>)Live, that is whether instances of this type
+are ever created at run-time. <SMALL>(Ok, it should have been L, instead of
+A...)</SMALL></DD>
+
+<DT><EM>Tagless</EM></DT>
+<DD>When the second character on a line is a star <TT><B>*</B></TT>, it marks
+an untagged type, that is a type on which there is no late binding
+but only static calls. Note that the type inference algorithm used in
+SmallEiffel increases the number of such types.</DD>
+
+<DT><EM># of live subtypes</EM></DT>
+<DD>Number of concrete, live descendants of the
+type (including itself). It is thus the number of items in the last field.
+</DD>
+
+<DT><EM>Type mangled name</EM></DD>
+<DD>The type name in the C code.
+As <A HREF="c_code.html#generated-type-ids">explained
+above</A>, the ID number varies.</DD>
+
+
+<DT><EM>Reference</EM><DT>
+<DD>Is the type a <B>R</B>eference or an <B>E</B>xpanded one?</DD>
+
+<DT><EM>Full type name</EM></DT>
+<DD>Self-explanatory...</DD>
+
+<DT><EM>Live subtypes list</EM></DT>
+<DD>A comma-separated list of type IDs listing all the live
+descendants of the current type (including itself, if it is a live one).
+</DD>
+
+</DL>
+
+<CENTER><P><IMG SRC="se-line.gif" ALT="[Line]" HEIGHT=16 WIDTH=550>
+<BR>
+<I><FONT SIZE=-1>Copyright &copy; Dominique COLNET and Suzanne COLLIN -
+<A HREF="mailto:colnet@loria.fr">&lt;colnet@loria.fr&gt;</A> <BR>
+Last update: 05 May 1999, by OZ.
+</FONT></I><BR></P></CENTER>
+

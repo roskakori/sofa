@@ -1,155 +1,43 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
-<html>
-<head>
-<title>Sofa - Welcome</title>
+<html><head>
+<title>SmallEiffel Obviously Fits Amiga - Sofa</title>
 </head>
+
 <body>
 <h1>Sofa</h1>
-<p><b>"SmallEiffel Obviously Fits Amiga"</b></p>
 
-Version 1.0 (beta 1)
 
-<h2>Basic Components and Libraries</h2>
+<p>Version 1.1</p>
 
-<ul>
-<li><a href="SmallEiffel/man/index.html">SmallEiffel</a> - the compiler and its standard library
-<li><a href="library/gobo/doc/index.html">Gobo library</a> - portable kernel, data structures library and parser tools (<a href="library/gobo/Readme.amiga">Sofa notes</a>)
-<li>eXML - XML parser based on <a href="library/exml/expat/expat.html">expat</a> (<a href="library/exml/Readme.amiga">Sofa notes</a>)
-</ul>
-
-<h2>Frequently Asked Questions</h2>
+<p>Sofa is the Amiga distribution of the SmallEiffel, the GNU Eiffel
+compiler. It also includes some additional tools and libraries.</p>
 
 <ul>
-<li><a href="SmallEiffel/man/Eiffel.FAQ">Eiffel FAQ</a></li>
-<li><a href="SmallEiffel/man/SmallEiffelFAQ.html">SmallEiffel FAQ</a></li>
+<li>Manual
+    <ul>
+    <li><a href="manual/requirement.html">Requirements</a>
+    <li><a href="manual/c_compiler.html">C Compiler Installation</a>
+    <li><a href="manual/install.html">Sofa Installation</a>
+    <li><a href="manual/hello.html"><b>First Steps</b></a>
+    <li><a href="manual/support.html">Support</a>
+    <li><a href="manual/faq.html"><b>Questions and Answers</b></a>
+    <li><a href="manual/todo.html">To Do</a>
+    <li><a href="manual/history.html">History</a>
+    </ul>
+<li>Tools and Libraries
+    <ul>
+    <li>SmallEiffel
+        <ul>
+        <li><a href="SmallEiffel/man/index.html"><b>Tools</b></a> - compiler, documentation generator, pretty printer etc
+        <li><a href="smalleiffel/misc/NOT_YET_IMPLEMENTED.html">Known bugs and limitations</a>
+        <li><a href="smalleiffel/misc/HISTORY.html">History</a>
+        </ul>
+    <li><a href="library/gobo/doc/index.html">Gobo library</a> - portable kernel, data structures library and parser tools (<a href="library/gobo/Readme.amiga">Sofa notes</a>)
+    <li><a href="library/sofa/welcome.html"><b>Sofa library</b></a> - accessing Amiga specific features
+    <li>eXML - XML parser based on <a href="library/exml/expat/expat.html">expat</a> (<a href="library/exml/Readme.amiga">Sofa notes</a>)
+    </ul>
+<li><a href="manual/copyright.html">Copyright</a>
 </ul>
-
-<h2>Copyright</h2>
-
-<p>All of the material included herein is covered under some Open Source
-licence. Usually it is either the
-<a href="documentation/license/forum.html">Eiffel Forum License</a>, the
-<a href="documentation/license/gpl.txt">GNU General Public License</a> or the
-<a href="documentation/license/mozilla.html">Mozilla Public License</a>.
-Refer to the documentation of the respective tool or library for
-details.</p>
-
-<p>Essentially, this means that you can freely redistribute the
-included material without having to pay, but also that there is no
-warranty for anything.</p>
-
-<h2>Requirements</h2>
-
-<ul>
-
-<li>A C compiler. Currently, SAS/c is the only one which is known to
-work. GCC should, but is rarely tested. Others will be supported in
-later releases (eg. VBCC).</li>
-
-<li>About 16 MB RAM and 20 MB hard-disk space. More is better, less
-might work but don't count on it. Because the SmallEiffel (SE)
-compiler doesn't yet handle out of memory errors, watch your Workbench
-title bar if you are short of RAM. (This SE-bug has already been
-reported and is probably fixed in later releases.)</li>
-
-</ul>
-
-
-<h2>Installation</h2>
-
-Use the installer script. This already fills all the cryptic setup
-files of SE with reasonable values, so unless you need an ego rush,
-don't perform a manual installation.
-
-<h2>First Steps</h2>
-
-<p>Once Sofa is installed and you have rebooted (to enable the new
-Workbench search path), open a CLI window.</p>
-
-<p>If you use SAS/c, you have to provide a <tt>SCOPTIONS</tt> file that
-has been prepared for use with SE. Simply type</p>
-
-<pre>
-copy sofa:settings/sofa.with SCOPTIONS
-</pre>
-
-After that, start your editor and create a file <tt>hello.e</tt> with the
-following content:
-
-<pre>
-class HELLO
-
-creation make
-
-feature
-   make is
-   do
-      print("hello.%N")
-   end
-
-end -- class HELLO
-</pre>
-
-<p>To compile it, type</p>
-
-<pre>
-compile hello
-</pre>
-
-<p>Then you might have to wait for quite some while. Eventually, you
-should end up with a program <tt>hello</tt> that when invoked displays
-the text "<tt>hello.</tt>".</p>
-
-<p>If not, request support (see below).</p>
-
-<p>If so, congratulations, you just created a debugging version of
-<tt>hello</tt>. To get rid of all the junk files the compiler created,
-type</p>
-
-<pre>
-clean hello
-</pre>
-
-<p>To create an optimised version without the garbage collector (GC),
-type</p>
-
-<pre>
-compile -boost -no_gc hello
-</pre>
-
-<p>This reduces the size of the executable from about 50K to about
-14K, which should be quite acceptable. I mention this just because
-early Eiffel compilers created 2MB <tt>hello</tt> programs, and some
-people still have this misconception in their mind.</p>
-
-<p>You can find some more examples in the
-<tt>sofa:SmallEiffel/lib_show</tt> directory. If you are new to Eiffel
-in general, take a look at <a
-href="http://elj.com/eiffel/getting-started/">http://elj.com/eiffel/getting-started/</a>.
-On the same site, you can find loads of other material, Eiffel news and pointers
-to more information.</p>
-
-<h2>Support</h2>
-
-<p>All tools and libraries have documentation which mentions where to obtain
-support for the specific item.</p>
-
-<p>In future, there will be a Sofa mailing list to discuss problems
-related to this particular distribution only, like installation or
-using Amiga specific features.</p>
-
-<p>For the time being, you can post Amiga specific questions to <a
-href="news:comp.sys.amiga.programmer">comp.sys.amiga.programmer</a>
-and Eiffel related questions to <a
-href="news:comp.lang.eiffel">comp.lang.eiffel</a>. For the time being,
-you can submit corrections and bug-fixes to Thomas Aglassinger
-&lt;agi@sbox.tu-graz.ac.at&gt;. But this will change once the mailing
-list is up.</p>
-
-Thomas.
-
-
-
 
 </body></html>
 
