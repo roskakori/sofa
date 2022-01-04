@@ -3,6 +3,8 @@ Sofa
 
 *SmallEiffel obviously fits Amiga*
 
+**This project is archived and no longer maintained.**
+
 Sofa is the Amiga distribution of SmallEiffel, the GNU Eiffel compiler. It
 also includes some goodies like the Gobo data structures library, parser
 generator tools and Amiga-related libraries for ARexx, argument parsing and
